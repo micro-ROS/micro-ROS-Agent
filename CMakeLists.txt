@@ -18,7 +18,7 @@ cmake_minimum_required(VERSION 3.5)
 
 
 # Set proyect name
-project(micro-ros-agent)
+project(micro_ros_agent)
 
 
 # Find packages depencences
@@ -28,7 +28,7 @@ find_package(fastcdr REQUIRED CONFIG)
 find_package(fastrtps REQUIRED CONFIG)
 find_package(micrortps_agent REQUIRED CONFIG)
 
-#find_package(ament_cmake_python REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 
 
 # Export dependencies to downstream packages
@@ -36,8 +36,38 @@ ament_export_dependencies(fastcdr)
 ament_export_dependencies(fastrtps)
 ament_export_dependencies(micrortps_agent)
 
-#ament_export_dependencies(rosidl_cmake)
-#ament_export_dependencies(rosidl_generator_c)
-#ament_export_dependencies(rosidl_generator_dds_idl)
+ament_export_dependencies(rosidl_cmake)
+ament_export_dependencies(rosidl_generator_c)
+ament_export_dependencies(rosidl_generator_dds_idl)
 
-ament_package()
+
+#ament_export_include_directories(include)
+
+# Install python files
+ament_python_install_package(${PROJECT_NAME})
+
+
+ament_index_register_resource("rosidl_typesupport_c")
+
+
+# Install the package.xml file, and generate code for
+# ``find_package`` so that other packages can get information about
+# this package.
+#
+# :param CONFIG_EXTRAS: a list of CMake files containing extra stuff
+#   that should be accessible to users of this package after
+#   ``find_package``\ -ing it.
+ament_package(
+  CONFIG_EXTRAS "micro_ros_agent-extras.cmake.in"
+)
+
+
+install(
+  PROGRAMS bin/micro_ros_agent
+  DESTINATION lib/micro_ros_agent
+)
+
+install(
+  DIRECTORY cmake resource
+  DESTINATION share/${PROJECT_NAME}
+)
