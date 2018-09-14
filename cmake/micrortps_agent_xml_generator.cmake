@@ -25,7 +25,7 @@ endforeach()
 
 
 # Set output dir
-set(_output_path "${CMAKE_CURRENT_BINARY_DIR}/micro_ros_agent/${PROJECT_NAME}")
+set(_output_path "${CMAKE_CURRENT_BINARY_DIR}/../micro_ros_agent/xml_gen")
 
 
 # check if all templates exits
@@ -49,7 +49,7 @@ rosidl_write_generator_arguments(
   ROS_INTERFACE_FILES "${rosidl_generate_interfaces_IDL_FILES}"
   ROS_INTERFACE_DEPENDENCIES "${_dependencies}"
   OUTPUT_DIR "${_output_path}"
-  TEMPLATE_DIR "${micro_ros_agent_TEMPLATE_DIR}"
+  TEMPLATE_DIR "NONE"
   TARGET_DEPENDENCIES ${target_dependencies}
   ADDITIONAL_FILES ${_dds_idl_files}
 )
@@ -60,3 +60,10 @@ execute_process(
                 COMMAND ${PYTHON_EXECUTABLE} ${micro_ros_agent_BIN}
                 --generator-arguments-file "${generator_arguments_file}"
                 )
+
+
+#Install
+install(
+  DIRECTORY "${_output_path}/"
+  DESTINATION "../micrortps_agent/bin"
+)

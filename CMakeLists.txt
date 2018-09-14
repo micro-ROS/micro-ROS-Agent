@@ -68,6 +68,6 @@ install(
 )
 
 install(
-  DIRECTORY cmake resource
+  DIRECTORY cmake
   DESTINATION share/${PROJECT_NAME}
 )

@@ -55,7 +55,7 @@ def generate_micro_ros_agent_xml_support(args):
                 os.makedirs(args['output_dir'])
 
             # Check if publixher exists
-            pub_file_path = "/root/install/publisher.xml"
+            pub_file_path = os.path.join(args['output_dir'], 'publisher.xml')
             pub_file = Path(pub_file_path)
             if not pub_file.is_file():
                 publ = open(pub_file_path, 'a')
@@ -66,10 +66,11 @@ def generate_micro_ros_agent_xml_support(args):
                 publ.close()
                 publ = open(pub_file_path,'w')
                 publ.writelines([item for item in lines[:-1]])
+                #publ = open(pub_file_path, "w")
+                #publ.seek(publ.seek(-1,2) - len("</profiles>\n"))
 
 
-            #publ = open(os.path.join(args['output_dir'], 'publisher.xml'), 'w+')
-            #publ = open('/root/install/publisher.xml', 'a')
+
             publ.write("   <publisher profile_name=\"default_xrce_publisher_profile\">\n")
             publ.write("       <topic>\n")
             publ.write("           <kind>NO_KEY</kind>\n")
@@ -89,8 +90,8 @@ def generate_micro_ros_agent_xml_support(args):
 
 
 
-             # Check if subcriber exists
-            subs_file_path = "/root/install/subscriber.xml"
+            # Check if subcriber exists
+            subs_file_path = os.path.join(args['output_dir'], 'subscriber.xml')
             subs_file = Path(subs_file_path)
             if not subs_file.is_file():
                 subs = open(subs_file_path, 'a')
@@ -103,9 +104,6 @@ def generate_micro_ros_agent_xml_support(args):
                 subs.writelines([item for item in lines[:-1]])
 
 
-            #subs = open(os.path.join(args['output_dir'], 'subscriber.xml'), 'w+')
-            #subs = open('/root/install/subscriber.xml', 'a')
-            #subs.write("<profiles>\n")
             subs.write("   <subscriber profile_name=\"default_xrce_subscriber_profile\">\n")
             subs.write("       <topic>\n")
             subs.write("           <kind>NO_KEY</kind>\n")
@@ -125,7 +123,7 @@ def generate_micro_ros_agent_xml_support(args):
 
 
             # Check if topic exists
-            topi_file_path = "/root/install/topic.xml"
+            topi_file_path = os.path.join(args['output_dir'], 'topic.xml')
             topi_file = Path(topi_file_path)
             if not topi_file.is_file():
                 topi = open(topi_file_path, 'a')
@@ -137,10 +135,6 @@ def generate_micro_ros_agent_xml_support(args):
                 topi = open(topi_file_path,'w')
                 topi.writelines([item for item in lines[:-1]])
 
-
-            #topi = open(os.path.join(args['output_dir'], 'topic.xml'), 'w+')
-            #topi = open('/root/install/topic.xml', 'a')
-            #topi.write("<dds>\n")
             topi.write("   <topic>\n")
             topi.write("       <name>%sPubSubTopic</name>\n" % (spec.msg_name))
             topi.write("       <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name))
