@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import struct
+import fcntl
 import os
+import sys
 
 from rosidl_cmake import convert_camel_case_to_lower_case_underscore
 from rosidl_cmake import expand_template
@@ -21,6 +24,7 @@ from rosidl_cmake import get_newest_modification_time
 from rosidl_parser import parse_message_file
 from rosidl_parser import parse_service_file
 from rosidl_parser import validate_field_types
+from shutil import copyfile
 from pathlib import Path
 
 
@@ -33,6 +37,34 @@ def generate_micro_ros_agent_xml_support(args):
         'get_header_filename_from_msg_name': convert_camel_case_to_lower_case_underscore,
     }
 
+
+    # Set file format
+    file_format = ".xml"
+    ros2_prefix = "rt/"
+
+
+    # Check destination dir
+    dest_dir = args['output_dir']
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+
+
+    # Check source dir
+    srcs_dir = os.path.join(dest_dir, "srcs")
+    if not os.path.exists(srcs_dir):
+        os.makedirs(srcs_dir)
+
+
+    # Copy all included xml files
+    for filename in os.listdir(args['template_dir']):
+        if filename.endswith(file_format): 
+            template_src_path = os.path.join(args['template_dir'], filename)
+            template_dest_path = os.path.join(srcs_dir, filename)
+            if not os.path.isfile(template_dest_path):
+                copyfile(template_src_path, template_dest_path)
+        
+        
+    # Iterate throw all msgs/srvs
     for idl_file in args['ros_interface_files']:
         extension = os.path.splitext(idl_file)[1]
         if extension == '.msg':
@@ -50,97 +82,84 @@ def generate_micro_ros_agent_xml_support(args):
             data.update(functions)
 
 
-            # Make destinatino dir
-            if not os.path.exists(args['output_dir']):
-                os.makedirs(args['output_dir'])
-
-            # Check if publixher exists
-            pub_file_path = os.path.join(args['output_dir'], 'publisher.xml')
-            pub_file = Path(pub_file_path)
-            if not pub_file.is_file():
-                publ = open(pub_file_path, 'a')
-                publ.write("<profiles>\n")
-            else:
-                publ = open(pub_file_path)
-                lines = publ.readlines()
-                publ.close()
-                publ = open(pub_file_path,'w')
-                publ.writelines([item for item in lines[:-1]])
-                #publ = open(pub_file_path, "w")
-                #publ.seek(publ.seek(-1,2) - len("</profiles>\n"))
+            # Generate source file path
+            src_file = os.path.join(srcs_dir, "%s_%s_%s.xml" % (spec.base_type.pkg_name, subfolder, spec.msg_name))
 
 
-
-            publ.write("   <publisher profile_name=\"default_xrce_publisher_profile\">\n")
-            publ.write("       <topic>\n")
-            publ.write("           <kind>NO_KEY</kind>\n")
-            publ.write("           <name>%sPubSubTopic</name>\n" % (spec.msg_name))
-            publ.write("           <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name))
-            publ.write("           <historyQos>\n")
-            publ.write("               <kind>KEEP_LAST</kind>\n")
-            publ.write("               <depth>5</depth>\n")
-            publ.write("           </historyQos>\n")
-            publ.write("           <durability>\n")
-            publ.write("               <kind>TRANSIENT_LOCAL</kind>\n")
-            publ.write("           </durability>\n")
-            publ.write("       </topic>\n")
-            publ.write("   </publisher>\n")
-            publ.write("</profiles>\n")
-            publ.close()
+            # Publisher
+            file_content  = "   <publisher profile_name=\"%s_%s_%s_p\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "       <topic profile_name=\"%s_%s_%s_t\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "           <kind>NO_KEY</kind>\n"
+            file_content += "           <name>%s%s_%s_%s</name>\n" % (ros2_prefix, spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "           <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "           <historyQos>\n"
+            file_content += "               <kind>KEEP_LAST</kind>\n"
+            file_content += "               <depth>5</depth>\n"
+            file_content += "           </historyQos>\n"
+            file_content += "           <durability>\n"
+            file_content += "               <kind>TRANSIENT_LOCAL</kind>\n"
+            file_content += "           </durability>\n"
+            file_content += "       </topic>\n"
+            file_content += "   </publisher>\n"
 
 
-
-            # Check if subcriber exists
-            subs_file_path = os.path.join(args['output_dir'], 'subscriber.xml')
-            subs_file = Path(subs_file_path)
-            if not subs_file.is_file():
-                subs = open(subs_file_path, 'a')
-                subs.write("<profiles>\n")
-            else:
-                subs = open(subs_file_path)
-                lines = subs.readlines()
-                subs.close()
-                subs = open(subs_file_path,'w')
-                subs.writelines([item for item in lines[:-1]])
-
-
-            subs.write("   <subscriber profile_name=\"default_xrce_subscriber_profile\">\n")
-            subs.write("       <topic>\n")
-            subs.write("           <kind>NO_KEY</kind>\n")
-            subs.write("           <name>%sPubSubTopic</name>\n" % (spec.msg_name))
-            subs.write("           <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name))
-            subs.write("           <historyQos>\n")
-            subs.write("               <kind>KEEP_LAST</kind>\n")
-            subs.write("               <depth>5</depth>\n")
-            subs.write("           </historyQos>\n")
-            subs.write("           <durability>\n")
-            subs.write("               <kind>TRANSIENT_LOCAL</kind>\n")
-            subs.write("           </durability>\n")
-            subs.write("       </topic>\n")
-            subs.write("   </subscriber>\n")
-            subs.write("</profiles>\n")
-            subs.close()
+            # Subscriber
+            file_content += "   <subscriber profile_name=\"%s_%s_%s_s\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "       <topic profile_name=\"%s_%s_%s_t\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "           <kind>NO_KEY</kind>\n"
+            file_content += "           <name>%s%s_%s_%s</name>\n" % (ros2_prefix, spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "           <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "           <historyQos>\n"
+            file_content += "               <kind>KEEP_LAST</kind>\n"
+            file_content += "               <depth>5</depth>\n"
+            file_content += "           </historyQos>\n"
+            file_content += "           <durability>\n"
+            file_content += "               <kind>TRANSIENT_LOCAL</kind>\n"
+            file_content += "           </durability>\n"
+            file_content += "       </topic>\n"
+            file_content += "   </subscriber>\n"
 
 
-            # Check if topic exists
-            topi_file_path = os.path.join(args['output_dir'], 'topic.xml')
-            topi_file = Path(topi_file_path)
-            if not topi_file.is_file():
-                topi = open(topi_file_path, 'a')
-                topi.write("<dds>\n")
-            else:
-                topi = open(topi_file_path)
-                lines = topi.readlines()
-                topi.close()
-                topi = open(topi_file_path,'w')
-                topi.writelines([item for item in lines[:-1]])
+            # Topic
+            file_content += "   <topic profile_name=\"%s_%s_%s_t\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "       <name>%s%s_%s_%s</name>\n" % (ros2_prefix, spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "       <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "   </topic>\n"
 
-            topi.write("   <topic>\n")
-            topi.write("       <name>%sPubSubTopic</name>\n" % (spec.msg_name))
-            topi.write("       <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name))
-            topi.write("   </topic>\n")
-            topi.write("</dds>\n")
-            topi.close() 
+
+            # Write file content
+            fd1 = open(src_file, "w")
+            fcntl.lockf(fd1, fcntl.LOCK_EX)
+            fd1.write(file_content)
+            fd1.close()
+
+
+            # Open collect file
+            collec_file = os.path.join(args['output_dir'], "DEFAULT_FASTRTPS_PROFILES.xml")
+            fd2 = open(collec_file, "w")
+            fcntl.lockf(fd2, fcntl.LOCK_EX)
+
+
+            # Generate head
+            fd2.write("<profiles>\n")
+
+
+            # Append all files contents
+            for filename in os.listdir(srcs_dir):
+                if filename.endswith(".xml"): 
+                    fd3 = open(os.path.join(srcs_dir, filename), "r+")
+                    fcntl.lockf(fd3, fcntl.LOCK_EX)
+                    fd2.write(fd3.read())
+                    fd3.close()
+
+
+            # Generate tail
+            fd2.write("</profiles>\n")        
+
+
+            # Close file
+            fd2.close()
+
 
         #elif extension == '.srv':
 

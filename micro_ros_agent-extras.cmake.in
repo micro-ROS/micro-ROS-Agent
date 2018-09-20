@@ -9,3 +9,6 @@ normalize_path(micro_ros_agent_BIN "${micro_ros_agent_BIN}")
 
 set(micro_ros_agent_GENERATOR_FILES "${micro_ros_agent_DIR}/../../../@PYTHON_INSTALL_DIR@/micro_ros_agent/__init__.py")
 normalize_path(micro_ros_agent_GENERATOR_FILES "${micro_ros_agent_GENERATOR_FILES}")
+
+set(micro_ros_agent_DEFAULT_PROFILES_DIR "${micro_ros_agent_DIR}/../resource")
+normalize_path(micro_ros_agent_DEFAULT_PROFILES_DIR "${micro_ros_agent_DEFAULT_PROFILES_DIR}")

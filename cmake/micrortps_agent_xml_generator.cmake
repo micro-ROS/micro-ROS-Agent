@@ -49,7 +49,7 @@ rosidl_write_generator_arguments(
   ROS_INTERFACE_FILES "${rosidl_generate_interfaces_IDL_FILES}"
   ROS_INTERFACE_DEPENDENCIES "${_dependencies}"
   OUTPUT_DIR "${_output_path}"
-  TEMPLATE_DIR "NONE"
+  TEMPLATE_DIR "${micro_ros_agent_DEFAULT_PROFILES_DIR}"
   TARGET_DEPENDENCIES ${target_dependencies}
   ADDITIONAL_FILES ${_dds_idl_files}
 )
