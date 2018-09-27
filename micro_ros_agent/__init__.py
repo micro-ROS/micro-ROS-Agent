@@ -13,9 +13,18 @@
 # limitations under the License.
 
 import struct
-import fcntl
 import os
 import sys
+
+if os.name == 'nt':
+    import win32con
+    import win32file
+    import pywintypes
+    __overlapped = pywintypes.OVERLAPPED()
+elif os.name == 'posix':
+    import fcntl
+else:
+    raise RuntimeError('PortaLocker only defined for nt and posix platforms')       
 
 from rosidl_cmake import convert_camel_case_to_lower_case_underscore
 from rosidl_cmake import expand_template
@@ -129,34 +138,91 @@ def generate_micro_ros_agent_xml_support(args):
 
             # Write file content
             fd1 = open(src_file, "w")
-            fcntl.lockf(fd1, fcntl.LOCK_EX)
-            fd1.write(file_content)
+            if os.name == 'nt':
+                # Lock
+                hfile1 = win32file._get_osfhandle(fd1.fileno())
+                win32file.LockFileEx(hfile1, win32con.LOCKFILE_EXCLUSIVE_LOCK, 0, -0x10000, __overlapped)
+                
+                # Write
+                fd1.write(file_content)
+                
+                # Unlock
+                win32file.UnlockFileEx(hfile1, 0, -0x10000, __overlapped)
+            elif os.name == 'posix':
+                # Lock
+                fcntl.flock(fd1.fileno(), fcntl.LOCK_EX)
+                
+                # Write
+                fd1.write(file_content)
+                
+                # Unlock
+                fcntl.flock(fd1.fileno(), fcntl.LOCK_UN)
             fd1.close()
 
 
             # Open collect file
             collec_file = os.path.join(args['output_dir'], "DEFAULT_FASTRTPS_PROFILES.xml")
             fd2 = open(collec_file, "w")
-            fcntl.lockf(fd2, fcntl.LOCK_EX)
+            if os.name == 'nt':
+                # Lock
+                hfile2 = win32file._get_osfhandle(fd2.fileno())
+                win32file.LockFileEx(hfile2, win32con.LOCKFILE_EXCLUSIVE_LOCK, 0, -0x10000, __overlapped)
+                
+                # Generate head
+                fd2.write("<profiles>\n")
+                
+                # Append all files contents
+                for filename in os.listdir(srcs_dir):
+                    if filename.endswith(".xml"): 
+                        # Open
+                        fd3 = open(os.path.join(srcs_dir, filename), "r+")
+                        
+                        # Lock
+                        hfile3 = win32file._get_osfhandle(fd3.fileno())
+                        win32file.LockFileEx(hfile3, win32con.LOCKFILE_EXCLUSIVE_LOCK, 0, -0x10000, __overlapped)
+                        
+                        # Write
+                        fd2.write(fd3.read())
+                        
+                        # Unlock
+                        win32file.UnlockFileEx(hfile3, 0, -0x10000, __overlapped)
+                        fd3.close()
+                
+                # Generate tail
+                fd2.write("</profiles>\n") 
+                
+                # UnLock
+                win32file.UnlockFileEx(hfile2, 0, -0x10000, __overlapped)
+            elif os.name == 'posix':
+                # Lock
+                fcntl.flock(fd2.fileno(), fcntl.LOCK_EX)
+                
+                # Generate head
+                fd2.write("<profiles>\n")
+                
+                # Append all files contents
+                for filename in os.listdir(srcs_dir):
+                    if filename.endswith(".xml"): 
+                        # Open
+                        fd3 = open(os.path.join(srcs_dir, filename), "r+")
+                        
+                        # Lock
+                        fcntl.flock(fd3, fcntl.LOCK_EX)
+                        
+                        # Write
+                        fd2.write(fd3.read())
+                        
+                        # Unlock
+                        fcntl.flock(fd3.fileno(), fcntl.LOCK_UN)
+                        
+                        # Close
+                        fd3.close()
+                
+                # Generate tail
+                fd2.write("</profiles>\n") 
 
-
-            # Generate head
-            fd2.write("<profiles>\n")
-
-
-            # Append all files contents
-            for filename in os.listdir(srcs_dir):
-                if filename.endswith(".xml"): 
-                    fd3 = open(os.path.join(srcs_dir, filename), "r+")
-                    fcntl.lockf(fd3, fcntl.LOCK_EX)
-                    fd2.write(fd3.read())
-                    fd3.close()
-
-
-            # Generate tail
-            fd2.write("</profiles>\n")        
-
-
+                # UnLock
+                fcntl.flock(fd2.fileno(), fcntl.LOCK_UN)
             # Close file
             fd2.close()
 
