@@ -1,4 +1,4 @@
-# Copyright 2016-2018 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+# Copyright 2016 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,19 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import struct
 import os
 import sys
-
-if os.name == 'nt':
-    import win32con
-    import win32file
-    import pywintypes
-    __overlapped = pywintypes.OVERLAPPED()
-elif os.name == 'posix':
-    import fcntl
-else:
-    raise RuntimeError('PortaLocker only defined for nt and posix platforms')       
+import xml.etree.ElementTree
 
 from rosidl_cmake import convert_camel_case_to_lower_case_underscore
 from rosidl_cmake import expand_template
@@ -33,14 +23,103 @@ from rosidl_cmake import get_newest_modification_time
 from rosidl_parser import parse_message_file
 from rosidl_parser import parse_service_file
 from rosidl_parser import validate_field_types
-from shutil import copyfile
-from pathlib import Path
 
 
-def generate_micro_ros_agent_xml_support(args):    
+def GetPackage(Dir):
+    
+    # ignore?
+    for f in os.listdir(Dir):
+        full_path = os.path.join(Dir, f)
+        if os.path.isfile(full_path):
+            if f == "COLCON_IGNORE":
+                return "COLCON_IGNORE"
+
+    # found package
+    found_package_path = ""
+    for f in os.listdir(Dir):
+        if f == "package.xml":
+            found_package_path = os.path.join(Dir, f)
+            found_package_path = os.path.abspath(found_package_path)
+            break
+
+
+    return found_package_path
+
+
+def GetPackageList(Dir):
+    package_list = []
+    package_path = GetPackage(Dir)
+
+    if package_path == "":
+        for f in os.listdir(Dir):
+            full_path = os.path.join(Dir, f)
+            if os.path.isdir(full_path):
+                for l in GetPackageList(full_path):
+                    package_list.append(l)
+    elif package_path != "COLCON_IGNORE":
+        package_list.append(package_path)
+    
+    return package_list
+
+
+def GetInterfacePackages(packages_list):
+    package_interface_list = []
+    for package in packages_list:
+        xml_root = xml.etree.ElementTree.parse(package).getroot()
+        for element in xml_root.findall('member_of_group'):
+            if element.text == "rosidl_interface_packages":
+                package_interface_list.append(package)
+    return package_interface_list
+             
+
+def GetPackageName(package_path):
+    xml_root = xml.etree.ElementTree.parse(package_path).getroot()
+    xml_name_elements = xml_root.findall('name')
+    if len(xml_name_elements) != 1:
+        return ""
+    else:
+        return xml_name_elements[0].text
+
+
+def GetInterfacePackageMsgs(package_path):
+    msg_list = []
+    package_dir = os.path.dirname(package_path)
+    for root, dirs, files in os.walk(package_dir):
+        for file in files:
+            if file.endswith(".msg"):
+                full_path = os.path.join(root, file)
+                msg_list.append(full_path)
+    
+    return msg_list
+
+def GetInterfacePackageSrvs(package_path):
+    msg_list = []
+    package_dir = os.path.dirname(package_path)
+    for root, dirs, files in os.walk(package_dir):
+        for file in files:
+            if file.endswith(".srv"):
+                full_path = os.path.join(root, file)
+                msg_list.append(full_path)
+    
+    return msg_list
+
+
+def ReadDefaultXMLs(Path):
+    for f in os.listdir(Path):
+        full_path = os.path.join(Path, f)
+        if os.path.isfile(full_path) and f.endswith(".xml"):
+            #xml_root = xml.etree.ElementTree.parse(full_path).getroot()
+            #if xml_root.iselement():
+            fd = open(full_path)
+            print ("%s" % fd.read())
+            fd.close()
+                
+
+
+def generate_XML(args):    
     pkg_name = args['package_name']
-    known_msg_types = extract_message_types(
-        pkg_name, args['ros_interface_files'], args.get('ros_interface_dependencies', []))
+    #known_msg_types = extract_message_types(
+    #    pkg_name, args['ros_interface_files'], args.get('ros_interface_dependencies', []))
 
     functions = {
         'get_header_filename_from_msg_name': convert_camel_case_to_lower_case_underscore,
@@ -48,7 +127,6 @@ def generate_micro_ros_agent_xml_support(args):
 
 
     # Set file format
-    file_format = ".xml"
     ros2_prefix = "rt/"
 
 
@@ -63,14 +141,6 @@ def generate_micro_ros_agent_xml_support(args):
     if not os.path.exists(srcs_dir):
         os.makedirs(srcs_dir)
 
-
-    # Copy all included xml files
-    for filename in os.listdir(args['template_dir']):
-        if filename.endswith(file_format): 
-            template_src_path = os.path.join(args['template_dir'], filename)
-            template_dest_path = os.path.join(srcs_dir, filename)
-            if not os.path.isfile(template_dest_path):
-                copyfile(template_src_path, template_dest_path)
         
         
     # Iterate throw all msgs/srvs
@@ -78,7 +148,7 @@ def generate_micro_ros_agent_xml_support(args):
         extension = os.path.splitext(idl_file)[1]
         if extension == '.msg':
             spec = parse_message_file(pkg_name, idl_file)
-            validate_field_types(spec, known_msg_types)
+            #validate_field_types(spec, known_msg_types)
             subfolder = os.path.basename(os.path.dirname(idl_file))
 
             data = {
@@ -137,94 +207,8 @@ def generate_micro_ros_agent_xml_support(args):
 
 
             # Write file content
-            fd1 = open(src_file, "w")
-            if os.name == 'nt':
-                # Lock
-                hfile1 = win32file._get_osfhandle(fd1.fileno())
-                win32file.LockFileEx(hfile1, win32con.LOCKFILE_EXCLUSIVE_LOCK, 0, -0x10000, __overlapped)
-                
-                # Write
-                fd1.write(file_content)
-                
-                # Unlock
-                win32file.UnlockFileEx(hfile1, 0, -0x10000, __overlapped)
-            elif os.name == 'posix':
-                # Lock
-                fcntl.flock(fd1.fileno(), fcntl.LOCK_EX)
-                
-                # Write
-                fd1.write(file_content)
-                
-                # Unlock
-                fcntl.flock(fd1.fileno(), fcntl.LOCK_UN)
-            fd1.close()
+            print ("%s" % file_content)
 
-
-            # Open collect file
-            collec_file = os.path.join(args['output_dir'], "DEFAULT_FASTRTPS_PROFILES.xml")
-            fd2 = open(collec_file, "w")
-            if os.name == 'nt':
-                # Lock
-                hfile2 = win32file._get_osfhandle(fd2.fileno())
-                win32file.LockFileEx(hfile2, win32con.LOCKFILE_EXCLUSIVE_LOCK, 0, -0x10000, __overlapped)
-                
-                # Generate head
-                fd2.write("<profiles>\n")
-                
-                # Append all files contents
-                for filename in os.listdir(srcs_dir):
-                    if filename.endswith(".xml"): 
-                        # Open
-                        fd3 = open(os.path.join(srcs_dir, filename), "r+")
-                        
-                        # Lock
-                        hfile3 = win32file._get_osfhandle(fd3.fileno())
-                        win32file.LockFileEx(hfile3, win32con.LOCKFILE_EXCLUSIVE_LOCK, 0, -0x10000, __overlapped)
-                        
-                        # Write
-                        fd2.write(fd3.read())
-                        
-                        # Unlock
-                        win32file.UnlockFileEx(hfile3, 0, -0x10000, __overlapped)
-                        fd3.close()
-                
-                # Generate tail
-                fd2.write("</profiles>\n") 
-                
-                # UnLock
-                win32file.UnlockFileEx(hfile2, 0, -0x10000, __overlapped)
-            elif os.name == 'posix':
-                # Lock
-                fcntl.flock(fd2.fileno(), fcntl.LOCK_EX)
-                
-                # Generate head
-                fd2.write("<profiles>\n")
-                
-                # Append all files contents
-                for filename in os.listdir(srcs_dir):
-                    if filename.endswith(".xml"): 
-                        # Open
-                        fd3 = open(os.path.join(srcs_dir, filename), "r+")
-                        
-                        # Lock
-                        fcntl.flock(fd3, fcntl.LOCK_EX)
-                        
-                        # Write
-                        fd2.write(fd3.read())
-                        
-                        # Unlock
-                        fcntl.flock(fd3.fileno(), fcntl.LOCK_UN)
-                        
-                        # Close
-                        fd3.close()
-                
-                # Generate tail
-                fd2.write("</profiles>\n") 
-
-                # UnLock
-                fcntl.flock(fd2.fileno(), fcntl.LOCK_UN)
-            # Close file
-            fd2.close()
 
 
         #elif extension == '.srv':
