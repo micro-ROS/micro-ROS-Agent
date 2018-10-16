@@ -1,8 +1,12 @@
+<a href="http://www.eprosima.com"><img src="http://www.eprosima.com/images/logos/eprosima/logo.png" align="top" hspace="8" vspace="2" width="650" height="200" ></a>
+
 # Overview
 
 This repo contains the Micro-Ros Agent package.
 Micro-Ros Agent is a ROS2 node that wrapps the Micro XRCE-DDS Agent.
 For farther information about Micro XRCE-DDA Agent click [here](https://github.com/eProsima/Micro-XRCE-DDS-Agent)
+This package is a part of the Micro-ROS poject stack. 
+For more information about Micro-ROS project click [here]().
 
 The node acts as a server between DDS Network and Micro-ROS nodes.
 It will receive messages containing operations from Micro-ROS nodes, keep track of the Micro-ROS nodes. 
@@ -24,12 +28,7 @@ This XML file can be referenced in the Agent-Client comunication in order to avo
 Communication between the Micro-ROS Agent and the Micro-ROS nodes supports two kind transports: 
 - UDP 
 - SerialPort. 
- 
 
-# Node configuration
- 
-## Transport type
 
-### udp
-
-### Serial port
+All available configurations are supported direcly by the Micro XRCE-DDS agent.
+For farther information how configure the agent click [here]().
