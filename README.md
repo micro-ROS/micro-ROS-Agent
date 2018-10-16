@@ -1,4 +1,4 @@
-<a href="http://www.eprosima.com"><img src="http://www.eprosima.com/images/logos/eprosima/logo.png" align="top" hspace="8" vspace="2" width="650" height="200" ></a>
+<a href="http://www.eprosima.com"><img src="http://www.eprosima.com/images/logos/eprosima/logo.png" align="center" hspace="8" vspace="2" width="850" height="200" ></a>
 
 # Overview
 
