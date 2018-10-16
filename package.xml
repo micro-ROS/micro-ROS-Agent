@@ -14,7 +14,7 @@
 
   <depend>fastcdr</depend>
   <depend>fastrtps</depend>
-  <depend>micrortps_agent</depend>
+  <depend>microxrcedds_agent</depend>
   <depend>rosidl_cmake</depend>
 
   <test_depend>ament_lint_auto</test_depend>

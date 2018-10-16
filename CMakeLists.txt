@@ -16,7 +16,6 @@
 # Set CMake version 
 cmake_minimum_required(VERSION 3.5)
 
-
 # Set proyect name
 project(uros_agent)
 
@@ -26,14 +25,14 @@ find_package(rosidl_cmake REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(fastcdr REQUIRED CONFIG)
 find_package(fastrtps REQUIRED CONFIG)
-find_package(micrortps_agent REQUIRED CONFIG)
+find_package(microxrcedds_agent REQUIRED CONFIG)
 find_package(ament_cmake_python REQUIRED)
 
 
 # Export dependencies to downstream packages
 ament_export_dependencies(fastcdr)
 ament_export_dependencies(fastrtps)
-ament_export_dependencies(micrortps_agent)
+ament_export_dependencies(microxrcedds_agent)
 
 
 # Set variables
@@ -202,7 +201,7 @@ ament_package()
 #Install
 install(
   FILES "${_DEFAULT_FASTRTPS_PROFILES_PATH}"
-  DESTINATION "../micrortps_agent/bin"
+  DESTINATION "../microxrcedds_agent/bin"
 )
 
 
