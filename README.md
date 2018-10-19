@@ -1,34 +1,31 @@
-<a href="http://www.eprosima.com"><img src="http://www.eprosima.com/images/logos/eprosima/logo.png" align="center" hspace="8" vspace="2" width="850" height="200" ></a>
+# Micro ROS Agent
 
-# Overview
+## Overview
 
-This repo contains the Micro-Ros Agent package.
-Micro-Ros Agent is a ROS2 node that wrapps the Micro XRCE-DDS Agent.
-For farther information about Micro XRCE-DDA Agent click [here](https://github.com/eProsima/Micro-XRCE-DDS-Agent)
-This package is a part of the Micro-ROS poject stack. 
-For more information about Micro-ROS project click [here]().
+This repository contains the Micro-ROS Agent package.
+Micro-ROS Agent is a ROS 2 node that wraps the Micro XRCE-DDS Agent.
+For further information about Micro XRCE-DDS Agent click [here](https://github.com/eProsima/Micro-XRCE-DDS-Agent)
+This package is a part of the Micro-ROS project stack.
+For more information about Micro-ROS project click [here](https://microros.github.io/micro-ROS/).
 
-The node acts as a server between DDS Network and Micro-ROS nodes.
-It will receive messages containing operations from Micro-ROS nodes, keep track of the Micro-ROS nodes. 
-The node will interact with DDS Global Data Space on behalf of the Micro-ROS nodes.
+The node acts as a server between DDS Network and Micro-ROS nodes inside MCU.
+It receives and send messages from Micro-ROS nodes, and keep track of the Micro-ROS nodes exposing them to the ROS 2 network.
+The node interacts with DDS Global Data Space on behalf of the Micro-ROS nodes.
 
-While the node is running, it attends any received request from the Micro-ROS nodes and will answers back with the result of a request each time a request is attended.
+## Package features
 
+### XML generation
 
-# Package features
+During the build process, the package looks for all ROS 2 messages to generate an initial list of XML profiles.
+These profiles can are referenced in the Agent-Client communication to avoid sending the full XML content.
+This reference mechanism can be switched on and off from the Micro XRCE-DDS middleware layer.
 
-## XML generation
+### Agent-Client communication mechanism
 
-During the build proces, the package will look for all ROS2 / Micro-ROS messages in order to generare XML profiles.
-This XML file can be referenced in the Agent-Client comunication in order to avoid sending the full XML content.
+Communication between the Micro-ROS Agent and the Micro-ROS nodes supports two types of transport:
 
+- UDP.
+- SerialPort.
 
-## Agent-Client comunication mechanims
-
-Communication between the Micro-ROS Agent and the Micro-ROS nodes supports two kind transports: 
-- UDP 
-- SerialPort. 
-
-
-All available configurations are supported direcly by the Micro XRCE-DDS agent.
-For farther information how configure the agent click [here]().
+All available configurations are supported directly by the Micro XRCE-DDS agent.
+For further information on how to configure the agent click [here](TODO).
