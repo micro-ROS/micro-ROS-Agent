@@ -165,45 +165,37 @@ def generate_XML(args):
             src_file = os.path.join(srcs_dir, "%s_%s_%s.xml" % (spec.base_type.pkg_name, subfolder, spec.msg_name))
 
 
-            # Publisher
-            file_content  = "   <publisher profile_name=\"%s_%s_%s_p\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
-            file_content += "       <topic profile_name=\"%s_%s_%s_t\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
-            file_content += "           <kind>NO_KEY</kind>\n"
-            file_content += "           <name>%s%s_%s_%s</name>\n" % (ros2_prefix, spec.base_type.pkg_name, subfolder, spec.msg_name)
-            file_content += "           <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
-            file_content += "           <historyQos>\n"
-            file_content += "               <kind>KEEP_LAST</kind>\n"
-            file_content += "               <depth>5</depth>\n"
-            file_content += "           </historyQos>\n"
-            file_content += "           <durability>\n"
-            file_content += "               <kind>TRANSIENT_LOCAL</kind>\n"
-            file_content += "           </durability>\n"
-            file_content += "       </topic>\n"
-            file_content += "   </publisher>\n"
+            # Data writer
+            #file_content  = "   <dds>\n"
+            file_content  = "       <data_writer profile_name=\"%s_%s_%s_p\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "           <topic profile_name=\"%s_%s_%s_t\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "               <kind>NO_KEY</kind>\n"
+            file_content += "               <name>%s%s_%s_%s</name>\n" % (ros2_prefix, spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "               <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "           </topic>\n"
+            file_content += "       </data_writer>\n"
+            #file_content += "   </dds>\n"
 
 
-            # Subscriber
-            file_content += "   <subscriber profile_name=\"%s_%s_%s_s\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
-            file_content += "       <topic profile_name=\"%s_%s_%s_t\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
-            file_content += "           <kind>NO_KEY</kind>\n"
-            file_content += "           <name>%s%s_%s_%s</name>\n" % (ros2_prefix, spec.base_type.pkg_name, subfolder, spec.msg_name)
-            file_content += "           <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
-            file_content += "           <historyQos>\n"
-            file_content += "               <kind>KEEP_LAST</kind>\n"
-            file_content += "               <depth>5</depth>\n"
-            file_content += "           </historyQos>\n"
-            file_content += "           <durability>\n"
-            file_content += "               <kind>TRANSIENT_LOCAL</kind>\n"
-            file_content += "           </durability>\n"
-            file_content += "       </topic>\n"
-            file_content += "   </subscriber>\n"
+            # Data reader
+            #file_content += "   <dds>\n"
+            file_content += "       <data_reader profile_name=\"%s_%s_%s_s\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "           <topic profile_name=\"%s_%s_%s_t\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "               <kind>NO_KEY</kind>\n"
+            file_content += "               <name>%s%s_%s_%s</name>\n" % (ros2_prefix, spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "               <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "           </topic>\n"
+            file_content += "       </data_reader>\n"
+            #file_content += "   </dds>\n"
 
 
             # Topic
-            file_content += "   <topic profile_name=\"%s_%s_%s_t\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
-            file_content += "       <name>%s%s_%s_%s</name>\n" % (ros2_prefix, spec.base_type.pkg_name, subfolder, spec.msg_name)
-            file_content += "       <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
-            file_content += "   </topic>\n"
+            #file_content += "   <dds>\n"
+            file_content += "       <topic profile_name=\"%s_%s_%s_t\">\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "           <name>%s%s_%s_%s</name>\n" % (ros2_prefix, spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "           <dataType>%s::%s::dds_::%s_</dataType>\n" % (spec.base_type.pkg_name, subfolder, spec.msg_name)
+            file_content += "       </topic>\n"
+            #file_content += "   </dds>\n"
 
 
             # Write file content
