@@ -20,6 +20,18 @@ cmake_minimum_required(VERSION 3.5)
 project(uros_agent)
 
 
+set(CMAKE_C_CLANG_TIDY clang-tidy -checks=*)
+
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+
 # Find packages depencences
 find_package(rosidl_cmake REQUIRED)
 find_package(ament_cmake REQUIRED)
@@ -193,9 +205,43 @@ set (_XmlDoc "<profiles>\n${_XmlDoc}</profiles>\n")
 file(WRITE "${_DEFAULT_FASTRTPS_PROFILES_PATH}" "${_XmlDoc}")
 
 
+# Only compile uROS agent if rclcpp is found
+find_package(rclcpp QUIET)
+if (rclcpp_FOUND)
+  find_package(microxrcedds_agent_cmake_module REQUIRED)
+  find_package(MicroXRCEDDS_Agent REQUIRED MODULE)
+
+  add_executable(${PROJECT_NAME} src/main.cpp)
+  ament_target_dependencies(
+    ${PROJECT_NAME} 
+    rclcpp
+    microxrcedds_agent
+  )
+
+  # TODO(Javier) Temporal until thread error is solver
+  target_link_libraries(
+    ${PROJECT_NAME}
+    microxrcedds_agent
+  )
+  
+else()
+  message("uROS agent node will be not build")
+endif()
+
+
+
 
 # Install the package.xml file, and generate code for ``find_package`` so that other packages can get information about this package.
 ament_package()
+
+
+# Only install if uROS_Agent is comiled
+if (rclcpp_FOUND)
+  install(TARGETS
+    ${PROJECT_NAME}
+    DESTINATION lib/${PROJECT_NAME}
+  )
+endif()
 
 
 #Install
