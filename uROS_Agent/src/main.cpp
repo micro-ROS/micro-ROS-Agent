@@ -16,13 +16,18 @@
 #ifdef _WIN32
 #include <uxr/agent/transport/udp/UDPServerWindows.hpp>
 #include <uxr/agent/transport/tcp/TCPServerWindows.hpp>
-#else
+
+#elif __unix__
+#include <unistd.h>
+#include <libgen.h>
+
 #include <uxr/agent/transport/serial/SerialServerLinux.hpp>
 #include <uxr/agent/transport/udp/UDPServerLinux.hpp>
 #include <uxr/agent/transport/tcp/TCPServerLinux.hpp>
 #include <termios.h>
 #include <fcntl.h>
-#endif //_WIN32
+#endif
+
 #include <iostream>
 #include <string>
 #include <limits>
@@ -84,9 +89,18 @@ private:
 
 int main(int argc, char** argv)
 {
+    
+#ifdef __unix__
+    char exe_path[200];
+    ssize_t count = readlink("/proc/self/exe", exe_path, sizeof(exe_path));
+    if (count != -1) {
+        chdir(dirname(exe_path));
+    }
+#endif
+
     bool initialized = false;
 
-#ifndef _WIN32
+#ifdef __unix__
     if(argc == 2 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0))
     {
         showHelp();
@@ -218,7 +232,7 @@ int main(int argc, char** argv)
     {
         initializationError();
     }
-#else
+#elif _WIN32
     (void) argc;
     (void) argv;
 

@@ -247,7 +247,7 @@ endif()
 #Install
 install(
   FILES "${_DEFAULT_FASTRTPS_PROFILES_PATH}"
-  DESTINATION "../microxrcedds_agent/bin"
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 

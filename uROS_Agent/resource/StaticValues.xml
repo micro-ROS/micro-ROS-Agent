@@ -1,6 +1,6 @@
-    <participant profile_name="default_xrce_participant">
+    <participant profile_name="participant_profile">
         <rtps>
-            <name>default_xrce_participant</name>
+            <name>participant_profile</name>
         </rtps>
     </participant>
     <data_writer profile_name="shapetype_data_writer">
