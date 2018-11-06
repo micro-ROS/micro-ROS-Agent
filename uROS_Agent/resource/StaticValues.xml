@@ -1,0 +1,24 @@
+    <participant profile_name="participant_profile">
+        <rtps>
+            <name>participant_profile</name>
+        </rtps>
+    </participant>
+    <data_writer profile_name="shapetype_data_writer">
+        <topic>
+            <kind>WITH_KEY</kind>
+            <name>Square</name>
+            <dataType>ShapeType</dataType>
+        </topic>
+    </data_writer>
+    <data_reader profile_name="shapetype_data_reader">
+        <topic>
+            <kind>WITH_KEY</kind>
+            <name>Square</name>
+            <dataType>ShapeType</dataType>
+        </topic>
+    </data_reader>
+    <topic profile_name="shapetype_topic">
+        <kind>WITH_KEY</kind>
+        <name>Square</name>
+        <dataType>ShapeType</dataType>
+    </topic>

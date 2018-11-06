@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="2">
+  <name>microxrcedds_agent_cmake_module</name>
+  <version>0.1.0</version>
+  <description>Provide CMake module to find eProsima Micro XRCE-DDS Agent</description>
+  <maintainer email="javiermoreno@eprosima.com">Javier Moreno</maintainer>
+  <license>Apache License 2.0</license>
+  <author>Javier Moreno</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <build_depend>microxrcedds_agent</build_depend>
+  <build_export_depend>microxrcedds_agent</build_export_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

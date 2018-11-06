@@ -1,0 +1,29 @@
+    <topic profile_name="parameter_events_t">
+        <name>rt/parameter_events</name>
+        <dataType>rcl_interfaces::msg::dds_::ParameterEvent_</dataType>
+    </topic>
+     <topic profile_name="clock_t">
+        <name>rt/clock</name>
+        <dataType>rosgraph_msgs::msg::dds_::Clock_</dataType>
+    </topic>
+    <data_writer profile_name="parameter_events_p">
+        <topic>
+            <kind>NO_KEY</kind>
+            <name>rt/parameter_events</name>
+            <dataType>rcl_interfaces::msg::dds_::ParameterEvent_</dataType>
+        </topic>
+    </data_writer>
+    <data_reader profile_name="clock_s">
+        <topic>
+            <kind>NO_KEY</kind>
+            <name>rt/clock</name>
+            <dataType>rosgraph_msgs::msg::dds_::Clock_</dataType>
+        </topic>
+    </data_reader>
+    <data_reader profile_name="parameter_events_s">
+        <topic>
+            <kind>NO_KEY</kind>
+            <name>rt/parameter_events</name>
+            <dataType>rcl_interfaces::msg::dds_::ParameterEvent_</dataType>
+        </topic>
+    </data_reader>

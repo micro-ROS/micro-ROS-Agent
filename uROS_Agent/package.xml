@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>uros_agent</name>
+  <version>0.0.2</version>
+  <description>DDS-XCRE agent implementation </description>
+  <maintainer email="javiermoreno@eprosima.com">Javier Moreno</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_export_depend>ament_cmake</buildtool_export_depend>
+
+  <exec_depend>rosidl_parser</exec_depend>
+
+  <depend>fastcdr</depend>
+  <depend>fastrtps</depend>
+  <depend>microxrcedds_agent_cmake_module</depend>
+  <depend>rosidl_cmake</depend>
+  
+  <build_depend>rclcpp</build_depend>
+
+  <exec_depend>rclcpp</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <group_depend>rosidl_interface_packages</group_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
+
+
+
+
