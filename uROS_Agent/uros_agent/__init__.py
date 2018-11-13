@@ -43,7 +43,7 @@ def GetPackage(Dir):
             break
 
 
-    return found_package_path
+    return found_package_path.replace("\\", "/")
 
 
 def GetPackageList(Dir):
@@ -58,7 +58,7 @@ def GetPackageList(Dir):
                     package_list.append(l)
     elif package_path != "COLCON_IGNORE":
         package_list.append(package_path)
-    
+
     return package_list
 
 
@@ -70,7 +70,7 @@ def GetInterfacePackages(packages_list):
             if element.text == "rosidl_interface_packages":
                 package_interface_list.append(package)
     return package_interface_list
-             
+
 
 def GetPackageName(package_path):
     xml_root = xml.etree.ElementTree.parse(package_path).getroot()
@@ -88,8 +88,8 @@ def GetInterfacePackageMsgs(package_path):
         for file in files:
             if file.endswith(".msg"):
                 full_path = os.path.join(root, file)
-                msg_list.append(full_path)
-    
+                msg_list.append(full_path.replace("\\", "/"))
+
     return msg_list
 
 def GetInterfacePackageSrvs(package_path):
@@ -99,8 +99,8 @@ def GetInterfacePackageSrvs(package_path):
         for file in files:
             if file.endswith(".srv"):
                 full_path = os.path.join(root, file)
-                msg_list.append(full_path)
-    
+                msg_list.append(full_path.replace("\\", "/"))
+
     return msg_list
 
 
@@ -113,7 +113,7 @@ def ReadDefaultXMLs(Path):
             fd = open(full_path)
             print ("%s" % fd.read())
             fd.close()
-                
+
 
 
 def generate_XML(args):    
