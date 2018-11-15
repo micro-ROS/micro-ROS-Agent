@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #endif
 
+#include <iterator>
 #include <iostream>
 #include <string>
 #include <limits>
@@ -74,6 +75,21 @@ uint16_t parsePort(const std::string& str_port)
     }
     return valid_port;
 }
+
+class uros_agent : public rclcpp::Node
+{
+public:
+  uros_agent() : Node("uROS_Agent")
+  {
+  }
+
+  ~uros_agent()
+  {
+  }
+
+private:
+
+};
 
 int main(int argc, char** argv)
 {
