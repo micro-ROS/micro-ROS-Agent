@@ -67,7 +67,7 @@ normalize_path(_DEFAULT_FASTRTPS_PROFILES_PATH "${_DEFAULT_FASTRTPS_PROFILES_PAT
 
 
 # Get colcon call dir
-get_filename_component(_COLCON_CALL_DIR "${CMAKE_INSTALL_PREFIX}" DIRECTORY)
+get_filename_component(_COLCON_CALL_DIR "${PROJECT_BINARY_DIR}" DIRECTORY)
 get_filename_component(_COLCON_CALL_DIR "${_COLCON_CALL_DIR}" DIRECTORY)
 
 
