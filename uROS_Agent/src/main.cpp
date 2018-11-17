@@ -76,21 +76,6 @@ uint16_t parsePort(const std::string& str_port)
     return valid_port;
 }
 
-class uros_agent : public rclcpp::Node
-{
-public:
-  uros_agent() : Node("uROS_Agent")
-  {
-  }
-
-  ~uros_agent()
-  {
-  }
-
-private:
-
-};
-
 int main(int argc, char** argv)
 {
     eprosima::uxr::Server* server = nullptr;
@@ -232,9 +217,14 @@ int main(int argc, char** argv)
         /* Launch server. */
         if (server->run())
         {
-            rclcpp::init(argc, argv);
-            rclcpp::spin(std::make_shared<uros_agent>());
-            rclcpp::shutdown();
+            std::cout << "OK" << std::endl;
+            std::cin.clear();
+            char exit_flag = 0;
+            while ('q' != exit_flag)
+            {
+                std::cout << "Enter 'q' for exit" << std::endl;
+                std::cin >> exit_flag;
+            }
             server->stop();
         }
         else
