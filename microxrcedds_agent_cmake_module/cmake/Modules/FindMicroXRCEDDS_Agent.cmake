@@ -20,7 +20,7 @@
 #
 # - MicroXRCEDDS_Agent_FOUND: flag indicating if the package was found
 # - MicroXRCEDDS_Agent_INCLUDE_DIR: Paths to the header files
-# 
+#
 # Example usage:
 #
 #   find_package(uros_agent_cmake_module REQUIRED)
@@ -54,15 +54,15 @@ if(MicroXRCEDDS_Agent_LIBRARY_RELEASE AND MicroXRCEDDS_Agent_LIBRARY_DEBUG)
     set(MicroXRCEDDS_Agent_LIBRARIES
         optimized ${MicroXRCEDDS_Agent_LIBRARY_RELEASE}
         debug ${MicroXRCEDDS_Agent_LIBRARY_DEBUG}
-      )
+    )
 elseif(MicroXRCEDDS_Agent_LIBRARY_RELEASE)
     set(MicroXRCEDDS_Agent_LIBRARIES
         ${MicroXRCEDDS_Agent_LIBRARY_RELEASE}
-      )
+    )
 elseif(MicroXRCEDDS_Agent_LIBRARY_DEBUG)
     set(MicroXRCEDDS_Agent_LIBRARIES
         ${MicroXRCEDDS_Agent_LIBRARY_DEBUG}
-      )
+    )
 else()
     set(MicroXRCEDDS_Agent_LIBRARIES "")
 endif()
@@ -78,15 +78,15 @@ if(FastRTPS_LIBRARY_RELEASE AND FastRTPS_LIBRARY_DEBUG)
     set(FastRTPS_LIBRARIES
         optimized ${FastRTPS_LIBRARY_RELEASE}
         debug ${FastRTPS_LIBRARY_DEBUG}
-      )
+    )
 elseif(FastRTPS_LIBRARY_RELEASE)
     set(FastRTPS_LIBRARIES
         ${MicroXRCEDDS_Agent_LIBRARY_RELEASE}
-      )
+    )
 elseif(FastRTPS_LIBRARY_DEBUG)
     set(FastRTPS_LIBRARIES
         ${MicroXRCEDDS_Agent_LIBRARY_DEBUG}
-      )
+    )
 else()
     set(FastRTPS_LIBRARIES "")
 endif()
@@ -102,15 +102,15 @@ if(FastCDR_LIBRARY_RELEASE AND FastCDR_LIBRARY_DEBUG)
     set(FastCDR_LIBRARIES
         optimized ${FastCDR_LIBRARY_RELEASE}
         debug ${FastCDR_LIBRARY_DEBUG}
-      )
+    )
 elseif(FastCDR_LIBRARY_RELEASE)
     set(FastCDR_LIBRARIES
         ${FastCDR_LIBRARY_RELEASE}
-      )
+    )
 elseif(FastCDR_LIBRARY_DEBUG)
     set(FastCDR_LIBRARIES
         ${FastCDR_LIBRARY_DEBUG}
-      )
+    )
 else()
     set(FastCDR_LIBRARIES "")
 endif()
