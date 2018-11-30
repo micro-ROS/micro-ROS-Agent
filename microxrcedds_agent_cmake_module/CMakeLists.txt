@@ -25,8 +25,8 @@ endif()
 
 ament_package(
     CONFIG_EXTRAS "microxrcedds_agent_cmake_module-extras.cmake"
-    )
+)
 
 install(DIRECTORY cmake
     DESTINATION share/${PROJECT_NAME}
-    )
+)

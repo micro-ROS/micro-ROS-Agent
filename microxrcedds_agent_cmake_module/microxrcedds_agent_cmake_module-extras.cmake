@@ -12,4 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-list(INSERT CMAKE_MODULE_PATH 0 "${microxrcedds_agent_cmake_module_DIR}/Modules")
+list(INSERT CMAKE_MODULE_PATH 0
+    "${microxrcedds_agent_cmake_module_DIR}/Modules")
