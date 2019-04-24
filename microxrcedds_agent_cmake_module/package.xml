@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>microxrcedds_agent_cmake_module</name>
-  <version>0.0.1<version>
+  <version>0.0.1</version>
   <description>Provide CMake module to find eProsima Micro XRCE-DDS Agent</description>
   <maintainer email="borjaouterelo@eprosima.com">Borja Outerelo</maintainer>
   <license>Apache License 2.0</license>
