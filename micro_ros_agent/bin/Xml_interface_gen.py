@@ -8,7 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),'..'))
 
 from rosidl_cmake import read_generator_arguments
 from rosidl_parser import UnknownMessageType
-from uros_agent import generate_XML
+from micro_ros_agent import generate_XML
 
 
 def main(argv=sys.argv[1:]):

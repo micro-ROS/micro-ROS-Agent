@@ -17,7 +17,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 # Set proyect name
-project(uros_agent)
+project(micro_ros_agent)
 
 
 set(CMAKE_C_CLANG_TIDY clang-tidy -checks=*)
