@@ -18,12 +18,12 @@ import xml.etree.ElementTree
 
 from rosidl_cmake import convert_camel_case_to_lower_case_underscore
 from rosidl_cmake import expand_template
-from rosidl_cmake import extract_message_types
 from rosidl_cmake import get_newest_modification_time
-from rosidl_parser import parse_message_file
-from rosidl_parser import parse_service_file
-from rosidl_parser import validate_field_types
+from rosidl_adapter.parser import parse_message_file
+from rosidl_adapter.parser import parse_service_file
+from rosidl_adapter.parser import validate_field_types
 
+from rosidl_cmake import generate_files
 
 def GetPackage(Dir):
     
