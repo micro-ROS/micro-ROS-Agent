@@ -208,8 +208,7 @@ file(WRITE "${_DEFAULT_FASTRTPS_PROFILES_PATH}" "${_XmlDoc}")
 # Only compile uROS agent if rclcpp is found
 find_package(rclcpp QUIET)
 if (rclcpp_FOUND)
-  find_package(microxrcedds_agent_cmake_module REQUIRED)
-  find_package(MicroXRCEDDS_Agent REQUIRED MODULE)
+  find_package(microxrcedds_agent REQUIRED)
 
   add_executable(${PROJECT_NAME} src/main.cpp)
   ament_target_dependencies(
