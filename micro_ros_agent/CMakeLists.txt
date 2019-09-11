@@ -100,6 +100,7 @@ execute_process(
 if(NOT _result EQUAL 0)
   message(FATAL_ERROR "Error finding xml packages")
 endif()
+message("Packages in '${_COLCON_CALL_DIR}: ${_packages}")
 
 
 # Convert output to list
