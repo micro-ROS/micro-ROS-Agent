@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
 
     /* CLI application. */
-    CLI::App app("eProsima Micro XRCE-DDS Agent");
+    CLI::App app("micro-ROS Agent");
     app.require_subcommand(1, 1);
     app.get_formatter()->column_width(42);
 
