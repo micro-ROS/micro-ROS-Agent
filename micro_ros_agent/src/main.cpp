@@ -1,5 +1,4 @@
-
-// Copyright 2018 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2017-present Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,9 +13,21 @@
 // limitations under the License.
 
 #include <uxr/agent/utils/CLI.hpp>
+#include <csignal>
 
 int main(int argc, char** argv)
 {
+#ifndef _WIN32
+    sigset_t signals;
+    sigemptyset(&signals);
+    if(sigaddset(&signals, SIGINT) && sigaddset(&signals, SIGTERM))
+    {
+        std::cerr << "Wrong signalset" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+    sigprocmask( SIG_BLOCK, &signals, nullptr );
+#endif
+
 
     /* CLI application. */
     CLI::App app("micro-ROS Agent");
@@ -24,8 +35,10 @@ int main(int argc, char** argv)
     app.get_formatter()->column_width(42);
 
     /* CLI subcommands. */
-    eprosima::uxr::cli::UDPSubcommand udp_subcommand(app);
-    eprosima::uxr::cli::TCPSubcommand tcp_subcommand(app);
+    eprosima::uxr::cli::UDPv4Subcommand udpv4_subcommand(app);
+    eprosima::uxr::cli::UDPv6Subcommand udpv6_subcommand(app);
+    eprosima::uxr::cli::TCPv4Subcommand tcpv4_subcommand(app);
+    eprosima::uxr::cli::TCPv6Subcommand tcpv6_subcommand(app);
 #ifndef _WIN32
     eprosima::uxr::cli::SerialSubcommand serial_subcommand(app);
     eprosima::uxr::cli::PseudoSerialSubcommand pseudo_serial_subcommand(app);
@@ -57,6 +70,7 @@ int main(int argc, char** argv)
         }
     }
 
+#ifdef  _WIN32
     /* Waiting until exit. */
     std::cin.clear();
     char exit_flag = 0;
@@ -64,6 +78,10 @@ int main(int argc, char** argv)
     {
         std::cin >> exit_flag;
     }
-
+#else
+    /* Wait for SIGTERM/SIGINT instead, as reading from stdin may be redirected to /dev/null. */
+    int n_signal = 0;
+    sigwait(&signals, &n_signal);
+#endif
     return 0;
 }
