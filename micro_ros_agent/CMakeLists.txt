@@ -80,12 +80,11 @@ if(UROSAGENT_GENERATE_PROFILE)
   get_filename_component(_COLCON_CALL_DIR "${_COLCON_CALL_DIR}" DIRECTORY)
 
   set(_PYTHON_SCRIPT_HEAD
-    "
-    import os\n
-    import sys\n
-    sys.path.append('${_OUTPUT_PATH}')\n
-    from ${_PYTHON_PKG_TOOL} import *\n
-    "
+"import os
+import sys
+sys.path.append('${_OUTPUT_PATH}')
+from ${_PYTHON_PKG_TOOL} import *
+"
     )
 
   file(
