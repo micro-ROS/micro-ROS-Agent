@@ -23,6 +23,7 @@ project(micro_ros_agent LANGUAGES CXX)
 
 find_package(ament_cmake REQUIRED)
 find_package(microxrcedds_agent REQUIRED)
+find_package(rosidl_cmake REQUIRED)
 
 add_executable(${PROJECT_NAME} src/main.cpp)
 
