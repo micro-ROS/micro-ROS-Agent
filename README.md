@@ -29,7 +29,7 @@ This reference mechanism can be switched on and off from the Micro XRCE-DDS midd
 
 Communication between the Micro-ROS Agent and the Micro-ROS nodes supports two types of transport:
 
-- UDP.
-- SerialPort.
+- UDP and TCP over IPv4 and IPv6.
+- Serial Port transports.
 
 All available configurations are supported directly by the Micro XRCE-DDS agent.
