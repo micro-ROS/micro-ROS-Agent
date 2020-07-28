@@ -1,4 +1,4 @@
 Third Party Licenses
 ====================
 
-This repository does not include any third-party components.
+This repository does not directly contain 3rd party source code. 
