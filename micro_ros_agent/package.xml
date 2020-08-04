@@ -6,7 +6,7 @@
   <description>DDS-XCRE agent implementation </description>
   <maintainer email="borjaouterelo@eprosima.com">Borja Outerelo</maintainer>
   <license>Apache License 2.0</license>
-
+<!-- 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_export_depend>ament_cmake</buildtool_export_depend>
 
@@ -26,6 +26,21 @@
   
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export> -->
+
+   <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <test_depend>rosidl_default_generators</test_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <test_depend>rosidl_typesupport_fastrtps_cpp</test_depend>
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>builtin_interfaces</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
