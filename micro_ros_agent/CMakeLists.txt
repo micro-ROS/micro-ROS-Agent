@@ -23,19 +23,34 @@ project(micro_ros_agent LANGUAGES CXX)
 
 find_package(ament_cmake REQUIRED)
 find_package(microxrcedds_agent REQUIRED)
+find_package(rosidl_cmake REQUIRED)
+find_package(fastcdr REQUIRED)
+find_package(fastrtps REQUIRED)
+find_package(fastrtps_cmake_module REQUIRED)
+find_package(rmw_dds_common REQUIRED)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+find_package(rosidl_runtime_cpp REQUIRED)
+find_package(rosidl_typesupport_fastrtps_cpp REQUIRED)
+
+add_executable(${PROJECT_NAME} 
+  src/main.cpp
+  # src/graph_manager.cpp
+  )
+
+# ament_target_dependencies(${PROJECT_NAME} rclcpp std_msgs)
 
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
     microxrcedds_agent
+    fastcdr 
+    fastrtps
     $<$<BOOL:$<PLATFORM_ID:Linux>>:rt>
     $<$<BOOL:$<PLATFORM_ID:Linux>>:dl>
   )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
   CXX_STANDARD
-    11
+    14
   CXX_STANDARD_REQUIRED
     YES
   )

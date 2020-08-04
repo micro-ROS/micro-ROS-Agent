@@ -12,6 +12,17 @@
 
   <depend>microxrcedds_agent</depend>
   <depend>rosidl_cmake</depend>
+
+  <build_depend>fastcdr</build_depend>
+  <build_depend>fastrtps</build_depend>
+  <build_depend>fastrtps_cmake_module</build_depend>
+
+  <depend>rosidl_typesupport_cpp</depend>
+  <depend>rmw_dds_common</depend>
+  <depend>builtin_interfaces</depend>
+
+  <depend>rosidl_runtime_cpp</depend>
+  <depend>rosidl_typesupport_fastrtps_cpp</depend>
   
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
