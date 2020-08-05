@@ -10,7 +10,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_export_depend>ament_cmake</buildtool_export_depend>
 
-  <depend>microxrcedds_agent</depend>
+  
   <depend>rosidl_cmake</depend>
 
   <build_depend>fastcdr</build_depend>
@@ -31,16 +31,18 @@
     <build_type>ament_cmake</build_type>
   </export> -->
 
-   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
   <test_depend>rosidl_default_generators</test_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
-
+  
+  <depend>microxrcedds_agent</depend>
   <depend>rmw</depend>
+  <depend>rmw_fastrtps_shared_cpp</depend>
   <depend>rmw_dds_common</depend>
-
+  
   <test_depend>rosidl_typesupport_fastrtps_cpp</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>builtin_interfaces</test_depend>

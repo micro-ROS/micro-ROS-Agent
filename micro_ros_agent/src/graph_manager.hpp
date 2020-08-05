@@ -22,42 +22,50 @@
 #include <fastrtps/publisher/PublisherListener.h>
 #include <fastrtps/rtps/common/MatchingInfo.h>
 
+#include <fastdds/dds/domain/DomainParticipant.hpp>
+#include <fastdds/dds/domain/qos/DomainParticipantQos.hpp>
+
 #include "rmw/types.h"
 #include "rmw_dds_common/graph_cache.hpp"
+#include "rmw_fastrtps_shared_cpp/create_rmw_gid.hpp"
 
 #include "rosidl_typesupport_cpp/message_type_support.hpp"
 #include "rosidl_typesupport_fastrtps_cpp/message_type_support.h"
 #include "rmw_dds_common/msg/participant_entities_info.hpp"
 
-#define RMW_GID_STORAGE_SIZE 24u
-
-namespace graphmanager{
+namespace GraphManager{
   
   using namespace eprosima::fastrtps;
   using namespace eprosima::fastcdr;
+  using namespace rmw_dds_common::msg;
 
-  class GraphType: public TopicDataType {
+  class ParticipantEntitiesInfoTypeSupport: public TopicDataType {
     public:
 
-      GraphType() 
-      : TopicDataType(){
+      ParticipantEntitiesInfoTypeSupport() 
+      : TopicDataType()
+      {
         m_isGetKeyDefined = false;
 
-        type_support = rosidl_typesupport_cpp::get_message_type_support_handle<rmw_dds_common::msg::ParticipantEntitiesInfo>();
+        type_support = rosidl_typesupport_cpp::get_message_type_support_handle<ParticipantEntitiesInfo>();
         type_support = get_message_typesupport_handle(type_support, "rosidl_typesupport_fastrtps_cpp");
         callbacks = static_cast<const message_type_support_callbacks_t *>(type_support->data);
 
-        bool max_size_bound_ = false;
+        std::ostringstream ss;
+        std::string message_namespace(callbacks->message_namespace_);
+        std::string message_name(callbacks->message_name_);
+        if (!message_namespace.empty()) {
+          ss << message_namespace << "::";
+        }
+        ss << "dds_::" << message_name << "_";
+        setName(ss.str().c_str());
+
+        bool max_size_bound_ = true;
         m_typeSize = 4 + callbacks->max_serialized_size(max_size_bound_);
-        m_typeSize=2000;
-        std::cout << "max size: " << m_typeSize << "\n";
       }
 
       bool serialize(void *data, rtps::SerializedPayload_t *payload) override
       {   
-
-          std::cout << "Call to serialize:\n";
-
           FastBuffer fastbuffer(reinterpret_cast<char *>(payload->data), payload->max_size);
           Cdr ser(fastbuffer, Cdr::DEFAULT_ENDIAN, Cdr::DDS_CDR);
 
@@ -73,8 +81,6 @@ namespace graphmanager{
 
       bool deserialize(rtps::SerializedPayload_t* payload, void* data) override
       {
-        std::cout << "Call to deserialize:\n";
-
         FastBuffer fastbuffer(reinterpret_cast<char *>(payload->data), payload->length);
         Cdr deser(fastbuffer, Cdr::DEFAULT_ENDIAN, Cdr::DDS_CDR);
 
@@ -85,46 +91,39 @@ namespace graphmanager{
 
       std::function<uint32_t()> getSerializedSizeProvider(void* data) override
       {
-        std::cout << "Call to getSerializedSizeProvider:\n";
           return [data, this]() -> uint32_t
           {
-              std::cout << "Call to getSerializedSizeProvider inside:"<< (4 + this->callbacks->get_serialized_size(data)) << "\n";
               return (uint32_t) 4 + this->callbacks->get_serialized_size(data);
-;
           };
       }
 
       void* createData() override
       {
-                std::cout << "Call to createData:\n";
-
-          return (void*)new std::vector<unsigned char>;
+        return (void*)nullptr;
       }
 
       void deleteData(void* data) override
       {
-                        std::cout << "Call to deleteData:\n";
-
-          delete((std::vector<unsigned char>*)data);
+        (void) data;
       }
 
       bool getKey(void *data, rtps::InstanceHandle_t* handle, bool force_md5) override
       {
-                                std::cout << "Call to getKey:\n";
-
           (void) data;
           (void) handle;
           (void) force_md5;
           return m_isGetKeyDefined;
       }
+    
     private:
       const message_type_support_callbacks_t * callbacks;
       const rosidl_message_type_support_t * type_support;
     };
 
-    class GraphManager{
+  class GraphManager{
     public:
-      GraphManager(): enclave("/")
+      GraphManager()
+      : enclave("/")
       {     
         uint32_t domain_id = 0;
 
@@ -141,110 +140,99 @@ namespace graphmanager{
 
         participant = Domain::createParticipant(participantAttrs);
 
-        const rosidl_message_type_support_t * type_support = rosidl_typesupport_cpp::get_message_type_support_handle<rmw_dds_common::msg::ParticipantEntitiesInfo>();
+        const rosidl_message_type_support_t * type_support = rosidl_typesupport_cpp::get_message_type_support_handle<ParticipantEntitiesInfo>();
         type_support = get_message_typesupport_handle(type_support, "rosidl_typesupport_fastrtps_cpp");
         callbacks = static_cast<const message_type_support_callbacks_t *>(type_support->data);
 
-        std::ostringstream ss;
-        std::string message_namespace(callbacks->message_namespace_);
-        std::string message_name(callbacks->message_name_);
-        if (!message_namespace.empty()) {
-          ss << message_namespace << "::";
-        }
-        ss << "dds_::" << message_name << "_";
 
-        m_type = new GraphType();
-        m_type->setName(ss.str().c_str());
+        m_type = new ParticipantEntitiesInfoTypeSupport();
         eprosima::fastrtps::Domain::registerType(participant,  m_type);
 
         //CREATE THE PUBLISHER
         PublisherAttributes publisherAttrs;
         Domain::getDefaultPublisherAttributes(publisherAttrs);
         publisherAttrs.topic.topicKind = eprosima::fastrtps::rtps::NO_KEY;
-        publisherAttrs.topic.topicDataType = ss.str();
+        publisherAttrs.topic.topicDataType = m_type->getName();
         publisherAttrs.topic.topicName = "ros_discovery_info";
         publisherAttrs.topic.historyQos.kind = KEEP_LAST_HISTORY_QOS;
         publisherAttrs.topic.historyQos.depth = 1;
+        publisherAttrs.historyMemoryPolicy = rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
+        publisherAttrs.qos.m_publishMode.kind = ASYNCHRONOUS_PUBLISH_MODE;
         publisherAttrs.qos.m_reliability.kind = RELIABLE_RELIABILITY_QOS;
         publisherAttrs.qos.m_durability.kind = TRANSIENT_LOCAL_DURABILITY_QOS;
-        publisher = Domain::createPublisher(participant, publisherAttrs, (PublisherListener*)&m_listener);
+        publisher = Domain::createPublisher(participant, publisherAttrs);
 
         std::cout << "Graph manager init\n"; 
+
+        // eprosima::fastrtps::rtps::GUID_t guid;
+        // guid.entityId.value[0] = 12;
+
+        // const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", guid);
+        // graphCache.add_participant(gid, enclave);
+
+        // ParticipantEntitiesInfo info = graphCache.add_node(gid, "test_node_name", "/");
+        
+
+        // publisher->write((void*)&info);
+
+        // eprosima::fastrtps::rtps::GUID_t reader_guid;
+        // reader_guid.entityId.value[0] = 12;
+        // reader_guid.guidPrefix.value[2] = 32;
+        // rmw_gid_t reader_gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", reader_guid);
+
+        // info = graphCache.associate_reader(reader_gid, gid, "test_node_name", "/");
+
+        // reader_guid.guidPrefix.value[2] = 2;
+        // reader_gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", reader_guid);
+        // info = graphCache.associate_writer(reader_gid, gid, "test_node_name", "/");
+
+        // publisher->write((void*)&info);
+
+
       }
 
-      void add_participant(const dds::GUID_t& guid)
+      void add_participant(const eprosima::fastrtps::rtps::GUID_t& guid, void* data)
       {
-        const rmw_gid_t gid = create_rmw_gid("rmw_fastrtps_cpp", guid);
+        const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", guid);
         graphCache.add_participant(gid, enclave);
-        rmw_dds_common::msg::ParticipantEntitiesInfo info = graphCache.add_node(gid, "testnodeeeeeeee", "/");
-        std::cout << "adding_participant in graph manager\n";
+
+        eprosima::fastdds::dds::DomainParticipant* participant = (eprosima::fastdds::dds::DomainParticipant*) data;
+        eprosima::fastdds::dds::DomainParticipantQos qos = participant->get_qos();
+
+        ParticipantEntitiesInfo info = graphCache.add_node(gid, qos.name().c_str(), "/");
+        
+        std::cout << "adding_participant " << qos.name().c_str() << "in graph manager\n";
 
         publisher->write((void*)&info);
 
+        std::cout << graphCache;
       }
 
-      rmw_gid_t create_rmw_gid(
-        const char * identifier, const dds::GUID_t& guid)
+      void add_datawriter(const eprosima::fastrtps::rtps::GUID_t& guid, void* data)
       {
-        rmw_gid_t rmw_gid = {};
-        rmw_gid.implementation_identifier = identifier;
-        static_assert(
-          sizeof(eprosima::fastrtps::rtps::GUID_t) <= RMW_GID_STORAGE_SIZE,
-          "RMW_GID_STORAGE_SIZE insufficient to store the fastrtps GUID_t."
-        );
-        copy_from_fastrtps_guid_to_byte_array(
-          guid,
-          rmw_gid.data);
-        return rmw_gid;
-      }
+        const rmw_gid_t reader_gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", guid);
 
-      template<typename ByteT>
-      void copy_from_fastrtps_guid_to_byte_array(
-        const dds::GUID_t& guid,
-        ByteT * guid_byte_array)
-      {
-        static_assert(
-          std::is_same<uint8_t, ByteT>::value || std::is_same<int8_t, ByteT>::value,
-          "ByteT should be either int8_t or uint8_t");
-        assert(guid_byte_array);
-        constexpr auto prefix_size = sizeof(guid.guidPrefix());
-        memcpy(guid_byte_array, &guid.guidPrefix(), prefix_size);
-        // memcpy(&guid_byte_array[prefix_size], &guid.entityId(), guid.entityId().size);
-        memcpy(&guid_byte_array[prefix_size], &guid.entityId(), 4);
+
+        eprosima::fastdds::dds::DomainParticipant* participant = (eprosima::fastdds::dds::DomainParticipant*) data;
+        eprosima::fastdds::dds::DomainParticipantQos qos = participant->get_qos();
+
+        const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", participant->guid());
+
+        ParticipantEntitiesInfo info = graphCache.associate_writer(reader_gid, gid,  qos.name().c_str(), "/");
+        
+        std::cout << "add_datawriter " << qos.name().c_str() << "in graph manager\n";
+
+        publisher->write((void*)&info);
+
+        std::cout << graphCache;
       }
 
     private:
       const char * enclave;
-      GraphType * m_type;
+      ParticipantEntitiesInfoTypeSupport * m_type;
       Participant * participant;
       Publisher * publisher;
       const message_type_support_callbacks_t * callbacks;
       rmw_dds_common::GraphCache graphCache;
-
-      class PubListener:public eprosima::fastrtps::PublisherListener
-      {
-      public:
-        PubListener():n_matched(0),firstConnected(false){};
-        ~PubListener(){};
-        int n_matched;
-        bool firstConnected;
-
-        void onPublicationMatched(
-            Publisher* /*pub*/,
-            rtps::MatchingInfo& info)
-        {
-            if (info.status == rtps::MATCHED_MATCHING)
-            {
-                n_matched++;
-                firstConnected = true;
-                std::cout << "Publisher matched" << std::endl;
-            }
-            else
-            {
-                n_matched--;
-                std::cout << "Publisher unmatched" << std::endl;
-            }
-        }
-      }m_listener;
-  };
+};
 }

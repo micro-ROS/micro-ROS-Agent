@@ -21,9 +21,6 @@ set(CMAKE_C_CLANG_TIDY clang-tidy -checks=*)
 
 project(micro_ros_agent LANGUAGES CXX)
 
-
-
-
 find_package(ament_cmake REQUIRED)
 find_package(microxrcedds_agent REQUIRED)
 find_package(rosidl_cmake REQUIRED)
@@ -32,6 +29,7 @@ find_package(fastrtps REQUIRED)
 find_package(fastrtps_cmake_module REQUIRED)
 find_package(rmw_dds_common REQUIRED)
 find_package(rmw REQUIRED)
+find_package(rmw_fastrtps_shared_cpp REQUIRED)
 
 find_package(ament_lint_auto REQUIRED)
 
@@ -52,6 +50,7 @@ ament_target_dependencies(${PROJECT_NAME}
   fastrtps
   rmw_dds_common
   rmw
+  rmw_fastrtps_shared_cpp
   )
 
 target_link_libraries(${PROJECT_NAME}
