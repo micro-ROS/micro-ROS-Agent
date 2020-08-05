@@ -190,15 +190,15 @@ class GraphManager{
 
         ParticipantEntitiesInfo info;
         if (is_reader) {
-            info = graphCache.associate_writer(gid, participant_gid,  qos.name().c_str(), "/");
-        } else {
             info = graphCache.associate_reader(gid, participant_gid,  qos.name().c_str(), "/");
+        } else {
+            info = graphCache.associate_writer(gid, participant_gid,  qos.name().c_str(), "/");
         }
         
         publisher->write((void*)&info);
 
-        // std::cout << "add_datawriter " << qos.name().c_str() << "in graph manager\n";
-        // std::cout << graphCache;
+        std::cout << "add_datawriter " << qos.name().c_str() << "in graph manager\n";
+        std::cout << graphCache;
     }
 
     private:
