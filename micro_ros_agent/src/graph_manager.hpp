@@ -164,12 +164,14 @@ class GraphManager{
         std::cout << "Graph manager init\n"; 
     }
 
-    void add_participant(const eprosima::fastrtps::rtps::GUID_t& guid, (void*) participant)
+    void add_participant(const eprosima::fastrtps::rtps::GUID_t& guid, void* participant)
     {
         const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", guid);
-        graphCache.add_participant(gid, enclave);
+        const eprosima::fastdds::dds::DomainParticipant * _participant = (eprosima::fastdds::dds::DomainParticipant *) participant;
 
-        eprosima::fastdds::dds::DomainParticipantQos qos = participant->get_qos();
+        eprosima::fastdds::dds::DomainParticipantQos qos = _participant->get_qos();
+
+        graphCache.add_participant(gid, enclave);
         ParticipantEntitiesInfo info = graphCache.add_node(gid, qos.name().c_str(), "/");
 
         publisher->write((void*)&info);
@@ -178,10 +180,10 @@ class GraphManager{
         // std::cout << graphCache;
     }
 
-    void associate_entity(const eprosima::fastrtps::rtps::GUID_t& guid, (void*) participant, bool is_reader)
+    void associate_entity(const eprosima::fastrtps::rtps::GUID_t& guid, void* participant, bool is_reader)
     {
         const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", guid);
-        const eprosima::fastdds::dds::DomainParticipant * _participant = (eprosima::fastdds::dds::DomainParticipant *) participant 
+        const eprosima::fastdds::dds::DomainParticipant * _participant = (eprosima::fastdds::dds::DomainParticipant *) participant;
         const rmw_gid_t participant_gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", _participant->guid());
 
         eprosima::fastdds::dds::DomainParticipantQos qos = _participant->get_qos();
