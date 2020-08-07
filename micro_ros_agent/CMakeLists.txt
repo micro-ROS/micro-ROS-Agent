@@ -29,6 +29,7 @@ find_package(fastrtps REQUIRED)
 find_package(fastrtps_cmake_module REQUIRED)
 find_package(rmw_dds_common REQUIRED)
 find_package(rmw REQUIRED)
+find_package(rcutils REQUIRED)
 find_package(rmw_fastrtps_shared_cpp REQUIRED)
 
 find_package(ament_lint_auto REQUIRED)
@@ -38,8 +39,11 @@ find_package(rosidl_runtime_cpp REQUIRED)
 find_package(rosidl_typesupport_cpp REQUIRED)
 find_package(ament_cmake_gtest REQUIRED)
 
+find_package(micro_ros_agent_msgs REQUIRED)
+
 add_executable(${PROJECT_NAME} 
   src/main.cpp
+  src/demangle.cpp
   )
 
 ament_target_dependencies(${PROJECT_NAME}
@@ -51,6 +55,7 @@ ament_target_dependencies(${PROJECT_NAME}
   rmw_dds_common
   rmw
   rmw_fastrtps_shared_cpp
+  micro_ros_agent_msgs
   )
 
 target_link_libraries(${PROJECT_NAME}
