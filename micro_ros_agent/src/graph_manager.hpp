@@ -26,8 +26,10 @@
 #include <fastdds/dds/domain/qos/DomainParticipantQos.hpp>
 
 #include "rmw/types.h"
+#include "rmw/impl/cpp/key_value.hpp"
 #include "rmw_dds_common/graph_cache.hpp"
 #include "rmw_fastrtps_shared_cpp/create_rmw_gid.hpp"
+#include "rmw_fastrtps_shared_cpp/qos.hpp"
 
 #include "rosidl_typesupport_cpp/message_type_support.hpp"
 #include "rosidl_typesupport_fastrtps_cpp/message_type_support.h"
@@ -161,7 +163,34 @@ class GraphManager{
         publisherAttrs.qos.m_durability.kind = TRANSIENT_LOCAL_DURABILITY_QOS;
         publisher = Domain::createPublisher(participant, publisherAttrs);
 
+        graphCache.set_on_change_callback([this](){ this->updated_graph_callback(); });
         std::cout << "Graph manager init\n"; 
+        microros_graph_publisher = std::thread(&GraphManager::publish_microros_graph, this);
+
+        graph_changed = false;
+    }
+
+    void updated_graph_callback()
+    {
+        std::cout << "Updated Graph\n";
+        std::unique_lock<std::mutex> lock(mtx);
+        graph_changed = true;
+        cv.notify_one();
+    }
+
+    void publish_microros_graph()
+    {   
+        while(true) {
+          {
+            std::unique_lock<std::mutex> lock(mtx);
+            cv.wait(lock, [this]{ return this->graph_changed; });
+          }
+          if(graph_changed){
+            std::cout << "Updated uros Graph\n";
+            std::cout << graphCache;
+            graph_changed = false;
+          }
+        }
     }
 
     void add_participant(const eprosima::fastrtps::rtps::GUID_t& guid, void* participant)
@@ -175,9 +204,6 @@ class GraphManager{
         ParticipantEntitiesInfo info = graphCache.add_node(gid, qos.name().c_str(), "/");
 
         publisher->write((void*)&info);
-
-        // std::cout << "adding_participant " << qos.name().c_str() << "in graph manager\n";
-        // std::cout << graphCache;
     }
 
     void associate_entity(const eprosima::fastrtps::rtps::GUID_t& guid, void* participant, bool is_reader)
@@ -196,9 +222,6 @@ class GraphManager{
         }
         
         publisher->write((void*)&info);
-
-        std::cout << "add_datawriter " << qos.name().c_str() << "in graph manager\n";
-        std::cout << graphCache;
     }
 
     private:
@@ -208,5 +231,107 @@ class GraphManager{
       Publisher * publisher;
       const message_type_support_callbacks_t * callbacks;
       rmw_dds_common::GraphCache graphCache;
+
+      bool graph_changed;
+      std::thread microros_graph_publisher;
+      std::mutex mtx;
+      std::condition_variable cv;
+};
+
+class ParticipantListener : public eprosima::fastrtps::ParticipantListener
+{
+public:
+    ParticipantListener(rmw_dds_common::GraphCache& graphCache) 
+    : _graphCache(graphCache)
+    {
+    }
+  void onParticipantDiscovery(
+    eprosima::fastrtps::Participant *,
+    eprosima::fastrtps::rtps::ParticipantDiscoveryInfo && info) override
+  {
+    switch (info.status) {
+      case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::DISCOVERED_PARTICIPANT:
+        {
+          auto map = rmw::impl::cpp::parse_key_value(info.info.m_userData);
+          auto name_found = map.find("enclave");
+
+          if (name_found == map.end()) {
+            return;
+          }
+          auto enclave =
+            std::string(name_found->second.begin(), name_found->second.end());
+
+          _graphCache.add_participant(
+            rmw_fastrtps_shared_cpp::create_rmw_gid(
+              "rmw_fastrtps_cpp", info.info.m_guid),
+            enclave);
+          break;
+        }
+      case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::REMOVED_PARTICIPANT:
+      // fall through
+      case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::DROPPED_PARTICIPANT:
+        _graphCache.remove_participant(
+          rmw_fastrtps_shared_cpp::create_rmw_gid(
+            "rmw_fastrtps_cpp", info.info.m_guid));
+        break;
+      default:
+        return;
+    }
+  }
+
+  void onSubscriberDiscovery(
+    eprosima::fastrtps::Participant *,
+    eprosima::fastrtps::rtps::ReaderDiscoveryInfo && info) override
+  {
+    if (eprosima::fastrtps::rtps::ReaderDiscoveryInfo::CHANGED_QOS_READER != info.status) {
+      bool is_alive =
+        eprosima::fastrtps::rtps::ReaderDiscoveryInfo::DISCOVERED_READER == info.status;
+      process_discovery_info(info.info, is_alive, true);
+    }
+  }
+
+  void onPublisherDiscovery(
+    eprosima::fastrtps::Participant *,
+    eprosima::fastrtps::rtps::WriterDiscoveryInfo && info) override
+  {
+    if (eprosima::fastrtps::rtps::WriterDiscoveryInfo::CHANGED_QOS_WRITER != info.status) {
+      bool is_alive =
+        eprosima::fastrtps::rtps::WriterDiscoveryInfo::DISCOVERED_WRITER == info.status;
+      process_discovery_info(info.info, is_alive, false);
+    }
+  }
+
+private:
+  template<class T>
+  void
+  process_discovery_info(T & proxyData, bool is_alive, bool is_reader)
+  {
+    {
+      if (is_alive) {
+        rmw_qos_profile_t qos_profile = rmw_qos_profile_unknown;
+        dds_qos_to_rmw_qos(proxyData.m_qos, &qos_profile);
+
+        _graphCache.add_entity(
+          rmw_fastrtps_shared_cpp::create_rmw_gid(
+            "rmw_fastrtps_cpp",
+            proxyData.guid()),
+          proxyData.topicName().to_string(),
+          proxyData.typeName().to_string(),
+          rmw_fastrtps_shared_cpp::create_rmw_gid(
+            "rmw_fastrtps_cpp",
+            iHandle2GUID(proxyData.RTPSParticipantKey())),
+          qos_profile,
+          is_reader);
+      } else {
+        _graphCache.remove_entity(
+          rmw_fastrtps_shared_cpp::create_rmw_gid(
+            "rmw_fastrtps_cpp",
+            proxyData.guid()),
+          is_reader);
+      }
+    }
+  }
+
+  rmw_dds_common::GraphCache& _graphCache;
 };
 }
