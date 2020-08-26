@@ -26,12 +26,14 @@
 #include <fastdds/dds/domain/qos/DomainParticipantQos.hpp>
 
 #include "rmw/types.h"
+#include "rmw/names_and_types.h"
 #include "rmw/impl/cpp/key_value.hpp"
 #include "rmw_dds_common/graph_cache.hpp"
 #include "rmw_fastrtps_shared_cpp/create_rmw_gid.hpp"
 #include "rmw_fastrtps_shared_cpp/qos.hpp"
 
 #include "rcutils/types.h"
+#include "rcutils/types/string_array.h"
 
 #include "rosidl_typesupport_cpp/message_type_support.hpp"
 #include "rosidl_typesupport_fastrtps_cpp/message_type_support.h"
@@ -201,37 +203,38 @@ class GraphManager{
             micro_ros_agent_msgs::msg::Graph graph_message;
 
 
-            rcutils_string_array_t node_names;
-            rcutils_string_array_t node_namespaces;
+            rcutils_string_array_t node_names = rcutils_get_zero_initialized_string_array();
+            rcutils_string_array_t node_namespaces = rcutils_get_zero_initialized_string_array();
             rcutils_allocator_t allocator = rcutils_get_default_allocator();
             graphCache.get_node_names(&node_names, &node_namespaces, nullptr, &allocator);
-              std::cout << node_names.size << "\n";
-              std::cout << graphCache.get_number_of_nodes() << "\n";
 
             for (size_t i = 0; i < node_names.size; i++)
             {
-              rmw_names_and_types_t rmw_names_and_types;
+              rmw_names_and_types_t rmw_names_and_types = rmw_get_zero_initialized_names_and_types();
               const std::string node_name(node_names.data[i]);
               const std::string node_namespace(node_namespaces.data[i]);
               std::cout << node_name << "\n";
 
-              // using DemangleFunction = std::string (*)(const std::string &);
+              using DemangleFunction = std::string (*)(const std::string &);
 
-              // DemangleFunction demangle_topic = _demangle_ros_topic_from_topic;
-              // DemangleFunction demangle_type = _demangle_if_ros_type;
+              DemangleFunction demangle_topic = _demangle_ros_topic_from_topic;
+              DemangleFunction demangle_type = _demangle_if_ros_type;
 
-              // graphCache.get_writer_names_and_types_by_node(  node_name, 
-              //                                                 node_namespace,
-              //                                                 demangle_topic,
-              //                                                 demangle_type,
-              //                                                 &allocator,
-              //                                                 &rmw_names_and_types
-              //                                               );
+              rmw_ret_t ret = graphCache.get_writer_names_and_types_by_node(  node_name, 
+                                                              node_namespace,
+                                                              demangle_topic,
+                                                              demangle_type,
+                                                              &allocator,
+                                                              &rmw_names_and_types
+                                                            );
 
-              // for (size_t i = 0; i < rmw_names_and_types.names.size; i++)
-              // {
-              //   std::cout << rmw_names_and_types.names.data[i] << "\n";
-              // }
+              std::cout << rmw_names_and_types.names.size << " reeet \n";
+
+
+              for (size_t i = 0; i < rmw_names_and_types.names.size; i++)
+              {
+                std::cout << rmw_names_and_types.names.data[i] << "\n";
+              }
             }
           }
         }
