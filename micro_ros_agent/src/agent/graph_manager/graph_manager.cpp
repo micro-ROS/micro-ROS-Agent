@@ -121,8 +121,13 @@ inline void GraphManager::publish_microros_graph()
             }
         }
 
-        rcutils_string_array_fini(&node_names);
-        rcutils_string_array_fini(&node_namespaces);
+        if (RCUTILS_RET_OK != rcutils_string_array_fini(&node_names) ||
+            RCUTILS_RET_OK != rcutils_string_array_fini(&node_namespaces))
+        {
+            std::cerr << "Problem while freeing resources in Micro-ROS Graph Manager"
+                      << ", file: '" << __FILE__ << "', line: '" << __LINE__ << "'." << std::endl;
+            break;
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
