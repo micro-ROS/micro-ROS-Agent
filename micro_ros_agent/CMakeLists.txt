@@ -41,9 +41,17 @@ find_package(ament_cmake_gtest REQUIRED)
 
 find_package(micro_ros_agent_msgs REQUIRED)
 
-add_executable(${PROJECT_NAME} 
+add_executable(${PROJECT_NAME}
   src/main.cpp
-  src/demangle.cpp
+  src/agent/Agent.cpp
+  src/agent/graph_manager/graph_manager.cpp
+  src/agent/graph_manager/graph_participants_typesupport.cpp
+  src/agent/utils/demangle.cpp
+  )
+
+target_include_directories(${PROJECT_NAME}
+  PRIVATE
+    include
   )
 
 ament_target_dependencies(${PROJECT_NAME}

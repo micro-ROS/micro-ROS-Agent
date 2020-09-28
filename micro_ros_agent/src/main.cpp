@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <uxr/agent/AgentInstance.hpp>
+#include <agent/Agent.hpp>
 
 int main(int argc, char** argv)
 {
-    eprosima::uxr::AgentInstance& xrce_dds_agent_instance =
-        xrce_dds_agent_instance.getInstance();
+    uros::agent::Agent micro_ros_agent;
 
-    if (!xrce_dds_agent_instance.create(argc, argv))
+    if (!micro_ros_agent.create(argc, argv))
     {
         return 1;
     }
-    xrce_dds_agent_instance.run();
+    micro_ros_agent.run();
 
     return 0;
 }
