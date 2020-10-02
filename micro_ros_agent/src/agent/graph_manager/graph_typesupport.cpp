@@ -15,7 +15,7 @@
 #ifndef UROS_AGENT_GRAPH_PARTICIPANTS_TYPESUPPORT_CPP_
 #define UROS_AGENT_GRAPH_PARTICIPANTS_TYPESUPPORT_CPP_
 
-#include <agent/graph_manager/graph_participants_typesupport.hpp>
+#include <agent/graph_manager/graph_typesupport.hpp>
 
 namespace uros {
 namespace agent {
@@ -111,6 +111,92 @@ bool ParticipantEntitiesInfoTypeSupport::getKey(
     (void) force_md5;
     return m_isGetKeyDefined;
 }
+
+
+MicrorosGraphInfoTypeSupport::MicrorosGraphInfoTypeSupport()
+    : TopicDataType()
+{
+    type_support_ = rosidl_typesupport_cpp::get_message_type_support_handle<
+        micro_ros_msgs::msg::Graph>();
+    std::cout << "got typesupporthandle for micro_ros_msgs::msg::Graph" << std::endl;
+    type_support_ = get_message_typesupport_handle(type_support_,
+        "rosidl_typesupport_fastrtps_cpp");
+    std::cout << "got typesupporthandle microrosmsg for fastrtps cpp" << std::endl;
+    callbacks_ = static_cast<const message_type_support_callbacks_t *>(type_support_->data);
+
+    this->setName(callbacks_->message_name_);
+
+    bool full_bounded = true;
+    m_typeSize = 4 + callbacks_->max_serialized_size(full_bounded);
+}
+
+bool MicrorosGraphInfoTypeSupport::serialize(
+        void * data,
+        eprosima::fastrtps::rtps::SerializedPayload_t * payload)
+{
+    eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload->data),
+        payload->max_size);
+    eprosima::fastcdr::Cdr scdr(fastbuffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
+        eprosima::fastcdr::Cdr::DDS_CDR);
+
+    scdr.serialize_encapsulation();
+    if (callbacks_->cdr_serialize(data, scdr))
+    {
+        payload->encapsulation = (scdr.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS) ?
+            CDR_BE : CDR_LE;
+        payload->length = static_cast<uint32_t>(scdr.getSerializedDataLength());
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool MicrorosGraphInfoTypeSupport::deserialize(
+        eprosima::fastrtps::rtps::SerializedPayload_t * payload,
+        void * data)
+{
+    eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload->data),
+        payload->length);
+    eprosima::fastcdr::Cdr dcdr(fastbuffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
+        eprosima::fastcdr::Cdr::DDS_CDR);
+
+    dcdr.read_encapsulation();
+    return callbacks_->cdr_deserialize(dcdr, data);
+}
+
+std::function<uint32_t()> MicrorosGraphInfoTypeSupport::getSerializedSizeProvider(
+        void * data)
+{
+    return [data, this]() -> uint32_t
+    {
+        return static_cast<uint32_t>(4 + callbacks_->get_serialized_size(data));
+    };
+}
+
+void * MicrorosGraphInfoTypeSupport::createData()
+{
+    return static_cast<void *>(nullptr);
+}
+
+void MicrorosGraphInfoTypeSupport::deleteData(
+        void * data)
+{
+    (void) data;
+}
+
+bool MicrorosGraphInfoTypeSupport::getKey(
+        void * data,
+        eprosima::fastrtps::rtps::InstanceHandle_t * handle,
+        bool force_md5)
+{
+    (void) data;
+    (void) handle;
+    (void) force_md5;
+    return m_isGetKeyDefined;
+}
+
 }  // namespace graph_manager
 }  // namespace agent
 }  // namespace uros

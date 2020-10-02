@@ -42,6 +42,8 @@
 
 #include "rmw_dds_common/msg/participant_entities_info.hpp"
 
+#include "micro_ros_msgs/msg/graph.hpp"
+
 namespace uros {
 namespace agent {
 namespace graph_manager {
@@ -58,29 +60,64 @@ public:
     ParticipantEntitiesInfoTypeSupport();
 
     virtual bool serialize(
-            void * data,
-            eprosima::fastrtps::rtps::SerializedPayload_t * payload) override;
+            void* data,
+            eprosima::fastrtps::rtps::SerializedPayload_t* payload) override;
 
     virtual bool deserialize(
-            eprosima::fastrtps::rtps::SerializedPayload_t * payload,
-            void * data) override;
+            eprosima::fastrtps::rtps::SerializedPayload_t* payload,
+            void* data) override;
 
     virtual std::function<uint32_t()> getSerializedSizeProvider(
-            void * data) override;
+            void* data) override;
 
-    virtual void * createData() override;
+    virtual void* createData() override;
 
-    virtual void deleteData(void * data) override;
+    virtual void deleteData(void* data) override;
 
     virtual bool getKey(
-            void * data,
-            eprosima::fastrtps::rtps::InstanceHandle_t * handle,
+            void* data,
+            eprosima::fastrtps::rtps::InstanceHandle_t* handle,
             bool force_md5) override;
 
 private:
 
-    const message_type_support_callbacks_t * callbacks_;
-    const rosidl_message_type_support_t * type_support_;
+    const message_type_support_callbacks_t* callbacks_;
+    const rosidl_message_type_support_t* type_support_;
+};
+
+/**
+ * @brief   TODO(jamoralp) docs
+ */
+class MicrorosGraphInfoTypeSupport : public eprosima::fastdds::dds::TopicDataType
+{
+public:
+
+    MicrorosGraphInfoTypeSupport();
+
+    virtual bool serialize(
+            void* data,
+            eprosima::fastrtps::rtps::SerializedPayload_t* payload) override;
+
+    virtual bool deserialize(
+            eprosima::fastrtps::rtps::SerializedPayload_t* payload,
+            void* data) override;
+
+    virtual std::function<uint32_t()> getSerializedSizeProvider(
+            void* data) override;
+
+    virtual void* createData() override;
+
+    virtual void deleteData(void* data) override;
+
+    virtual bool getKey(
+            void* data,
+            eprosima::fastrtps::rtps::InstanceHandle_t* handle,
+            bool force_md5) override;
+
+private:
+
+    const message_type_support_callbacks_t* callbacks_;
+    const rosidl_message_type_support_t* type_support_;
 };
 
 }  // namespace graph_manager

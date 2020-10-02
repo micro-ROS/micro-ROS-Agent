@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(micro_ros_agent_msgs)
+project(micro_ros_msgs)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -34,7 +34,7 @@ if(BUILD_TESTING)
 endif()
 
 rosidl_generate_interfaces(
-  ${PROJECT_NAME}_msgs
+  ${PROJECT_NAME}
   "msg/Graph.msg"
   "msg/Node.msg"
   "msg/Entity.msg"
