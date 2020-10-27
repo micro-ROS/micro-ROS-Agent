@@ -31,6 +31,9 @@
 #include <fastdds/dds/publisher/Publisher.hpp>
 #include <fastdds/dds/subscriber/DataReader.hpp>
 #include <fastdds/dds/subscriber/qos/DataReaderQos.hpp>
+#include <fastdds/dds/subscriber/SampleInfo.hpp>
+#include <fastdds/dds/subscriber/Subscriber.hpp>
+#include <fastdds/dds/subscriber/DataReaderListener.hpp>
 
 #include "rmw/types.h"
 #include "rmw/names_and_types.h"
@@ -62,6 +65,10 @@ namespace uros {
 namespace agent {
 namespace graph_manager {
 
+/**
+ * @brief   Class that keeps track of the existing entities in the ROS 2 world,
+ *          both coming from micro-ROS or from external ROS 2 applications.
+ */
 class GraphManager
 {
 public:
@@ -90,7 +97,10 @@ public:
             const eprosima::fastdds::dds::DomainParticipant* participant);
 
     /**
-     * @brief   TODO
+     * @brief   Adds a DDS participant to the graph tree.
+     * @param   guid rtps::GUID_t of the participant to be added.
+     * @param   node_name Name of the ROS 2 node associated to the given participant.
+     * @param   enclave ROS 2 enclave.
      */
     void add_participant(
             const eprosima::fastrtps::rtps::GUID_t& guid,
@@ -105,7 +115,10 @@ public:
             const eprosima::fastrtps::rtps::GUID_t& guid);
 
     /**
-     * @brief   TODO
+     * @brief   Adds a DDS datawriter to the graph tree.
+     * @param   datawriter_guid rtps::GUID_t of the datawriter to be added.
+     * @param   participant Pointer to the participant which owns this datawriter.
+     * @param   datawriter Pointer to the datawriter to be added.
      */
     void add_datawriter(
             const eprosima::fastrtps::rtps::GUID_t& datawriter_guid,
@@ -113,7 +126,12 @@ public:
             const eprosima::fastdds::dds::DataWriter* datawriter);
 
     /**
-     * @brief   TODO
+     * @brief   Adds a DDS datawriter to the graph tree.
+     * @param   datawriter_guid rtps::GUID_t of the datawriter to be added.
+     * @param   topic_name Name of the topic to which the datawriter sends information to.
+     * @param   type_name Type name of the sent topic.
+     * @param   participant_guid rtps::GUID_t of the participant which owns this datawriter.
+     * @param   writer_qos QOS of the datawriter to be included into the graph tree.
      */
     void add_datawriter(
             const eprosima::fastrtps::rtps::GUID_t& datawriter_guid,
@@ -122,6 +140,14 @@ public:
             const eprosima::fastrtps::rtps::GUID_t& participant_guid,
             const eprosima::fastdds::dds::DataWriterQos& writer_qos);
 
+    /**
+     * @brief   Adds a DDS datawriter to the graph tree.
+     * @param   datawriter_guid rtps::GUID_t of the datawriter to be added.
+     * @param   topic_name Name of the topic to which the datawriter sends information to.
+     * @param   type_name Type name of the sent topic.
+     * @param   participant_guid rtps::GUID_t of the participant which owns this datawriter.
+     * @param   writer_qos QOS of the datawriter to be included into the graph tree.
+     */
     void add_datawriter(
             const eprosima::fastrtps::rtps::GUID_t& datawriter_guid,
             const std::string& topic_name,
@@ -130,13 +156,17 @@ public:
             const eprosima::fastdds::dds::WriterQos& writer_qos);
 
     /**
-     * @brief   TODO
+     * @brief   Removes a DDS datawriter from the graph tree.
+     * @param   datawriter_guid rtps::GUID_t of the datawriter to be removed.
      */
     void remove_datawriter(
             const eprosima::fastrtps::rtps::GUID_t& datawriter_guid);
 
     /**
-     * @brief   TODO
+     * @brief   Adds a DDS datareader to the graph tree.
+     * @param   datareader_guid rtps::GUID_t of the datareader to be added.
+     * @param   participant Pointer to the participant which owns this datareader.
+     * @param   datareader Pointer to the datareader to be added.
      */
     void add_datareader(
             const eprosima::fastrtps::rtps::GUID_t& datareader_guid,
@@ -144,7 +174,12 @@ public:
             const eprosima::fastdds::dds::DataReader* datareader);
 
     /**
-     * @brief   TODO
+     * @brief   Adds a DDS datareader to the graph tree.
+     * @param   datareader_guid rtps::GUID_t of the datareader to be added.
+     * @param   topic_name Name of the topic to which the datareader sends information to.
+     * @param   type_name Type name of the sent topic.
+     * @param   participant_guid rtps::GUID_t of the participant which owns this datareader.
+     * @param   writer_qos QOS of the datareader to be included into the graph tree.
      */
     void add_datareader(
             const eprosima::fastrtps::rtps::GUID_t& datareader_guid,
@@ -153,6 +188,14 @@ public:
             const eprosima::fastrtps::rtps::GUID_t& participant_guid,
             const eprosima::fastdds::dds::DataReaderQos& reader_qos);
 
+    /**
+     * @brief   Adds a DDS datareader to the graph tree.
+     * @param   datareader_guid rtps::GUID_t of the datareader to be added.
+     * @param   topic_name Name of the topic to which the datareader sends information to.
+     * @param   type_name Type name of the sent topic.
+     * @param   participant_guid rtps::GUID_t of the participant which owns this datareader.
+     * @param   writer_qos QOS of the datareader to be included into the graph tree.
+     */
     void add_datareader(
             const eprosima::fastrtps::rtps::GUID_t& datareader_guid,
             const std::string& topic_name,
@@ -161,7 +204,8 @@ public:
             const eprosima::fastdds::dds::ReaderQos& reader_qos);
 
     /**
-     * @brief   TODO
+     * @brief   Removes a DDS datareader from the graph tree.
+     * @param   datareader_guid rtps::GUID_t of the datareader to be removed.
      */
     void remove_datareader(
             const  eprosima::fastrtps::rtps::GUID_t& datareader_guid);
@@ -180,12 +224,16 @@ public:
 private:
 
     /**
-     * @brief   TODO(jamoralp) docs
+     * @brief   Implementation of FastDDS' DomainParticipantListener abstract class.
      */
     class ParticipantListener : public eprosima::fastdds::dds::DomainParticipantListener
     {
     public:
 
+        /**
+         * @brief   Constructor.
+         * @param   graph_manager Pointer to the GraphManager object which owns this ParticipantListener.
+         */
         ParticipantListener(
                 GraphManager* graph_manager);
     private:
@@ -199,21 +247,55 @@ private:
                 eprosima::fastrtps::rtps::ParticipantDiscoveryInfo&& info) override;
 
         void on_subscriber_discovery(
-                eprosima::fastdds::dds::DomainParticipant* participant,
+                eprosima::fastdds::dds::DomainParticipant* /*participant*/,
                 eprosima::fastrtps::rtps::ReaderDiscoveryInfo&& info) override;
 
         void on_publisher_discovery(
-                eprosima::fastdds::dds::DomainParticipant* participant,
+                eprosima::fastdds::dds::DomainParticipant* /*participant*/,
                 eprosima::fastrtps::rtps::WriterDiscoveryInfo&& info) override;
 
         GraphManager* graphManager_from_;
     };
 
+    /**
+     * @brief   Implementation of FastDDS' DomainReaderListener abstract class.
+     */
+    class DatareaderListener : public eprosima::fastdds::dds::DataReaderListener
+    {
+    public:
+
+        /**
+         * @brief   Constructor.
+         * @param   graph_manager Pointer to the GraphManager object which owns this DataReaderListener.
+         */
+        DatareaderListener(
+                GraphManager* graph_manager);
+
+    private:
+
+        void on_data_available(
+                eprosima::fastdds::dds::DataReader* /*sub*/) override;
+
+        GraphManager* graphManager_from_;
+    };
+
+    /**
+     * @brief   Convert FastDDS QOS object instance to RMW instance.
+     * @param   fastdds_qos QOS instance to be converted.
+     * @returns RMW object representation of the given FastDDS QOS.
+     */
     template <typename FastDDSQos>
     const rmw_qos_profile_t fastdds_qos_to_rmw_qos(
             const FastDDSQos& fastdds_qos);
 
+    /**
+     * @brief   Update micro-ROS graph information upon new data
+     *          received in the 'ros_discovery_info' topic.
+     */
+    void update_node_entities_info();
+
     bool graph_changed_;
+    bool display_on_change_;
     const char * enclave_;
     std::thread microros_graph_publisher_;
     std::mutex mtx_;
@@ -221,31 +303,18 @@ private:
 
     rmw_dds_common::GraphCache graphCache_;
     std::unique_ptr<ParticipantListener> participant_listener_;
+    std::unique_ptr<DatareaderListener> datareader_listener_;
 
     std::unique_ptr<eprosima::fastdds::dds::TypeSupport> participant_info_typesupport_;
     std::unique_ptr<eprosima::fastdds::dds::TypeSupport> microros_graph_info_typesupport_;
     std::unique_ptr<eprosima::fastdds::dds::DomainParticipant> participant_;
     std::unique_ptr<eprosima::fastdds::dds::Publisher> publisher_;
+    std::unique_ptr<eprosima::fastdds::dds::Subscriber> subscriber_;
     std::unique_ptr<eprosima::fastdds::dds::Topic> ros_discovery_topic_;
     std::unique_ptr<eprosima::fastdds::dds::Topic> ros_to_microros_graph_topic_;
     std::unique_ptr<eprosima::fastdds::dds::DataWriter> ros_discovery_datawriter_;
     std::unique_ptr<eprosima::fastdds::dds::DataWriter> ros_to_microros_graph_datawriter_;
-
-    /// TODO(jamoralp)
-    /**
-     * We need to come up with a way to identify which participant corresponds with its nodes,
-     * to associates writers/readers with nodes.
-     * This should be implemented by means of a subscriber to the "ros_discovery_info" topic.
-     * This subscriber, which must have a DataWriterListener entity associated to it, should implement
-     * the callback function for the DataWriterListener, filling a micro_ros_msgs::msg::Graph message instance
-     * and sending it via a different datawriter (also to be implemented).
-     *
-     * We could keep the current DomainParticipantListener, or limit it to a SubscriberListener/PublisherListener
-     * to gather information about the existing writers and readers and keep them in our local graphCache. As "ros_discovery_info"
-     * topic gives us the writer/readers GID associated to each node, the could be looked up from our local graphCache entity,
-     * to fill the micro_ros_msgs::msg::Node entities array and send it back to micro-ROS.
-     *
-     */
+    std::unique_ptr<eprosima::fastdds::dds::DataReader> ros_discovery_datareader_;
 };
 
 }  // namespace graph_manager

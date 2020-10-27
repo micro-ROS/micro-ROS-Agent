@@ -7,4 +7,4 @@ byte ACTION_CLIENT=5
 
 byte entity_type
 string<=256 name
-string<=256[] type
+string<=256[] types
