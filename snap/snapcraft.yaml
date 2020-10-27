@@ -82,17 +82,28 @@ architectures:
   - build-on: ppc64el
 
 parts:
-  agent:
+  agent-uxrce:
     plugin: cmake
-    source: .
-    cmake-parameters: [-DCMAKE_INSTALL_PREFIX=/usr]
+    source: https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+    cmake-parameters: [-DCMAKE_INSTALL_PREFIX=/usr, -DUAGENT_CLI_PROFILE=OFF -DUAGENT_BUILD_EXECUTABLE=OFF]
     build-packages: [make, gcc, g++]
 
-  runner:
-    plugin: dump
-    source: snap/local/
-    organize:
-      '*': usr/bin/
+  uros-agent:
+    plugin: cmake
+    source: .
+    source-subdir: micro_ros_agent
+    override-build: |
+      cd ../../agent-uxrce/build && make install && cd -
+      cd micro_ros_agent
+      mkdir -p build
+      cd build
+      cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DUROSAGENT_AMENTIFY_PACKAGE=OFF
+      make
+      make install
+      chmod +x /usr/lib/micro_ros_agent/micro_ros_agent
+    build-packages: [make, gcc, g++]
+    after:
+      - agent-uxrce
 
 apps:
   micro-ros-agent:

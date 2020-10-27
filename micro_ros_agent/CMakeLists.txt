@@ -17,11 +17,16 @@ cmake_minimum_required(VERSION 3.5)
 option(UROSAGENT_GENERATE_PROFILE
   "Generates agent.refs according to the .msgs provided in the .repos" OFF
   )
+option(UROSAGENT_AMENTIFY_PACKAGE "Amentify this package" ON)
+
 set(CMAKE_C_CLANG_TIDY clang-tidy -checks=*)
 
 project(micro_ros_agent LANGUAGES CXX)
 
-find_package(ament_cmake REQUIRED)
+if(UROSAGENT_AMENTIFY_PACKAGE)
+  find_package(ament_cmake REQUIRED)
+endif()
+
 find_package(microxrcedds_agent REQUIRED)
 find_package(rosidl_cmake REQUIRED)
 find_package(fastcdr REQUIRED)
@@ -102,9 +107,10 @@ target_compile_options(${PROJECT_NAME}
     $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wpedantic>
   )
 
-ament_export_dependencies(microxrcedds_agent)
-
-ament_package()
+if(UROSAGENT_AMENTIFY_PACKAGE)
+  ament_export_dependencies(microxrcedds_agent)
+  ament_package()
+endif()
 
 install(
   TARGETS
@@ -198,7 +204,7 @@ from ${_PYTHON_PKG_TOOL} import *
   endforeach()
 
   execute_process(
-    COMMAND 
+    COMMAND
       "${PYTHON_EXECUTABLE}" "${_XML_DEFAULT_READ_BIN}" "--default-xml-path" "${_RESOURCE_DIR}"
     OUTPUT_VARIABLE
       _XmlDoc
@@ -207,7 +213,7 @@ from ${_PYTHON_PKG_TOOL} import *
     )
 
   if(NOT _result EQUAL 0)
-    message(FATAL_ERROR "Error in typesuppor generation") 
+    message(FATAL_ERROR "Error in typesupport generation")
   endif()
 
   foreach(package ${_packages})
@@ -241,7 +247,7 @@ from ${_PYTHON_PKG_TOOL} import *
       )
 
     if(NOT _result EQUAL 0)
-      message(FATAL_ERROR "Error in typesuppor generation") 
+      message(FATAL_ERROR "Error in typesupport generation")
     endif()
 
     set(_XmlDoc "${_XmlDoc}${_XmlGen}")
