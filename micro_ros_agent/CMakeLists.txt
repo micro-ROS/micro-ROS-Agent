@@ -14,10 +14,9 @@
 
 cmake_minimum_required(VERSION 3.5)
 
-option(UROSAGENT_GENERATE_PROFILE
-  "Generates agent.refs according to the .msgs provided in the .repos" OFF
-  )
+option(UROSAGENT_GENERATE_PROFILE "Generates agent.refs according to the .msgs provided in the .repos" OFF)
 option(UROSAGENT_AMENTIFY_PACKAGE "Amentify this package" ON)
+option(UROSAGENT_SNAP_PACKAGING "Create the snap package for the micro-ROS Agent" OFF)
 
 set(CMAKE_C_CLANG_TIDY clang-tidy -checks=*)
 
@@ -119,6 +118,17 @@ install(
     lib/${PROJECT_NAME}
   )
 
+if(UROSAGENT_SNAP_PACKAGING)
+  install(
+    FILES
+      ${CMAKE_CURRENT_SOURCE_DIR}/../snap/local/micro-ros-agent-daemon
+    DESTINATION
+      lib/${PROJECT_NAME}
+    PERMISSIONS
+      WORLD_EXECUTE
+    )
+endif()
+
 if(UROSAGENT_GENERATE_PROFILE)
   set(_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/python")
 
@@ -128,7 +138,7 @@ if(UROSAGENT_GENERATE_PROFILE)
   set(_XML_DEFAULT_READ_BIN "${_OUTPUT_PATH}/bin/Xml_read_default_profiles.py")
   normalize_path(_XML_DEFAULT_READ_BIN "${_XML_DEFAULT_READ_BIN}")
 
-  set(_PYTHON_PKG_TOOL ${PROJECT_NAME})
+  set(_PYTHON_PKG_TOOL utils)
 
   set(_RESOURCE_DIR "${_OUTPUT_PATH}/resource")
   normalize_path(_RESOURCE_DIR "${_RESOURCE_DIR}")
