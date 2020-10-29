@@ -98,6 +98,15 @@ parts:
     after:
       - agent-uxrce
 
+  uxrce-runnuer:
+    plugin: dump
+    source: $SNAPCRAFT_STAGE/../parts/agent-uxrce/install/usr/local/lib/
+    source-type: local
+    organize:
+      '*': usr/lib/
+    after:
+      - agent-uxrce
+
   uros-runner:
     plugin: dump
     source: $SNAPCRAFT_STAGE/../parts/uros-agent/install/usr/local/lib/
@@ -111,7 +120,7 @@ apps:
   micro-ros-agent:
     command: usr/bin/micro_ros_agent/micro_ros_agent
     environment:
-      LD_LIBRARY_PATH: $SNAPCRAFT_STAGE/usr/local/lib/
+      LD_LIBRARY_PATH: $SNAPCRAFT_STAGE/../parts/agent-uxrce/install/usr/lib/
     plugs: [network, network-bind, serial-port]
 
   daemon:
