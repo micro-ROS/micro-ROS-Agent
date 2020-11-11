@@ -76,6 +76,7 @@ GraphManager::GraphManager()
     ros_to_microros_graph_topic_.reset(participant_->create_topic("ros_to_microros_graph",
         microros_graph_info_typesupport_->get_type_name(),
         eprosima::fastdds::dds::TOPIC_QOS_DEFAULT));
+
     // Create datawriters
     eprosima::fastdds::dds::DataWriterQos datawriter_qos =
         eprosima::fastdds::dds::DATAWRITER_QOS_DEFAULT;
@@ -94,6 +95,9 @@ GraphManager::GraphManager()
 
     ros_discovery_datawriter_.reset(
         publisher_->create_datawriter(ros_discovery_topic_.get(), datawriter_qos));
+
+    datawriter_qos.history().kind =
+        eprosima::fastdds::dds::HistoryQosPolicyKind::KEEP_ALL_HISTORY_QOS;
     ros_to_microros_graph_datawriter_.reset(
         publisher_->create_datawriter(ros_to_microros_graph_topic_.get(), datawriter_qos));
 

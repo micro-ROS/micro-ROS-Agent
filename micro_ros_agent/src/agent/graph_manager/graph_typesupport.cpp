@@ -124,7 +124,16 @@ MicrorosGraphInfoTypeSupport::MicrorosGraphInfoTypeSupport()
     std::cout << "got typesupporthandle microrosmsg for fastrtps cpp" << std::endl;
     callbacks_ = static_cast<const message_type_support_callbacks_t *>(type_support_->data);
 
-    this->setName(callbacks_->message_name_);
+    std::ostringstream ss;
+    const std::string message_namespace(callbacks_->message_namespace_);
+    const std::string message_name(callbacks_->message_name_);
+
+    if (!message_namespace.empty())
+    {
+        ss << message_namespace << "::";
+    }
+    ss << "dds_::" << message_name << "_";
+    this->setName(ss.str().c_str());
 
     bool full_bounded = true;
     m_typeSize = 4 + callbacks_->max_serialized_size(full_bounded);
