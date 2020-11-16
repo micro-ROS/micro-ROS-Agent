@@ -1,0 +1,26 @@
+name: CI micro-ROS Agent
+
+on:
+    pull_request:
+      branches: 
+        - '**'
+
+jobs:
+
+    microros_agent_ci:
+        runs-on: ubuntu-20.04
+        container: ros:foxy
+    
+        steps:
+        - uses: actions/checkout@v2
+          with:
+            path: src/micro_ros_agent
+
+        - name: Download dependencies
+          run: |
+            git clone -b foxy https://github.com/eProsima/Micro-XRCE-DDS-Agent src/microxrcedds_agent
+      
+        - name: Build
+          run:  |
+            . /opt/ros/foxy/setup.sh
+            colcon build 
