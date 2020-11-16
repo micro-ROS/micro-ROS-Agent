@@ -17,6 +17,7 @@
 
 #include <uxr/agent/AgentInstance.hpp>
 #include <uxr/agent/middleware/Middleware.hpp>
+#include <uxr/agent/middleware/utils/Callbacks.hpp>
 
 #include <agent/graph_manager/graph_manager.hpp>
 // TODO(jamoralp): class Documentation
