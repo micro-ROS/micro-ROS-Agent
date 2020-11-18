@@ -89,11 +89,9 @@ public:
 
     /**
      * @brief   Adds a DDS participant to the graph tree.
-     * @param   guid rtps::GUID_t of the participant to be added.
      * @param   participant Pointer to the participant to be added to the graph.
      */
     void add_participant(
-            const eprosima::fastrtps::rtps::GUID_t& guid,
             const eprosima::fastdds::dds::DomainParticipant* participant);
 
     /**

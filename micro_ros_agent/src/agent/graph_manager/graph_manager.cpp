@@ -234,11 +234,10 @@ inline void GraphManager::publish_microros_graph()
 }
 
 void GraphManager::add_participant(
-        const eprosima::fastrtps::rtps::GUID_t& guid,
         const eprosima::fastdds::dds::DomainParticipant* participant)
 {
     const eprosima::fastdds::dds::DomainParticipantQos qos = participant->get_qos();
-    this->add_participant(guid, qos.name().to_string(), enclave_);
+    this->add_participant(participant->guid(), qos.name().to_string(), enclave_);
 }
 
 void GraphManager::add_participant(
