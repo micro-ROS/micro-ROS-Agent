@@ -68,7 +68,7 @@ std::string Demangle::demangle_ros_topic_from_topic(
     return _resolve_prefix(topic_name, ros_topic_prefix);
 }
 
-std::string Demangle::demangle_service_from_topic(
+std::string Demangle::_demangle_service_from_topic(
         const std::string& prefix,
         const std::string& topic_name,
         const std::string& suffix)
@@ -118,13 +118,13 @@ std::string Demangle::demangle_service_from_topic(
 std::string Demangle::demangle_service_request_from_topic(
         const std::string& topic_name)
 {
-    return demangle_service_from_topic(ros_service_requester_prefix, topic_name, "Request");
+    return _demangle_service_from_topic(ros_service_requester_prefix, topic_name, "Request");
 }
 
 std::string Demangle::demangle_service_reply_from_topic(
         const std::string& topic_name)
 {
-    return demangle_service_from_topic(ros_service_response_prefix, topic_name, "Reply");
+    return _demangle_service_from_topic(ros_service_response_prefix, topic_name, "Reply");
 }
 
 std::string Demangle::demangle_service_type_only(

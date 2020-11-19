@@ -216,9 +216,43 @@ inline void GraphManager::publish_microros_graph()
                 node_message.entities.emplace_back(std::move(entity_message));
             }
 
-            // TODO(jamoralp): fill service/action entities
+            // Get services
+            rmw_names_and_types_t service_names_and_types =
+              rmw_get_zero_initialized_names_and_types();
+            if (RMW_RET_OK != graphCache_.get_names_and_types(
+                uros::agent::utils::Demangle::demangle_service_from_topic,
+                uros::agent::utils::Demangle::demangle_service_type_only,
+                &allocator, &service_names_and_types))
+            {
+                break;
+            }
+
+            for (size_t i = 0; i < service_names_and_types.names.size; ++i)
+            {
+                micro_ros_msgs::msg::Entity entity_message;
+                entity_message.entity_type = micro_ros_msgs::msg::Entity::SERVICE;
+                entity_message.name = std::move(std::string(service_names_and_types.names.data[i]));
+
+                for (size_t j = 0; j < service_names_and_types.types[i].size; ++j)
+                {
+                    entity_message.types.emplace_back(service_names_and_types.types[i].data[j]);
+                }
+
+                node_message.entities.emplace_back(std::move(entity_message));
+            }
+
+            // TODO(jamoralp): fill action entities
 
             graph_message.nodes.emplace_back(std::move(node_message));
+
+            if (RMW_RET_OK != rmw_names_and_types_fini(&writer_names_and_types) ||
+                RMW_RET_OK != rmw_names_and_types_fini(&reader_names_and_types) ||
+                RMW_RET_OK != rmw_names_and_types_fini(&service_names_and_types))
+            {
+                std::cerr << "Problem while freeing resources in Micro-ROS Graph Manager"
+                          << ", file: '" << __FILE__ << "', line: '" << __LINE__ << "'." << std::endl;
+                return;
+            }
         }
 
         ros_to_microros_graph_datawriter_->write(static_cast<void *>(&graph_message));

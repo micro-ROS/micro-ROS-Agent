@@ -42,7 +42,7 @@ private:
      * @param   suffix The ROS service suffix.
      * @returns The demangled service name.
      */
-    static std::string demangle_service_from_topic(
+    static std::string _demangle_service_from_topic(
             const std::string& prefix,
             const std::string& topic_name,
             const std::string& suffix);
