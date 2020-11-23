@@ -85,45 +85,33 @@ parts:
   agent-uxrce:
     plugin: cmake
     source: https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
-    cmake-parameters: [-DUAGENT_CLI_PROFILE=OFF -DUAGENT_BUILD_EXECUTABLE=OFF]
+    cmake-parameters:
+      - -DUAGENT_CLI_PROFILE=OFF
+      - -DUAGENT_BUILD_EXECUTABLE=OFF
     build-packages: [make, gcc, g++]
 
   uros-agent:
     plugin: cmake
     source: .
     source-subdir: micro_ros_agent
-    cmake-parameters: [-DUROSAGENT_AMENTIFY_PACKAGE=OFF, -DUROSAGENT_SNAP_PACKAGING=ON,
-      -DCMAKE_PREFIX_PATH=$SNAPCRAFT_PART_INSTALL/../../agent-uxrce/install/usr/local/]
+    cmake-parameters:
+      - -DUROSAGENT_AMENTIFY_PACKAGE=OFF
+      - -DUROSAGENT_SNAP_PACKAGING=ON
+      - -DCMAKE_PREFIX_PATH=$SNAPCRAFT_STAGE/usr/local
     build-packages: [make, gcc, g++]
     after:
       - agent-uxrce
 
-  uxrce-runnuer:
-    plugin: dump
-    source: $SNAPCRAFT_STAGE/../parts/agent-uxrce/install/usr/local/lib/
-    source-type: local
-    organize:
-      '*': usr/lib/
-    after:
-      - agent-uxrce
-
-  uros-runner:
-    plugin: dump
-    source: $SNAPCRAFT_STAGE/../parts/uros-agent/install/usr/local/lib/
-    source-type: local
-    organize:
-      '*': usr/bin/
-    after:
-      - uros-agent
-
 apps:
   micro-ros-agent:
-    command: usr/bin/micro_ros_agent/micro_ros_agent
+    command: usr/local/lib/micro_ros_agent/micro_ros_agent
     environment:
-      LD_LIBRARY_PATH: $SNAPCRAFT_STAGE/../parts/agent-uxrce/install/usr/lib/
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/local/lib"
     plugs: [network, network-bind, serial-port]
 
   daemon:
-    command: usr/bin/micro_ros_agent/micro-ros-agent-daemon
+    command: usr/local/lib/micro_ros_agent/micro-ros-agent-daemon
+    environment:
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/local/lib"
     daemon: simple
     plugs: [network, network-bind, serial-port]
