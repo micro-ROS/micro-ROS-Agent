@@ -118,10 +118,8 @@ MicrorosGraphInfoTypeSupport::MicrorosGraphInfoTypeSupport()
 {
     type_support_ = rosidl_typesupport_cpp::get_message_type_support_handle<
         micro_ros_msgs::msg::Graph>();
-    std::cout << "got typesupporthandle for micro_ros_msgs::msg::Graph" << std::endl;
     type_support_ = get_message_typesupport_handle(type_support_,
         "rosidl_typesupport_fastrtps_cpp");
-    std::cout << "got typesupporthandle microrosmsg for fastrtps cpp" << std::endl;
     callbacks_ = static_cast<const message_type_support_callbacks_t *>(type_support_->data);
 
     std::ostringstream ss;
