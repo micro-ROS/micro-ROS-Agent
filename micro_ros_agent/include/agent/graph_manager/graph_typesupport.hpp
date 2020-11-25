@@ -15,7 +15,6 @@
 #ifndef UROS_AGENT_GRAPH_PARTICIPANTS_TYPESUPPORT_HPP_
 #define UROS_AGENT_GRAPH_PARTICIPANTS_TYPESUPPORT_HPP_
 
-// TODO(jamoralp): are all these includes really necessary?
 #include "fastrtps/Domain.h"
 #include <fastrtps/TopicDataType.h>
 #include "fastrtps/attributes/ParticipantAttributes.h"
@@ -86,7 +85,8 @@ private:
 };
 
 /**
- * @brief   TODO(jamoralp) docs
+ * @brief   Implementation of virtual class eprosima::fastdds::dds::TopicDataType.
+ *          Is used to send graph information to Micro-ROS.
  */
 class MicrorosGraphInfoTypeSupport : public eprosima::fastdds::dds::TopicDataType
 {

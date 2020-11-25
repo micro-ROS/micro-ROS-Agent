@@ -217,37 +217,62 @@ inline void GraphManager::publish_microros_graph()
             }
 
             // Get services
-            rmw_names_and_types_t service_names_and_types =
+            //// Get servers
+            rmw_names_and_types_t service_server_names_and_types =
               rmw_get_zero_initialized_names_and_types();
             if (RMW_RET_OK != graphCache_.get_names_and_types(
-                uros::agent::utils::Demangle::demangle_service_from_topic,
+                uros::agent::utils::Demangle::demangle_service_request_from_topic,
                 uros::agent::utils::Demangle::demangle_service_type_only,
-                &allocator, &service_names_and_types))
+                &allocator, &service_server_names_and_types))
             {
                 break;
             }
 
-            for (size_t i = 0; i < service_names_and_types.names.size; ++i)
+            for (size_t i = 0; i < service_server_names_and_types.names.size; ++i)
             {
                 micro_ros_msgs::msg::Entity entity_message;
-                entity_message.entity_type = micro_ros_msgs::msg::Entity::SERVICE;
-                entity_message.name = std::move(std::string(service_names_and_types.names.data[i]));
+                entity_message.entity_type = micro_ros_msgs::msg::Entity::SERVICE_SERVER;
+                entity_message.name = std::move(std::string(service_server_names_and_types.names.data[i]));
 
-                for (size_t j = 0; j < service_names_and_types.types[i].size; ++j)
+                for (size_t j = 0; j < service_server_names_and_types.types[i].size; ++j)
                 {
-                    entity_message.types.emplace_back(service_names_and_types.types[i].data[j]);
+                    entity_message.types.emplace_back(service_server_names_and_types.types[i].data[j]);
                 }
 
                 node_message.entities.emplace_back(std::move(entity_message));
             }
 
-            // TODO(jamoralp): fill action entities
+            //// Get clients
+            rmw_names_and_types_t service_client_names_and_types =
+              rmw_get_zero_initialized_names_and_types();
+            if (RMW_RET_OK != graphCache_.get_names_and_types(
+                uros::agent::utils::Demangle::demangle_service_reply_from_topic,
+                uros::agent::utils::Demangle::demangle_service_type_only,
+                &allocator, &service_client_names_and_types))
+            {
+              break;
+            }
+
+            for (size_t i = 0; i < service_client_names_and_types.names.size; ++i)
+            {
+                micro_ros_msgs::msg::Entity entity_message;
+                entity_message.entity_type = micro_ros_msgs::msg::Entity::SERVICE_CLIENT;
+                entity_message.name = std::move(std::string(service_client_names_and_types.names.data[i]));
+
+                for (size_t j = 0; j < service_client_names_and_types.types[i].size; ++j)
+                {
+                    entity_message.types.emplace_back(service_client_names_and_types.types[i].data[j]);
+                }
+
+                node_message.entities.emplace_back(std::move(entity_message));
+            }
 
             graph_message.nodes.emplace_back(std::move(node_message));
 
             if (RMW_RET_OK != rmw_names_and_types_fini(&writer_names_and_types) ||
                 RMW_RET_OK != rmw_names_and_types_fini(&reader_names_and_types) ||
-                RMW_RET_OK != rmw_names_and_types_fini(&service_names_and_types))
+                RMW_RET_OK != rmw_names_and_types_fini(&service_server_names_and_types) ||
+                RMW_RET_OK != rmw_names_and_types_fini(&service_client_names_and_types))
             {
                 std::cerr << "Problem while freeing resources in Micro-ROS Graph Manager"
                           << ", file: '" << __FILE__ << "', line: '" << __LINE__ << "'." << std::endl;
