@@ -23,19 +23,74 @@ project(micro_ros_agent LANGUAGES CXX)
 
 find_package(ament_cmake REQUIRED)
 find_package(microxrcedds_agent REQUIRED)
+find_package(rosidl_cmake REQUIRED)
+find_package(fastcdr REQUIRED)
+find_package(fastrtps REQUIRED)
+find_package(fastrtps_cmake_module REQUIRED)
+find_package(rmw_dds_common REQUIRED)
+find_package(rmw REQUIRED)
+find_package(rcutils REQUIRED)
+find_package(rmw_fastrtps_shared_cpp REQUIRED)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+find_package(ament_lint_auto REQUIRED)
+
+find_package(rosidl_typesupport_fastrtps_cpp REQUIRED)
+find_package(rosidl_runtime_cpp REQUIRED)
+find_package(rosidl_typesupport_cpp REQUIRED)
+find_package(ament_cmake_gtest REQUIRED)
+
+find_package(micro_ros_msgs REQUIRED)
+
+add_executable(${PROJECT_NAME}
+  src/main.cpp
+  src/agent/Agent.cpp
+  src/agent/graph_manager/graph_manager.cpp
+  src/agent/graph_manager/graph_typesupport.cpp
+  src/agent/utils/demangle.cpp
+  )
+
+target_include_directories(${PROJECT_NAME}
+  PRIVATE
+    include
+  )
+
+ament_target_dependencies(${PROJECT_NAME}
+  rosidl_typesupport_fastrtps_cpp
+  rosidl_runtime_cpp
+  rosidl_typesupport_cpp
+  fastcdr
+  fastrtps
+  rmw_dds_common
+  rmw
+  rmw_fastrtps_shared_cpp
+  micro_ros_msgs
+  )
 
 target_link_libraries(${PROJECT_NAME}
+  microxrcedds_agent
+  fastcdr
+  fastrtps
+  $<$<BOOL:$<PLATFORM_ID:Linux>>:rt>
+  $<$<BOOL:$<PLATFORM_ID:Linux>>:dl>
+  )
+
+target_compile_options(${PROJECT_NAME}
   PRIVATE
-    microxrcedds_agent
-    $<$<BOOL:$<PLATFORM_ID:Linux>>:rt>
-    $<$<BOOL:$<PLATFORM_ID:Linux>>:dl>
+    $<$<C_COMPILER_ID:GNU>:-Wall>
+    $<$<C_COMPILER_ID:GNU>:-Wextra>
+    $<$<C_COMPILER_ID:GNU>:-pedantic>
   )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
   CXX_STANDARD
-    11
+    14
+  CXX_STANDARD_REQUIRED
+    YES
+  )
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+  CXX_STANDARD
+    14
   CXX_STANDARD_REQUIRED
     YES
   )
