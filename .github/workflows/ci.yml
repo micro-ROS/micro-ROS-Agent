@@ -10,16 +10,16 @@ jobs:
     microros_agent_ci:
         runs-on: ubuntu-20.04
         container: microros/base:foxy
-    
+
+         - name: Download dependencies
+          run: |
+            cd /uros_ws && . install/local_setup.sh && ros2 run micro_ros_setup create_agent_ws.sh 
+ 
         steps:
         - uses: actions/checkout@v2
           with:
             path: /uros_ws/src/uros/micro-ROS-Agent
 
-        - name: Download dependencies
-          run: |
-            cd /uros_ws && . install/local_setup.sh && ros2 run micro_ros_setup create_agent_ws.sh
-      
-        - name: Build
+       - name: Build
           run:  |
             cd /uros_ws && . install/local_setup.sh && ros2 run micro_ros_setup build_agent.sh 
