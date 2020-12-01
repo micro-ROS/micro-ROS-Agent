@@ -22,7 +22,7 @@ jobs:
  
         - uses: actions/checkout@v2
           with:
-            path: /uros_ws/src/uros/micro-ROS-Agent
+            path: src/uros/micro-ROS-Agent
 
         - name: Build
           run:  |
