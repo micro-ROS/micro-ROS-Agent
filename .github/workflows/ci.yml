@@ -9,18 +9,24 @@ jobs:
 
     microros_agent_ci:
         runs-on: ubuntu-20.04
-        container: ros:foxy
-    
-        steps:
-        - uses: actions/checkout@v2
-          with:
-            path: src/micro_ros_agent
+        container: microros/base:foxy
 
+        steps:
         - name: Download dependencies
           run: |
-            git clone -b foxy https://github.com/eProsima/Micro-XRCE-DDS-Agent src/microxrcedds_agent
-      
+            cd /uros_ws
+            . /opt/ros/foxy/setup.sh
+            . install/local_setup.sh
+            rosdep update
+            ros2 run micro_ros_setup create_agent_ws.sh 
+ 
+        - uses: actions/checkout@v2
+          with:
+            path: src/uros/micro-ROS-Agent
+
         - name: Build
           run:  |
+            cd /uros_ws
             . /opt/ros/foxy/setup.sh
-            colcon build 
+            . install/local_setup.sh
+            ros2 run micro_ros_setup build_agent.sh 
