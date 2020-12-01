@@ -14,12 +14,12 @@ jobs:
         steps:
         - uses: actions/checkout@v2
           with:
-            path: src/uros/micro-ROS-Agent
+            path: /uros_ws/src/uros/micro-ROS-Agent
 
         - name: Download dependencies
           run: |
-            ros2 run micro_ros_setup create_agent_ws.sh
+            cd /uros_ws && . install/local_setup.sh && ros2 run micro_ros_setup create_agent_ws.sh
       
         - name: Build
           run:  |
-            ros2 run micro_ros_setup build_agent.sh 
+            cd /uros_ws && . install/local_setup.sh && ros2 run micro_ros_setup build_agent.sh 
