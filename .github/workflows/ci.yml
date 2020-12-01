@@ -14,7 +14,10 @@ jobs:
         steps:
         - name: Download dependencies
           run: |
-            cd /uros_ws && . install/local_setup.sh && ros2 run micro_ros_setup create_agent_ws.sh 
+            cd /uros_ws
+            . /opt/ros/foxy/setup.sh
+            . install/local_setup.sh
+            ros2 run micro_ros_setup create_agent_ws.sh 
  
         - uses: actions/checkout@v2
           with:
@@ -22,4 +25,7 @@ jobs:
 
         - name: Build
           run:  |
-            cd /uros_ws && . install/local_setup.sh && ros2 run micro_ros_setup build_agent.sh 
+            cd /uros_ws
+            . /opt/ros/foxy/setup.sh
+            . install/local_setup.sh
+            ros2 run micro_ros_setup build_agent.sh 
