@@ -22,138 +22,145 @@ namespace agent {
 
 Agent::Agent()
     : xrce_dds_agent_instance_(xrce_dds_agent_instance_.getInstance())
-    , graph_manager_(std::make_unique<graph_manager::GraphManager>())
+    , graph_manager_(nullptr)
 {
-    /**
-     * Add CREATE_PARTICIPANT callback.
-     */
-    std::function<void (
-        const eprosima::fastdds::dds::DomainParticipant *)> on_create_participant
-        ([&](
-            const eprosima::fastdds::dds::DomainParticipant* participant) -> void
-        {
-            graph_manager_->add_participant(participant);
-        });
-    xrce_dds_agent_instance_.add_middleware_callback(
-        eprosima::uxr::Middleware::Kind::FASTDDS,
-        eprosima::uxr::middleware::CallbackKind::CREATE_PARTICIPANT,
-        std::move(on_create_participant));
-
-    /**
-     * Add REMOVE_PARTICIPANT callback.
-     */
-    std::function<void (
-        const eprosima::fastdds::dds::DomainParticipant *)> on_delete_participant
-        ([&](
-            const eprosima::fastdds::dds::DomainParticipant* participant) -> void
-        {
-            graph_manager_->remove_participant(participant->guid());
-        });
-    xrce_dds_agent_instance_.add_middleware_callback(
-        eprosima::uxr::Middleware::Kind::FASTDDS,
-        eprosima::uxr::middleware::CallbackKind::DELETE_PARTICIPANT,
-        std::move(on_delete_participant));
-
-    /**
-     * Add CREATE_DATAWRITER callback.
-     */
-    std::function<void (
-        const eprosima::fastdds::dds::DomainParticipant *,
-        const eprosima::fastdds::dds::DataWriter *)> on_create_datawriter
-        ([&](
-            const eprosima::fastdds::dds::DomainParticipant* participant,
-            const eprosima::fastdds::dds::DataWriter* datawriter) -> void
-        {
-            // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
-            const eprosima::fastrtps::rtps::InstanceHandle_t instance_handle =
-                datawriter->get_instance_handle();
-            const eprosima::fastrtps::rtps::GUID_t datawriter_guid =
-                iHandle2GUID(instance_handle);
-            graph_manager_->add_datawriter(datawriter_guid, participant, datawriter);
-            graph_manager_->associate_entity(
-                datawriter_guid, participant, dds::xrce::OBJK_DATAWRITER);
-        });
-    xrce_dds_agent_instance_.add_middleware_callback(
-        eprosima::uxr::Middleware::Kind::FASTDDS,
-        eprosima::uxr::middleware::CallbackKind::CREATE_DATAWRITER,
-        std::move(on_create_datawriter));
-
-    /**
-     * Add DELETE_DATAWRITER callback.
-     */
-    std::function<void (
-        const eprosima::fastdds::dds::DomainParticipant *,
-        const eprosima::fastdds::dds::DataWriter *)> on_delete_datawriter
-        ([&](
-            const eprosima::fastdds::dds::DomainParticipant* /*participant*/,
-            const eprosima::fastdds::dds::DataWriter* datawriter) -> void
-        {
-            // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
-            const eprosima::fastrtps::rtps::InstanceHandle_t instance_handle =
-                datawriter->get_instance_handle();
-            const eprosima::fastrtps::rtps::GUID_t datawriter_guid =
-                eprosima::fastrtps::rtps::iHandle2GUID(instance_handle);
-            graph_manager_->remove_datawriter(datawriter_guid);
-        });
-
-    xrce_dds_agent_instance_.add_middleware_callback(
-        eprosima::uxr::Middleware::Kind::FASTDDS,
-        eprosima::uxr::middleware::CallbackKind::DELETE_DATAWRITER,
-        std::move(on_delete_datawriter));
-
-    /**
-     * Add CREATE_DATAREADER callback.
-     */
-    std::function<void (
-        const eprosima::fastdds::dds::DomainParticipant *,
-        const eprosima::fastdds::dds::DataReader*)> on_create_datareader
-        ([&](
-            const eprosima::fastdds::dds::DomainParticipant* participant,
-            const eprosima::fastdds::dds::DataReader* datareader) -> void
-        {
-            // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
-            const eprosima::fastrtps::rtps::InstanceHandle_t instance_handle =
-                datareader->get_instance_handle();
-            const eprosima::fastrtps::rtps::GUID_t datareader_guid =
-                eprosima::fastrtps::rtps::iHandle2GUID(instance_handle);
-            graph_manager_->add_datareader(datareader_guid, participant, datareader);
-            graph_manager_->associate_entity(
-                datareader_guid, participant, dds::xrce::OBJK_DATAREADER);
-        });
-    xrce_dds_agent_instance_.add_middleware_callback(
-        eprosima::uxr::Middleware::Kind::FASTDDS,
-        eprosima::uxr::middleware::CallbackKind::CREATE_DATAREADER,
-        std::move(on_create_datareader));
-
-    /**
-     * Add DELETE_DATAREADER callback.
-     */
-    std::function<void (
-        const eprosima::fastdds::dds::DomainParticipant *,
-        const eprosima::fastdds::dds::DataReader *)> on_delete_datareader
-        ([&](
-            const eprosima::fastdds::dds::DomainParticipant* /*participant*/,
-            const eprosima::fastdds::dds::DataReader* datareader) -> void
-        {
-            // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
-            const eprosima::fastrtps::rtps::InstanceHandle_t instance_handle =
-                datareader->get_instance_handle();
-            const eprosima::fastrtps::rtps::GUID_t datareader_guid =
-                eprosima::fastrtps::rtps::iHandle2GUID(instance_handle);
-            graph_manager_->remove_datareader(datareader_guid);
-        });
-
-    xrce_dds_agent_instance_.add_middleware_callback(
-        eprosima::uxr::Middleware::Kind::FASTDDS,
-        eprosima::uxr::middleware::CallbackKind::DELETE_DATAREADER,
-        std::move(on_delete_datareader));
 }
 
 bool Agent::create(
         int argc,
         char** argv)
 {
-    return xrce_dds_agent_instance_.create(argc, argv);
+    bool result = xrce_dds_agent_instance_.create(argc, argv);
+    if (result)
+    {
+        graph_manager_.reset(new graph_manager::GraphManager());
+
+        /**
+         * Add CREATE_PARTICIPANT callback.
+         */
+        std::function<void (
+            const eprosima::fastdds::dds::DomainParticipant *)> on_create_participant
+            ([&](
+                const eprosima::fastdds::dds::DomainParticipant* participant) -> void
+            {
+                graph_manager_->add_participant(participant);
+            });
+        xrce_dds_agent_instance_.add_middleware_callback(
+            eprosima::uxr::Middleware::Kind::FASTDDS,
+            eprosima::uxr::middleware::CallbackKind::CREATE_PARTICIPANT,
+            std::move(on_create_participant));
+
+        /**
+         * Add REMOVE_PARTICIPANT callback.
+         */
+        std::function<void (
+            const eprosima::fastdds::dds::DomainParticipant *)> on_delete_participant
+            ([&](
+                const eprosima::fastdds::dds::DomainParticipant* participant) -> void
+            {
+                graph_manager_->remove_participant(participant->guid());
+            });
+        xrce_dds_agent_instance_.add_middleware_callback(
+            eprosima::uxr::Middleware::Kind::FASTDDS,
+            eprosima::uxr::middleware::CallbackKind::DELETE_PARTICIPANT,
+            std::move(on_delete_participant));
+
+        /**
+         * Add CREATE_DATAWRITER callback.
+         */
+        std::function<void (
+            const eprosima::fastdds::dds::DomainParticipant *,
+            const eprosima::fastdds::dds::DataWriter *)> on_create_datawriter
+            ([&](
+                const eprosima::fastdds::dds::DomainParticipant* participant,
+                const eprosima::fastdds::dds::DataWriter* datawriter) -> void
+            {
+                // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
+                const eprosima::fastrtps::rtps::InstanceHandle_t instance_handle =
+                    datawriter->get_instance_handle();
+                const eprosima::fastrtps::rtps::GUID_t datawriter_guid =
+                    iHandle2GUID(instance_handle);
+                graph_manager_->add_datawriter(datawriter_guid, participant, datawriter);
+                graph_manager_->associate_entity(
+                    datawriter_guid, participant, dds::xrce::OBJK_DATAWRITER);
+            });
+        xrce_dds_agent_instance_.add_middleware_callback(
+            eprosima::uxr::Middleware::Kind::FASTDDS,
+            eprosima::uxr::middleware::CallbackKind::CREATE_DATAWRITER,
+            std::move(on_create_datawriter));
+
+        /**
+         * Add DELETE_DATAWRITER callback.
+         */
+        std::function<void (
+            const eprosima::fastdds::dds::DomainParticipant *,
+            const eprosima::fastdds::dds::DataWriter *)> on_delete_datawriter
+            ([&](
+                const eprosima::fastdds::dds::DomainParticipant* /*participant*/,
+                const eprosima::fastdds::dds::DataWriter* datawriter) -> void
+            {
+                // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
+                const eprosima::fastrtps::rtps::InstanceHandle_t instance_handle =
+                    datawriter->get_instance_handle();
+                const eprosima::fastrtps::rtps::GUID_t datawriter_guid =
+                    eprosima::fastrtps::rtps::iHandle2GUID(instance_handle);
+                graph_manager_->remove_datawriter(datawriter_guid);
+            });
+
+        xrce_dds_agent_instance_.add_middleware_callback(
+            eprosima::uxr::Middleware::Kind::FASTDDS,
+            eprosima::uxr::middleware::CallbackKind::DELETE_DATAWRITER,
+            std::move(on_delete_datawriter));
+
+        /**
+         * Add CREATE_DATAREADER callback.
+         */
+        std::function<void (
+            const eprosima::fastdds::dds::DomainParticipant *,
+            const eprosima::fastdds::dds::DataReader*)> on_create_datareader
+            ([&](
+                const eprosima::fastdds::dds::DomainParticipant* participant,
+                const eprosima::fastdds::dds::DataReader* datareader) -> void
+            {
+                // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
+                const eprosima::fastrtps::rtps::InstanceHandle_t instance_handle =
+                    datareader->get_instance_handle();
+                const eprosima::fastrtps::rtps::GUID_t datareader_guid =
+                    eprosima::fastrtps::rtps::iHandle2GUID(instance_handle);
+                graph_manager_->add_datareader(datareader_guid, participant, datareader);
+                graph_manager_->associate_entity(
+                    datareader_guid, participant, dds::xrce::OBJK_DATAREADER);
+            });
+        xrce_dds_agent_instance_.add_middleware_callback(
+            eprosima::uxr::Middleware::Kind::FASTDDS,
+            eprosima::uxr::middleware::CallbackKind::CREATE_DATAREADER,
+            std::move(on_create_datareader));
+
+        /**
+         * Add DELETE_DATAREADER callback.
+         */
+        std::function<void (
+            const eprosima::fastdds::dds::DomainParticipant *,
+            const eprosima::fastdds::dds::DataReader *)> on_delete_datareader
+            ([&](
+                const eprosima::fastdds::dds::DomainParticipant* /*participant*/,
+                const eprosima::fastdds::dds::DataReader* datareader) -> void
+            {
+                // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
+                const eprosima::fastrtps::rtps::InstanceHandle_t instance_handle =
+                    datareader->get_instance_handle();
+                const eprosima::fastrtps::rtps::GUID_t datareader_guid =
+                    eprosima::fastrtps::rtps::iHandle2GUID(instance_handle);
+                graph_manager_->remove_datareader(datareader_guid);
+            });
+
+        xrce_dds_agent_instance_.add_middleware_callback(
+            eprosima::uxr::Middleware::Kind::FASTDDS,
+            eprosima::uxr::middleware::CallbackKind::DELETE_DATAREADER,
+            std::move(on_delete_datareader));
+    }
+
+    return result;
 }
 
 void Agent::run()
