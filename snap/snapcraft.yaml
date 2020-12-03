@@ -88,8 +88,12 @@ parts:
     source: .
     override-build: |
         git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git -b $ROS_DISTRO
+        git clone https://github.com/eProsima/Micro-CDR.git -b $ROS_DISTRO
+        git clone https://github.com/micro-ROS/micro_ros_msgs.git -b $ROS_DISTRO
+        git clone https://github.com/micro-ROS/rosidl_typesupport_microxrcedds.git -b $ROS_DISTRO
+        git clone https://github.com/micro-ROS/rmw-microxrcedds.git -b $ROS_DISTRO
         . /opt/ros/$ROS_DISTRO/setup.sh
-        colcon build --merge-install --install-base $SNAPCRAFT_PRIME --cmake-args '-DUAGENT_CLI_PROFILE=OFF -DUAGENT_BUILD_EXECUTABLE=OFF'
+        colcon build --merge-install --install-base $SNAPCRAFT_PRIME --cmake-args '-DUAGENT_CLI_PROFILE=OFF -DUAGENT_BUILD_EXECUTABLE=OFF' --packages-up-to micro_ros_agent
     build-packages: [make, gcc, g++]
     stage-packages: [ros-foxy-ros2launch]
 
