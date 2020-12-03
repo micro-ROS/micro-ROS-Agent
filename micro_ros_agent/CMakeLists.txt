@@ -122,7 +122,7 @@ if(UROSAGENT_GENERATE_PROFILE)
   set(_XML_DEFAULT_READ_BIN "${_OUTPUT_PATH}/bin/Xml_read_default_profiles.py")
   normalize_path(_XML_DEFAULT_READ_BIN "${_XML_DEFAULT_READ_BIN}")
 
-  set(_PYTHON_PKG_TOOL ${PROJECT_NAME})
+  set(_PYTHON_PKG_TOOL utils)
 
   set(_RESOURCE_DIR "${_OUTPUT_PATH}/resource")
   normalize_path(_RESOURCE_DIR "${_RESOURCE_DIR}")
@@ -198,7 +198,7 @@ from ${_PYTHON_PKG_TOOL} import *
   endforeach()
 
   execute_process(
-    COMMAND 
+    COMMAND
       "${PYTHON_EXECUTABLE}" "${_XML_DEFAULT_READ_BIN}" "--default-xml-path" "${_RESOURCE_DIR}"
     OUTPUT_VARIABLE
       _XmlDoc
@@ -207,7 +207,7 @@ from ${_PYTHON_PKG_TOOL} import *
     )
 
   if(NOT _result EQUAL 0)
-    message(FATAL_ERROR "Error in typesuppor generation") 
+    message(FATAL_ERROR "Error in typesupport generation")
   endif()
 
   foreach(package ${_packages})
@@ -241,7 +241,7 @@ from ${_PYTHON_PKG_TOOL} import *
       )
 
     if(NOT _result EQUAL 0)
-      message(FATAL_ERROR "Error in typesuppor generation") 
+      message(FATAL_ERROR "Error in typesupport generation")
     endif()
 
     set(_XmlDoc "${_XmlDoc}${_XmlGen}")

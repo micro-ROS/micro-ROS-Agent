@@ -1,0 +1,119 @@
+name: micro-ros-agent
+base: core20
+version: git
+summary: Bridge between Micro ROS client applications and ROS 2
+description: |
+  Micro-ROS, whose default implementation is based on eProsima's
+  Micro XRCE-DDS middleware, is composed of client applications
+  which interact with the ROS 2 world by means of an Agent.
+  This agent keeps tracks of the entities created by means of
+  requests performed on the microcontroller side, and uses them
+  to communicate with the ROS 2 dataspace.
+
+  Being an extension of the Micro XRCE-DDS Agent, the micro-ROS
+  agent supports being run by the user like this:
+
+      $ micro-ros-agent --help
+
+  In addition, the Agent supports running as a service that can be
+  enabled with:
+
+      $ snap set micro-ros-agent daemon=true
+
+  If the service is enabled, by default it uses the `udp4` transport on
+  port 8888. The following parameters can be changed (these are
+  specific to the service, the `micro-ros-agent` command simply
+  takes command-line arguments, but the capabilities are the same):
+
+  * `transport`. Supported transports are `udp4`, `udp6`, `tcp4`,
+    `tcp6`, `serial`, and `pseudoterminal`. Default is `udp4`. Change
+    with:
+
+        $ snap set micro-ros-agent transport="new transport"
+
+  * `middleware`. Supported kinds of middleware are `ced`, `rtps`, and
+    `dds`. Default is `dds`. Change with:
+
+        $ snap set micro-ros-agent middleware="new middleware"
+
+  * `verbosity`. Supported verbosity levels are 0-6, defaulting to 4.
+    Change with:
+
+        $ snap set micro-ros-agent verbosity="selected verbosity"
+
+  * `discovery`. Enable or disable the discovery server. Defaults to
+    "false". Change with:
+
+        $ snap set micro-ros-agent discovery="true or false"
+
+  * `discovery-port`. Port on which the discovery server (see above)
+    listens. Defaults to 7400. Change with:
+
+        $ snap set micro-ros-agent discovery-port="selected port"
+
+  * `p2p-port`. Port to use for the P2P profile. Change with:
+
+        $ snap set micro-ros-agent p2p-port="selected port"
+
+  * `port`. Port on which the agent listens. Only applicable to one of
+    the UDP or TCP transports (see above). Defaults to 8888. Change with:
+
+        $ snap set micro-ros-agent port="selected port"
+
+  * `baudrate`. Baud rate to use when accessing serial ports. Only
+    applicable when using the `serial` or `pseudoterminal` transport.
+    Defaults to 115200. Change with:
+
+        $ snap set micro-ros-agent baudrate="baud rate"
+
+  * `device`. The serial device to use. Only applicable when using the
+    `serial` or `pseudoterminal` transport. Change with:
+
+        $ snap set micro-ros-agent device="device path"
+
+
+grade: stable
+confinement: strict
+
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+  - build-on: armhf
+  - build-on: ppc64el
+
+parts:
+
+  uros-agent:
+    plugin: colcon
+    source: .
+    override-build: |
+        git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git -b $ROS_DISTRO
+        git clone https://github.com/eProsima/Micro-CDR.git -b $ROS_DISTRO
+        git clone https://github.com/micro-ROS/micro_ros_msgs.git -b $ROS_DISTRO
+        git clone https://github.com/micro-ROS/rosidl_typesupport_microxrcedds.git -b $ROS_DISTRO
+        git clone https://github.com/micro-ROS/rmw-microxrcedds.git -b $ROS_DISTRO
+        . /opt/ros/$ROS_DISTRO/setup.sh
+        colcon build --merge-install --install-base $SNAPCRAFT_PRIME --cmake-args '-DUAGENT_CLI_PROFILE=OFF -DUAGENT_BUILD_EXECUTABLE=OFF' --packages-up-to micro_ros_agent
+    build-packages: [make, gcc, g++]
+    stage-packages: [ros-foxy-ros2launch]
+
+  runner:
+    plugin: dump
+    source: snap/local/
+    organize:
+      '*': usr/bin/
+
+apps:
+  micro-ros-agent:
+    command: lib/micro_ros_agent/micro_ros_agent
+    environment:
+        LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/lib"
+    plugs: [network, network-bind, serial-port]
+    extensions: [ros2-foxy]
+
+  daemon:
+    command: usr/bin/micro-ros-agent-daemon
+    environment:
+        LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/lib"
+    daemon: simple
+    plugs: [network, network-bind, serial-port]
