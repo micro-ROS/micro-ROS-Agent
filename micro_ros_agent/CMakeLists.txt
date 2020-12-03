@@ -14,17 +14,14 @@
 
 cmake_minimum_required(VERSION 3.5)
 
-option(UROSAGENT_GENERATE_PROFILE "Generates agent.refs according to the .msgs provided in the .repos" OFF)
-option(UROSAGENT_AMENTIFY_PACKAGE "Amentify this package" ON)
-
+option(UROSAGENT_GENERATE_PROFILE
+  "Generates agent.refs according to the .msgs provided in the .repos" OFF
+  )
 set(CMAKE_C_CLANG_TIDY clang-tidy -checks=*)
 
 project(micro_ros_agent LANGUAGES CXX)
 
-if(UROSAGENT_AMENTIFY_PACKAGE)
-  find_package(ament_cmake REQUIRED)
-endif()
-
+find_package(ament_cmake REQUIRED)
 find_package(microxrcedds_agent REQUIRED)
 find_package(rosidl_cmake REQUIRED)
 find_package(fastcdr REQUIRED)
@@ -105,10 +102,9 @@ target_compile_options(${PROJECT_NAME}
     $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wpedantic>
   )
 
-if(UROSAGENT_AMENTIFY_PACKAGE)
-  ament_export_dependencies(microxrcedds_agent)
-  ament_package()
-endif()
+ament_export_dependencies(microxrcedds_agent)
+
+ament_package()
 
 install(
   TARGETS
