@@ -71,6 +71,35 @@ description: |
 
         $ snap set micro-ros-agent device="device path"
 
+  When using the snap with a serial device, some steps need to be taken
+  in order to establish a successful connection:
+
+  * Refresh your local installation of the snap `core` package:
+
+        $ sudo snap refresh core --edge
+
+  * Enable the hotplug feature and restart the `snapd` daemon:
+
+        $ sudo snap set core experimental.hotplug=true
+        $ sudo systemctl restart snapd
+
+  * After plugging the microcontroller to the serial port, execute
+    the `snap interface serial-port` command. You should see something
+    like this:
+
+          name:    serial-port
+          summary: allows accessing a specific serial port
+          plugs:
+            - micro-ros-agent
+          slots:
+          - snapd:cp2102cp2109uartbrid (allows accessing a specific serial port)
+
+  * Connect your snap image to the desired serial port (replace accordingly):
+
+        $ snap connect micro-ros-agent:serial-port snapd:cp2102cp2109uartbrid
+
+  After this, you can execute your snap as usual,
+  using `sudo micro-ros-agent serial -d <serial-dev>`.
 
 grade: stable
 confinement: strict
