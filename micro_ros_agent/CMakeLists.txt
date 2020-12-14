@@ -113,6 +113,13 @@ install(
     lib/${PROJECT_NAME}
   )
 
+install(
+  DIRECTORY
+    launch
+  DESTINATION
+    share/${PROJECT_NAME}
+  )
+
 if(UROSAGENT_GENERATE_PROFILE)
   set(_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/python")
 
