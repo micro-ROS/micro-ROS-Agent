@@ -11,7 +11,7 @@ This repository contains the Micro-ROS Agent package.
 Micro-ROS Agent is a ROS 2 node that wraps the Micro XRCE-DDS Agent.
 For further information about Micro XRCE-DDS Agent click [here](https://github.com/eProsima/Micro-XRCE-DDS-Agent)
 This package is a part of the Micro-ROS project stack.
-For more information about Micro-ROS project click [here](https://microros.github.io/micro-ROS/).
+For more information about Micro-ROS project click [here](https://micro-ros.github.io/).
 
 The node acts as a server between DDS Network and Micro-ROS nodes inside MCU.
 It receives and send messages from Micro-ROS nodes, and keep track of the Micro-ROS nodes exposing them to the ROS 2 network.
