@@ -17,6 +17,11 @@ cmake_minimum_required(VERSION 3.5)
 option(UROSAGENT_GENERATE_PROFILE
   "Generates agent.refs according to the .msgs provided in the .repos" OFF
   )
+
+option(UGENERATE_GRAPH_MANAGER
+  "Include graph manager functionality" OFF
+  )
+
 set(CMAKE_C_CLANG_TIDY clang-tidy -checks=*)
 
 project(micro_ros_agent LANGUAGES CXX)
@@ -40,6 +45,10 @@ find_package(rosidl_typesupport_cpp REQUIRED)
 find_package(ament_cmake_gtest REQUIRED)
 
 find_package(micro_ros_msgs REQUIRED)
+
+if(UGENERATE_GRAPH_MANAGER)
+  add_compile_definitions(GRAPH_MANAGER)
+endif()
 
 add_executable(${PROJECT_NAME}
   src/main.cpp

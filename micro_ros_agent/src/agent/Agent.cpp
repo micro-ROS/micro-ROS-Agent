@@ -31,6 +31,8 @@ bool Agent::create(
         char** argv)
 {
     bool result = xrce_dds_agent_instance_.create(argc, argv);
+
+#ifdef GRAPH_MANAGER
     if (result)
     {
         graph_manager_.reset(new graph_manager::GraphManager());
@@ -159,6 +161,7 @@ bool Agent::create(
             eprosima::uxr::middleware::CallbackKind::DELETE_DATAREADER,
             std::move(on_delete_datareader));
     }
+#endif
 
     return result;
 }
