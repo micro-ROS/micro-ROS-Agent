@@ -47,7 +47,7 @@ find_package(ament_cmake_gtest REQUIRED)
 find_package(micro_ros_msgs REQUIRED)
 
 if(MICROROS_AGENT_ENABLE_GRAPH_MANAGER)
-  add_compile_definitions(GRAPH_MANAGER)
+  add_compile_definitions(MICROROS_AGENT_ENABLE_GRAPH_MANAGER)
 endif()
 
 add_executable(${PROJECT_NAME}
