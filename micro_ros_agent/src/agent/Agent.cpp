@@ -32,7 +32,7 @@ bool Agent::create(
 {
     bool result = xrce_dds_agent_instance_.create(argc, argv);
 
-#ifdef GRAPH_MANAGER
+#ifdef MICROROS_AGENT_ENABLE_GRAPH_MANAGER
     if (result)
     {
         graph_manager_.reset(new graph_manager::GraphManager());
