@@ -18,7 +18,7 @@ option(UROSAGENT_GENERATE_PROFILE
   "Generates agent.refs according to the .msgs provided in the .repos" OFF
   )
 
-option(UGENERATE_GRAPH_MANAGER
+option(MICROROS_AGENT_ENABLE_GRAPH_MANAGER
   "Include graph manager functionality" OFF
   )
 
