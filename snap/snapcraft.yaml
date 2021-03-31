@@ -71,6 +71,16 @@ description: |
 
         $ snap set micro-ros-agent device="device path"
 
+  If connecting the micro-ROS Agent using an IP based connection mode,
+  that is, `udp4`, `udp6`, `tcp4` or `tcp6`, care must be taken to
+  connect first the `micro-ros-agent-shm-netplug` plug.
+  This is due to the fact that ROS 2 Foxy is using Fast-DDS as the
+  default DDS middleware, and Fast-DDS comes with *shared memory transport*.
+  Thus, this plugin must be enabled, in order to gain access to the
+  `/dev/shm` folder from the snap image, prior to running it:
+
+      $ sudo snap connect micro-ros-agent:micro-ros-agent-shm-netplug
+
   When using the snap with a serial device, some steps need to be taken
   in order to establish a successful connection:
 
@@ -116,13 +126,16 @@ parts:
     plugin: colcon
     source: .
     override-build: |
+        set +u
         git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git -b $ROS_DISTRO
         git clone https://github.com/eProsima/Micro-CDR.git -b $ROS_DISTRO
         git clone https://github.com/micro-ROS/micro_ros_msgs.git -b $ROS_DISTRO
         git clone https://github.com/micro-ROS/rosidl_typesupport_microxrcedds.git -b $ROS_DISTRO
         git clone https://github.com/micro-ROS/rmw-microxrcedds.git -b $ROS_DISTRO
+        git clone https://github.com/micro-ROS/micro-ROS-Agent.git -b $ROS_DISTRO
         . /opt/ros/$ROS_DISTRO/setup.sh
-        colcon build --merge-install --install-base $SNAPCRAFT_PRIME --cmake-args '-DUAGENT_BUILD_EXECUTABLE=OFF' --packages-up-to micro_ros_agent
+        colcon build --merge-install --install-base $SNAPCRAFT_PRIME --cmake-args "-DUAGENT_BUILD_EXECUTABLE=OFF -DUAGENT_USE_SYSTEM_FASTDDS=ON" --packages-up-to micro_ros_agent
+        set -u
     build-packages: [make, gcc, g++]
     stage-packages: [ros-foxy-ros2launch]
 
@@ -132,12 +145,19 @@ parts:
     organize:
       '*': usr/bin/
 
+plugs:
+  micro-ros-agent-shm-netplug:
+    interface: system-files
+    allow-auto-connection: true
+    write:
+      - /dev/shm
+
 apps:
   micro-ros-agent:
     command: lib/micro_ros_agent/micro_ros_agent
     environment:
         LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/lib"
-    plugs: [network, network-bind, serial-port]
+    plugs: [network, network-bind, serial-port, micro-ros-agent-shm-netplug]
     extensions: [ros2-foxy]
 
   daemon:
@@ -145,4 +165,4 @@ apps:
     environment:
         LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/lib"
     daemon: simple
-    plugs: [network, network-bind, serial-port]
+    plugs: [network, network-bind, serial-port, micro-ros-agent-shm-netplug]
