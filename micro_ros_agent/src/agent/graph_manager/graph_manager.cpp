@@ -351,27 +351,6 @@ void GraphManager::add_datawriter(
         type_name, participant_gid, qos_profile, false);
 }
 
-void GraphManager::add_datawriter(
-        const eprosima::fastrtps::rtps::GUID_t& datawriter_guid,
-        const std::string& topic_name,
-        const std::string& type_name,
-        const eprosima::fastrtps::rtps::GUID_t& participant_guid,
-        const eprosima::fastdds::dds::WriterQos& /* writer_qos */)
-{
-    const rmw_gid_t datawriter_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
-        "rmw_fastrtps_cpp", datawriter_guid);
-    const rmw_gid_t participant_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
-        "rmw_fastrtps_cpp", participant_guid);
-    
-    // TODO (pablogs): Fill this properly
-    // rmw_qos_profile_t qos_profile = fastdds_qos_to_rmw_qos(writer_qos);
-
-    rmw_qos_profile_t qos_profile = rmw_qos_profile_unknown;
-
-    graphCache_.add_entity(datawriter_gid, topic_name,
-        type_name, participant_gid, qos_profile, false);
-}
-
 void GraphManager::remove_datawriter(
         const eprosima::fastrtps::rtps::GUID_t& datawriter_guid)
 {
@@ -404,26 +383,6 @@ void GraphManager::add_datareader(
     const rmw_gid_t participant_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
         "rmw_fastrtps_cpp", participant_guid);
     const rmw_qos_profile_t qos_profile = fastdds_qos_to_rmw_qos(reader_qos);
-
-    graphCache_.add_entity(datareader_gid, topic_name,
-        type_name, participant_gid, qos_profile, true);
-}
-
-void GraphManager::add_datareader(
-        const eprosima::fastrtps::rtps::GUID_t& datareader_guid,
-        const std::string& topic_name,
-        const std::string& type_name,
-        const eprosima::fastrtps::rtps::GUID_t& participant_guid,
-        const eprosima::fastdds::dds::ReaderQos& /* reader_qos */)
-{
-    const rmw_gid_t datareader_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
-        "rmw_fastrtps_cpp", datareader_guid);
-    const rmw_gid_t participant_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
-        "rmw_fastrtps_cpp", participant_guid);
-
-    // TODO(pablogs): Fill this properly
-    // rmw_qos_profile_t qos_profile = fastdds_qos_to_rmw_qos(reader_qos);
-    rmw_qos_profile_t qos_profile = rmw_qos_profile_unknown;
 
     graphCache_.add_entity(datareader_gid, topic_name,
         type_name, participant_gid, qos_profile, true);
