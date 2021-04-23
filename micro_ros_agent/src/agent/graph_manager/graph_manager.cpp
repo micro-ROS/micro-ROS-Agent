@@ -356,14 +356,17 @@ void GraphManager::add_datawriter(
         const std::string& topic_name,
         const std::string& type_name,
         const eprosima::fastrtps::rtps::GUID_t& participant_guid,
-        const eprosima::fastdds::dds::WriterQos& writer_qos)
+        const eprosima::fastdds::dds::WriterQos& /* writer_qos */)
 {
     const rmw_gid_t datawriter_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
         "rmw_fastrtps_cpp", datawriter_guid);
     const rmw_gid_t participant_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
         "rmw_fastrtps_cpp", participant_guid);
+    
+    // TODO (pablogs): Fill this properly
+    // rmw_qos_profile_t qos_profile = fastdds_qos_to_rmw_qos(writer_qos);
+
     rmw_qos_profile_t qos_profile = rmw_qos_profile_unknown;
-    dds_qos_to_rmw_qos(writer_qos, &qos_profile);
 
     graphCache_.add_entity(datawriter_gid, topic_name,
         type_name, participant_gid, qos_profile, false);
@@ -411,14 +414,16 @@ void GraphManager::add_datareader(
         const std::string& topic_name,
         const std::string& type_name,
         const eprosima::fastrtps::rtps::GUID_t& participant_guid,
-        const eprosima::fastdds::dds::ReaderQos& reader_qos)
+        const eprosima::fastdds::dds::ReaderQos& /* reader_qos */)
 {
     const rmw_gid_t datareader_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
         "rmw_fastrtps_cpp", datareader_guid);
     const rmw_gid_t participant_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
         "rmw_fastrtps_cpp", participant_guid);
+
+    // TODO(pablogs): Fill this properly
+    // rmw_qos_profile_t qos_profile = fastdds_qos_to_rmw_qos(reader_qos);
     rmw_qos_profile_t qos_profile = rmw_qos_profile_unknown;
-    dds_qos_to_rmw_qos(reader_qos, &qos_profile);
 
     graphCache_.add_entity(datareader_gid, topic_name,
         type_name, participant_gid, qos_profile, true);
@@ -550,7 +555,7 @@ void GraphManager::update_node_entities_info()
     if (ros_discovery_datareader_->take_next_sample(&entities_info, &sample_info) ==
         eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK)
     {
-        if (sample_info.instance_state == eprosima::fastdds::dds::InstanceStateKind::ALIVE)
+        if (sample_info.instance_state == eprosima::fastdds::dds::InstanceStateKind::ALIVE_INSTANCE_STATE)
         {
             graphCache_.update_participant_entities(entities_info);
         }
