@@ -12,21 +12,27 @@ jobs:
         container: microros/base:foxy
 
         steps:
+        - uses: actions/checkout@v2
+          with:
+            path: urosagent
+
         - name: Download dependencies
           run: |
+            apt update
             cd /uros_ws
-            . /opt/ros/foxy/setup.sh
+            . /opt/ros/$ROS_DISTRO/setup.sh
             . install/local_setup.sh
             rosdep update
             ros2 run micro_ros_setup create_agent_ws.sh 
- 
-        - uses: actions/checkout@v2
-          with:
-            path: src/uros/micro-ROS-Agent
+        
+        - name: Patch branch
+          run: |
+            rm -rf /uros_ws/src/uros/micro-ROS-Agent/*
+            cp -R urosagent/* /uros_ws/src/uros/micro-ROS-Agent/
 
         - name: Build
           run:  |
             cd /uros_ws
-            . /opt/ros/foxy/setup.sh
+            . /opt/ros/$ROS_DISTRO/setup.sh
             . install/local_setup.sh
             ros2 run micro_ros_setup build_agent.sh 
