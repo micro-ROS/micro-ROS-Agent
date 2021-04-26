@@ -350,24 +350,6 @@ void GraphManager::add_datawriter(
         type_name, participant_gid, qos_profile, false);
 }
 
-void GraphManager::add_datawriter(
-        const eprosima::fastrtps::rtps::GUID_t& datawriter_guid,
-        const std::string& topic_name,
-        const std::string& type_name,
-        const eprosima::fastrtps::rtps::GUID_t& participant_guid,
-        const eprosima::fastdds::dds::WriterQos& writer_qos)
-{
-    const rmw_gid_t datawriter_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
-        "rmw_fastrtps_cpp", datawriter_guid);
-    const rmw_gid_t participant_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
-        "rmw_fastrtps_cpp", participant_guid);
-    rmw_qos_profile_t qos_profile = rmw_qos_profile_unknown;
-    dds_qos_to_rmw_qos(writer_qos, &qos_profile);
-
-    graphCache_.add_entity(datawriter_gid, topic_name,
-        type_name, participant_gid, qos_profile, false);
-}
-
 void GraphManager::remove_datawriter(
         const eprosima::fastrtps::rtps::GUID_t& datawriter_guid)
 {
@@ -400,24 +382,6 @@ void GraphManager::add_datareader(
     const rmw_gid_t participant_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
         "rmw_fastrtps_cpp", participant_guid);
     const rmw_qos_profile_t qos_profile = fastdds_qos_to_rmw_qos(reader_qos);
-
-    graphCache_.add_entity(datareader_gid, topic_name,
-        type_name, participant_gid, qos_profile, true);
-}
-
-void GraphManager::add_datareader(
-        const eprosima::fastrtps::rtps::GUID_t& datareader_guid,
-        const std::string& topic_name,
-        const std::string& type_name,
-        const eprosima::fastrtps::rtps::GUID_t& participant_guid,
-        const eprosima::fastdds::dds::ReaderQos& reader_qos)
-{
-    const rmw_gid_t datareader_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
-        "rmw_fastrtps_cpp", datareader_guid);
-    const rmw_gid_t participant_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
-        "rmw_fastrtps_cpp", participant_guid);
-    rmw_qos_profile_t qos_profile = rmw_qos_profile_unknown;
-    dds_qos_to_rmw_qos(reader_qos, &qos_profile);
 
     graphCache_.add_entity(datareader_gid, topic_name,
         type_name, participant_gid, qos_profile, true);
@@ -549,7 +513,7 @@ void GraphManager::update_node_entities_info()
     if (ros_discovery_datareader_->take_next_sample(&entities_info, &sample_info) ==
         eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK)
     {
-        if (sample_info.instance_state == eprosima::fastdds::dds::InstanceStateKind::ALIVE)
+        if (sample_info.instance_state == eprosima::fastdds::dds::InstanceStateKind::ALIVE_INSTANCE_STATE)
         {
             graphCache_.update_participant_entities(entities_info);
         }
@@ -597,6 +561,52 @@ void GraphManager::ParticipantListener::on_participant_discovery(
     }
 }
 
+static eprosima::fastdds::dds::DataWriterQos writer_qos_conversion(
+    const eprosima::fastdds::dds::WriterQos& writer_qos)
+{
+    eprosima::fastdds::dds::DataWriterQos datawriter_qos;
+    datawriter_qos.durability(writer_qos.m_durability);
+    datawriter_qos.durability_service(writer_qos.m_durabilityService);
+    datawriter_qos.deadline(writer_qos.m_deadline);
+    datawriter_qos.latency_budget(writer_qos.m_latencyBudget);
+    datawriter_qos.liveliness(writer_qos.m_liveliness);
+    datawriter_qos.reliability(writer_qos.m_reliability);
+    datawriter_qos.destination_order(writer_qos.m_destinationOrder);
+    datawriter_qos.lifespan(writer_qos.m_lifespan);
+    datawriter_qos.user_data(writer_qos.m_userData);
+    datawriter_qos.ownership(writer_qos.m_ownership);
+    datawriter_qos.ownership_strength(writer_qos.m_ownershipStrength);
+    datawriter_qos.publish_mode(writer_qos.m_publishMode);
+    datawriter_qos.representation(writer_qos.representation);
+    datawriter_qos.data_sharing(writer_qos.data_sharing);
+
+    return datawriter_qos;
+}
+
+static eprosima::fastdds::dds::DataReaderQos reader_qos_conversion(
+    const eprosima::fastdds::dds::ReaderQos& reader_qos)
+{
+    eprosima::fastdds::dds::DataReaderQos datareader_qos;
+    
+    datareader_qos.durability(reader_qos.m_durability);
+    datareader_qos.deadline(reader_qos.m_deadline);
+    datareader_qos.latency_budget(reader_qos.m_latencyBudget);
+    datareader_qos.liveliness(reader_qos.m_liveliness);
+    datareader_qos.reliability(reader_qos.m_reliability);
+    datareader_qos.destination_order(reader_qos.m_destinationOrder);
+    datareader_qos.user_data(reader_qos.m_userData);
+    datareader_qos.ownership(reader_qos.m_ownership);
+    datareader_qos.time_based_filter(reader_qos.m_timeBasedFilter);
+    datareader_qos.lifespan(reader_qos.m_lifespan);
+    datareader_qos.durability_service(reader_qos.m_durabilityService);
+    eprosima::fastdds::dds::TypeConsistencyQos consistency;
+    consistency.type_consistency = reader_qos.type_consistency;
+    datareader_qos.type_consistency(consistency);
+    datareader_qos.data_sharing(reader_qos.data_sharing);
+
+    return datareader_qos;
+}
+
 template <>
 void GraphManager::ParticipantListener::process_discovery_info<eprosima::fastrtps::rtps::ReaderDiscoveryInfo>(
         const eprosima::fastrtps::rtps::ReaderDiscoveryInfo& reader_info)
@@ -613,7 +623,7 @@ void GraphManager::ParticipantListener::process_discovery_info<eprosima::fastrtp
             const std::string type_name = reader_info.info.typeName().to_string();
 
             graphManager_from_->add_datareader(reader_info.info.guid(), topic_name, type_name,
-                iHandle2GUID(reader_info.info.RTPSParticipantKey()), reader_info.info.m_qos);
+                iHandle2GUID(reader_info.info.RTPSParticipantKey()), reader_qos_conversion(reader_info.info.m_qos));
             break;
         }
         default:
@@ -640,7 +650,7 @@ void GraphManager::ParticipantListener::process_discovery_info<eprosima::fastrtp
             const std::string type_name = writer_info.info.typeName().to_string();
 
             graphManager_from_->add_datawriter(writer_info.info.guid(), topic_name, type_name,
-                iHandle2GUID(writer_info.info.RTPSParticipantKey()), writer_info.info.m_qos);
+                iHandle2GUID(writer_info.info.RTPSParticipantKey()), writer_qos_conversion(writer_info.info.m_qos));
             break;
         }
         default:
