@@ -9,7 +9,7 @@ jobs:
 
     microros_agent_ci:
         runs-on: ubuntu-20.04
-        container: microros/base:foxy
+        container: microros/base:rolling
 
         steps:
         - uses: actions/checkout@v2

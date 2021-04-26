@@ -139,21 +139,6 @@ public:
             const eprosima::fastdds::dds::DataWriterQos& writer_qos);
 
     /**
-     * @brief   Adds a DDS datawriter to the graph tree.
-     * @param   datawriter_guid rtps::GUID_t of the datawriter to be added.
-     * @param   topic_name Name of the topic to which the datawriter sends information to.
-     * @param   type_name Type name of the sent topic.
-     * @param   participant_guid rtps::GUID_t of the participant which owns this datawriter.
-     * @param   writer_qos QOS of the datawriter to be included into the graph tree.
-     */
-    void add_datawriter(
-            const eprosima::fastrtps::rtps::GUID_t& datawriter_guid,
-            const std::string& topic_name,
-            const std::string& type_name,
-            const eprosima::fastrtps::rtps::GUID_t& participant_guid,
-            const eprosima::fastdds::dds::WriterQos& writer_qos);
-
-    /**
      * @brief   Removes a DDS datawriter from the graph tree.
      * @param   datawriter_guid rtps::GUID_t of the datawriter to be removed.
      */
@@ -185,21 +170,6 @@ public:
             const std::string& type_name,
             const eprosima::fastrtps::rtps::GUID_t& participant_guid,
             const eprosima::fastdds::dds::DataReaderQos& reader_qos);
-
-    /**
-     * @brief   Adds a DDS datareader to the graph tree.
-     * @param   datareader_guid rtps::GUID_t of the datareader to be added.
-     * @param   topic_name Name of the topic to which the datareader sends information to.
-     * @param   type_name Type name of the sent topic.
-     * @param   participant_guid rtps::GUID_t of the participant which owns this datareader.
-     * @param   writer_qos QOS of the datareader to be included into the graph tree.
-     */
-    void add_datareader(
-            const eprosima::fastrtps::rtps::GUID_t& datareader_guid,
-            const std::string& topic_name,
-            const std::string& type_name,
-            const eprosima::fastrtps::rtps::GUID_t& participant_guid,
-            const eprosima::fastdds::dds::ReaderQos& reader_qos);
 
     /**
      * @brief   Removes a DDS datareader from the graph tree.
