@@ -78,7 +78,7 @@ public:
     GraphManager(eprosima::fastdds::dds::DomainId_t domain_id);
 
     /**
-     * @brief   Default destrucctor.
+     * @brief   Default destructor.
      */
     ~GraphManager() = default;
 
