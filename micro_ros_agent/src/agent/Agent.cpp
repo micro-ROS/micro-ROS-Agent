@@ -22,7 +22,6 @@ namespace agent {
 
 Agent::Agent()
     : xrce_dds_agent_instance_(xrce_dds_agent_instance_.getInstance())
-    , graph_manager_(nullptr)
 {
 }
 
@@ -43,7 +42,7 @@ bool Agent::create(
             {
                 auto graph_manager_ =
                     find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t(
-                        participant.get_domain_id()
+                        participant->get_domain_id()
                     )
                 );
 
@@ -64,7 +63,7 @@ bool Agent::create(
             {
                 auto graph_manager_ =
                     find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t(
-                        participant.get_domain_id()
+                        participant->get_domain_id()
                     )
                 );
 
@@ -87,7 +86,7 @@ bool Agent::create(
             {
                 auto graph_manager_ =
                     find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t(
-                        participant.get_domain_id()
+                        participant->get_domain_id()
                     )
                 );
 
@@ -118,7 +117,7 @@ bool Agent::create(
 
                 auto graph_manager_ =
                     find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t(
-                        participant.get_domain_id()
+                        participant->get_domain_id()
                     )
                 );
 
@@ -147,7 +146,7 @@ bool Agent::create(
             {
                 auto graph_manager_ =
                     find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t(
-                        participant.get_domain_id()
+                        participant->get_domain_id()
                     )
                 );
 
@@ -177,7 +176,7 @@ bool Agent::create(
             {
                 auto graph_manager_ =
                     find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t(
-                        participant.get_domain_id()
+                        participant->get_domain_id()
                     )
                 );
 
@@ -208,7 +207,7 @@ std::shared_ptr<graph_manager::GraphManager> Agent::find_or_create_graph_manager
     auto it = graph_manager_map_.find(domain_id);
 
     if (it != graph_manager_map_.end()) {
-        return it.second();
+        return it->second();
     }else{
         return graph_manager_map_.insert(
             std::pair<
