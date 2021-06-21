@@ -111,7 +111,7 @@ bool Agent::create(
             const eprosima::fastdds::dds::DomainParticipant *,
             const eprosima::fastdds::dds::DataWriter *)> on_delete_datawriter
             ([&](
-                const eprosima::fastdds::dds::DomainParticipant* /*participant*/,
+                const eprosima::fastdds::dds::DomainParticipant* participant,
                 const eprosima::fastdds::dds::DataWriter* datawriter) -> void
             {
 
@@ -207,7 +207,7 @@ std::shared_ptr<graph_manager::GraphManager> Agent::find_or_create_graph_manager
     auto it = graph_manager_map_.find(domain_id);
 
     if (it != graph_manager_map_.end()) {
-        return it->second();
+        return it->second;
     }else{
         return graph_manager_map_.insert(
             std::pair<
@@ -217,7 +217,7 @@ std::shared_ptr<graph_manager::GraphManager> Agent::find_or_create_graph_manager
                 domain_id,
                 std::make_shared<graph_manager::GraphManager>(domain_id)
             )
-        );
+        ).first->second;
     }
 }
 
