@@ -21,9 +21,10 @@ namespace uros {
 namespace agent {
 namespace graph_manager {
 
-GraphManager::GraphManager()
+GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     // : eprosima::fastrtps::ParticipantListener()
-    : graph_changed_(false)
+    : domain_id_(domain_id)
+    , graph_changed_(false)
     , display_on_change_(false)
     , enclave_("/")
     , mtx_()
@@ -37,8 +38,6 @@ GraphManager::GraphManager()
         eprosima::fastdds::dds::TypeSupport>(new graph_manager::MicrorosGraphInfoTypeSupport()))
 {
     // Create DomainParticipant
-    eprosima::fastdds::dds::DomainId_t domain_id(0);
-
     eprosima::fastdds::dds::DomainParticipantQos participant_qos =
         eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->get_default_participant_qos();
 
@@ -54,7 +53,7 @@ GraphManager::GraphManager()
         eprosima::fastrtps::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
 
     participant_.reset(eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->
-        create_participant(domain_id, participant_qos, participant_listener_.get()));
+        create_participant(domain_id_, participant_qos, participant_listener_.get()));
 
     // Register participant within typesupport
     participant_->register_type(*participant_info_typesupport_);
