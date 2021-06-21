@@ -75,10 +75,10 @@ public:
     /**
      * @brief   Default constructor.
      */
-    GraphManager();
+    GraphManager(eprosima::fastdds::dds::DomainId_t domain_id);
 
     /**
-     * @brief   Default destructor.
+     * @brief   Default destrucctor.
      */
     ~GraphManager() = default;
 
@@ -292,6 +292,7 @@ private:
      */
     void update_node_entities_info();
 
+    eprosima::fastdds::dds::DomainId_t domain_id_;
     bool graph_changed_;
     bool display_on_change_;
     const char * enclave_;
