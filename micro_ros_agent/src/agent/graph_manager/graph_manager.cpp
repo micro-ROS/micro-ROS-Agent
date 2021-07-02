@@ -37,6 +37,8 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     , microros_graph_info_typesupport_(std::make_unique<
         eprosima::fastdds::dds::TypeSupport>(new graph_manager::MicrorosGraphInfoTypeSupport()))
 {
+    eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->load_profiles();
+
     // Create DomainParticipant
     eprosima::fastdds::dds::DomainParticipantQos participant_qos =
         eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->get_default_participant_qos();
@@ -309,33 +311,8 @@ void GraphManager::add_participant(
 
     if (node_name != enclave) // Do not add root node
     {
-        // Split node name in domain and node name
-        std::istringstream iss(node_name);
-        std::vector<std::string> result;
-        std::string token;
-
-        while(std::getline(iss, token, '/'))
-        {
-            result.push_back(token);
-        }
-
-        std::string isolated_node_name = "";
-        std::string isolated_namespace = "";
-
-        if (result.size() > 1)
-        {
-            isolated_namespace = result[0];
-            for (size_t i = 1; i < result.size(); i++)
-            {
-                isolated_node_name.append(result[i] + "/");
-            }
-            isolated_node_name.pop_back();
-        }
-        else
-        {
-            isolated_node_name = node_name;
-            isolated_namespace = "";
-        }
+        std::string isolated_node_name, isolated_namespace;
+        get_name_and_namespace(node_name, isolated_node_name, isolated_namespace);
 
         rmw_dds_common::msg::ParticipantEntitiesInfo info =
             graphCache_.add_node(gid, isolated_node_name, isolated_namespace);
@@ -477,14 +454,18 @@ void GraphManager::associate_entity(
     {
         case dds::xrce::OBJK_DATAWRITER:
         {
+            std::string isolated_node_name, isolated_namespace;
+            get_name_and_namespace(qos.name().c_str(), isolated_node_name, isolated_namespace);
             info = graphCache_.associate_writer(
-                entity_gid, participant_gid, qos.name().c_str(), enclave_);
+                entity_gid, participant_gid, isolated_node_name, isolated_namespace);
             break;
         }
         case dds::xrce::OBJK_DATAREADER:
         {
+            std::string isolated_node_name, isolated_namespace;
+            get_name_and_namespace(qos.name().c_str(), isolated_node_name, isolated_namespace);
             info = graphCache_.associate_reader(
-                entity_gid, participant_gid, qos.name().c_str(), enclave_);
+                entity_gid, participant_gid, isolated_node_name, isolated_namespace);
             break;
         }
         default:
@@ -581,6 +562,43 @@ void GraphManager::update_node_entities_info()
         {
             graphCache_.update_participant_entities(entities_info);
         }
+    }
+}
+
+void GraphManager::get_name_and_namespace(
+    std::string participant_name,
+    std::string& node_name,
+    std::string& node_namespace)
+{
+    // Remove first / if exists
+    if (participant_name.rfind("/", 0) == 0)
+    {
+        participant_name.erase(participant_name.begin());
+    }
+
+    // Split node name in domain and node name
+    std::istringstream iss(participant_name);
+    std::vector<std::string> result;
+    std::string token;
+
+    while(std::getline(iss, token, '/'))
+    {
+        result.push_back(token);
+    }
+
+    if (result.size() > 1)
+    {
+        node_namespace = "/" + result[0];
+        for (size_t i = 1; i < result.size(); i++)
+        {
+            node_name.append(result[i] + "/");
+        }
+        node_name.pop_back();
+    }
+    else
+    {
+        node_name = participant_name;
+        node_namespace = "/";
     }
 }
 
