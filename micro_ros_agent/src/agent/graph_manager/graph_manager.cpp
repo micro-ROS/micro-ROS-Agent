@@ -37,6 +37,8 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     , microros_graph_info_typesupport_(std::make_unique<
         eprosima::fastdds::dds::TypeSupport>(new graph_manager::MicrorosGraphInfoTypeSupport()))
 {
+    eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->load_profiles();
+
     // Create DomainParticipant
     eprosima::fastdds::dds::DomainParticipantQos participant_qos =
         eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->get_default_participant_qos();
@@ -532,6 +534,12 @@ void GraphManager::get_name_and_namespace(
     std::string& node_name,
     std::string& node_namespace)
 {
+    // Remove first / if exists
+    if (participant_name.rfind("/", 0) == 0)
+    {
+        participant_name.erase(participant_name.begin());
+    }
+
     // Split node name in domain and node name
     std::istringstream iss(participant_name);
     std::vector<std::string> result;
@@ -542,12 +550,9 @@ void GraphManager::get_name_and_namespace(
         result.push_back(token);
     }
 
-    node_name = "";
-    node_namespace = "";
-
     if (result.size() > 1)
     {
-        node_namespace = result[0];
+        node_namespace = "/" + result[0];
         for (size_t i = 1; i < result.size(); i++)
         {
             node_name.append(result[i] + "/");
@@ -557,7 +562,7 @@ void GraphManager::get_name_and_namespace(
     else
     {
         node_name = participant_name;
-        node_namespace = "";
+        node_namespace = "/";
     }
 }
 
