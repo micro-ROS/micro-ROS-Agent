@@ -309,8 +309,36 @@ void GraphManager::add_participant(
 
     if (node_name != enclave) // Do not add root node
     {
+        // Split node name in domain and node name
+        std::istringstream iss(node_name);
+        std::vector<std::string> result;
+        std::string token;
+
+        while(std::getline(iss, token, '/'))
+        {
+            result.push_back(token);
+        }
+
+        std::string isolated_node_name = "";
+        std::string isolated_namespace = "";
+
+        if (result.size() > 1)
+        {
+            isolated_namespace = result[0];
+            for (size_t i = 1; i < result.size(); i++)
+            {
+                isolated_node_name.append(result[i] + "/");
+            }
+            isolated_node_name.pop_back();
+        }
+        else
+        {
+            isolated_node_name = node_name;
+            isolated_namespace = "";
+        }
+
         rmw_dds_common::msg::ParticipantEntitiesInfo info =
-            graphCache_.add_node(gid, node_name, enclave_);
+            graphCache_.add_node(gid, isolated_node_name, isolated_namespace);
         ros_discovery_datawriter_->write(static_cast<void *>(&info));
     }
 }
