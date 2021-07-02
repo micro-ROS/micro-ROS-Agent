@@ -262,6 +262,18 @@ private:
      */
     void update_node_entities_info();
 
+    /**
+     * @brief   Retrieves node name and namespace from
+     *          participant.
+     * @param   participant_name DDS participant name.
+     * @param   node_name ROS2 Node name.
+     * @param   namespace ROS2 Node namespace.
+     */
+    void get_name_and_namespace(
+            std::string participant_name,
+            std::string& node_name,
+            std::string& node_namespace);
+
     eprosima::fastdds::dds::DomainId_t domain_id_;
     bool graph_changed_;
     bool display_on_change_;
