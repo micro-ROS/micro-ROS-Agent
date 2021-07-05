@@ -27,6 +27,11 @@ int main(int argc, char** argv)
     std::vector<std::string> params;
     for (int i = 0; i < argc; ++i)
     {
+        if(strcmp("--ros-args", argv[i]) == 0)
+        {
+            argc = i;
+            break;
+        }
         params.emplace_back(std::string(argv[i]));
     }
 
