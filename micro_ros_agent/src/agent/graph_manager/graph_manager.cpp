@@ -54,8 +54,9 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     participant_qos.wire_protocol().builtin.writerHistoryMemoryPolicy =
         eprosima::fastrtps::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
 
+    eprosima::fastdds::dds::StatusMask par_mask = eprosima::fastdds::dds::StatusMask::none();
     participant_.reset(eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->
-        create_participant(domain_id_, participant_qos, participant_listener_.get()));
+        create_participant(domain_id_, participant_qos, participant_listener_.get(), par_mask));
 
     // Register participant within typesupport
     participant_->register_type(*participant_info_typesupport_);
