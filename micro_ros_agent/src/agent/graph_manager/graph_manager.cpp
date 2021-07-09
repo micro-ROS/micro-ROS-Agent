@@ -22,11 +22,9 @@ namespace agent {
 namespace graph_manager {
 
 GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
-    // : eprosima::fastrtps::ParticipantListener()
     : domain_id_(domain_id)
     , graph_changed_(false)
     , display_on_change_(false)
-    , enclave_("/")
     , mtx_()
     , cv_()
     , graphCache_()
@@ -43,12 +41,13 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     eprosima::fastdds::dds::DomainParticipantQos participant_qos =
         eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->get_default_participant_qos();
 
-    size_t length = snprintf(nullptr, 0, "enclave=%s;", enclave_) + 1;
+    const char * enclave = "/";
+    size_t length = snprintf(nullptr, 0, "enclave=%s;", enclave) + 1;
     participant_qos.user_data().resize(length);
     snprintf(reinterpret_cast<char *>(participant_qos.user_data().data_vec().data()),
-        length, "enclave=%s;", enclave_);
+        length, "enclave=%s;", enclave);
 
-    participant_qos.name(enclave_);
+    participant_qos.name(enclave);
     participant_qos.wire_protocol().builtin.readerHistoryMemoryPolicy =
         eprosima::fastrtps::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
     participant_qos.wire_protocol().builtin.writerHistoryMemoryPolicy =
@@ -80,28 +79,26 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
         eprosima::fastdds::dds::TOPIC_QOS_DEFAULT));
 
     // Create datawriters
-    eprosima::fastdds::dds::DataWriterQos datawriter_qos =
+    datawriter_qos_ =
         eprosima::fastdds::dds::DATAWRITER_QOS_DEFAULT;
 
-    datawriter_qos.history().kind =
+    datawriter_qos_.history().kind =
         eprosima::fastdds::dds::HistoryQosPolicyKind::KEEP_LAST_HISTORY_QOS;
-    datawriter_qos.history().depth = 1;
-    datawriter_qos.endpoint().history_memory_policy =
+    datawriter_qos_.history().depth = 1;
+    datawriter_qos_.endpoint().history_memory_policy =
         eprosima::fastrtps::rtps::MemoryManagementPolicy::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
-    datawriter_qos.publish_mode().kind =
+    datawriter_qos_.publish_mode().kind =
         eprosima::fastdds::dds::PublishModeQosPolicyKind::ASYNCHRONOUS_PUBLISH_MODE;
-    datawriter_qos.reliability().kind =
+    datawriter_qos_.reliability().kind =
         eprosima::fastdds::dds::ReliabilityQosPolicyKind::RELIABLE_RELIABILITY_QOS;
-    datawriter_qos.durability().kind =
+    datawriter_qos_.durability().kind =
         eprosima::fastdds::dds::DurabilityQosPolicyKind::TRANSIENT_LOCAL_DURABILITY_QOS;
 
-    ros_discovery_datawriter_.reset(
-        publisher_->create_datawriter(ros_discovery_topic_.get(), datawriter_qos));
-
-    datawriter_qos.history().kind =
+    eprosima::fastdds::dds::DataWriterQos ros_to_microros_datawriter_qos_ = datawriter_qos_;
+    ros_to_microros_datawriter_qos_.history().kind =
         eprosima::fastdds::dds::HistoryQosPolicyKind::KEEP_ALL_HISTORY_QOS;
     ros_to_microros_graph_datawriter_.reset(
-        publisher_->create_datawriter(ros_to_microros_graph_topic_.get(), datawriter_qos));
+        publisher_->create_datawriter(ros_to_microros_graph_topic_.get(), ros_to_microros_datawriter_qos_));
 
     // Create datareaders
 
@@ -295,37 +292,55 @@ inline void GraphManager::publish_microros_graph()
 }
 
 void GraphManager::add_participant(
-        const eprosima::fastdds::dds::DomainParticipant* participant)
-{
-    const eprosima::fastdds::dds::DomainParticipantQos qos = participant->get_qos();
-    this->add_participant(participant->guid(), qos.name().to_string(), enclave_);
-}
-
-void GraphManager::add_participant(
-        const eprosima::fastrtps::rtps::GUID_t& guid,
-        const std::string& node_name,
+        const eprosima::fastdds::dds::DomainParticipant* participant,
+        bool from_microros,
         const std::string& enclave)
 {
-    const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", guid);
+    const eprosima::fastdds::dds::DomainParticipantQos qos = participant->get_qos();
+    const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", participant->guid());
 
     graphCache_.add_participant(gid, enclave);
 
-    if (node_name != enclave) // Do not add root node
+    // Do not add root node and
+    // do not announce non-micro-ROS participants
+    if (qos.name().to_string() != "/" && from_microros)
     {
         std::string isolated_node_name, isolated_namespace;
-        get_name_and_namespace(node_name, isolated_node_name, isolated_namespace);
+        get_name_and_namespace(qos.name().to_string(), isolated_node_name, isolated_namespace);
 
         rmw_dds_common::msg::ParticipantEntitiesInfo info =
             graphCache_.add_node(gid, isolated_node_name, isolated_namespace);
-        ros_discovery_datawriter_->write(static_cast<void *>(&info));
+
+        auto it = micro_ros_graph_datawriters_.find(participant);
+        if (it == micro_ros_graph_datawriters_.end())
+        {
+            // Create datawriter
+            std::unique_ptr<eprosima::fastdds::dds::DataWriter> datawriter;
+            datawriter.reset(publisher_->create_datawriter(ros_discovery_topic_.get(), datawriter_qos_));
+
+            it = micro_ros_graph_datawriters_.insert(
+                std::make_pair(participant, std::move(datawriter))).first;
+        }
+
+        it->second->write(static_cast<void *>(&info));
     }
 }
 
 void GraphManager::remove_participant(
-        const eprosima::fastrtps::rtps::GUID_t& guid)
+        const eprosima::fastdds::dds::DomainParticipant* participant,
+        bool from_microros)
 {
-    const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", guid);
+    const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", participant->guid());
     graphCache_.remove_participant(gid);
+
+    if (from_microros)
+    {
+        rmw_dds_common::msg::ParticipantEntitiesInfo info;
+        rmw_dds_common::convert_gid_to_msg(&gid, &info.gid);
+        auto it = micro_ros_graph_datawriters_.find(participant);
+        it->second->write(static_cast<void *>(&info));
+    }
+    micro_ros_graph_datawriters_.erase(participant);
 }
 
 void GraphManager::add_datawriter(
@@ -474,7 +489,9 @@ void GraphManager::associate_entity(
             break;
         }
     }
-    ros_discovery_datawriter_->write(static_cast<void *>(&info));
+
+    auto it = micro_ros_graph_datawriters_.find(participant);
+    it->second->write(static_cast<void *>(&info));
 }
 
 
@@ -628,13 +645,13 @@ void GraphManager::ParticipantListener::on_participant_discovery(
             const std::string enclave =
                 std::string(name_found->second.begin(), name_found->second.end());
 
-            graphManager_from_->add_participant(participant->guid(), info.info.m_participantName.to_string(), enclave);
+            graphManager_from_->add_participant(participant, false, enclave);
             break;
         }
         case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::REMOVED_PARTICIPANT:
         case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::DROPPED_PARTICIPANT:
         {
-            graphManager_from_->remove_participant(info.info.m_guid);
+            graphManager_from_->remove_participant(participant, false);
             break;
         }
         default:
@@ -703,7 +720,6 @@ void GraphManager::ParticipantListener::on_subscriber_discovery(
         eprosima::fastrtps::rtps::ReaderDiscoveryInfo&& info)
 {
     process_discovery_info<eprosima::fastrtps::rtps::ReaderDiscoveryInfo>(info);
-    // graphManager_from_->associate_entity(info.info.guid(), participant, dds::xrce::OBJK_DATAREADER);
 }
 
 void GraphManager::ParticipantListener::on_publisher_discovery(
@@ -711,7 +727,6 @@ void GraphManager::ParticipantListener::on_publisher_discovery(
         eprosima::fastrtps::rtps::WriterDiscoveryInfo&& info)
 {
     process_discovery_info<eprosima::fastrtps::rtps::WriterDiscoveryInfo>(info);
-    // graphManager_from_->associate_entity(info.info.guid(), participant, dds::xrce::OBJK_DATAWRITER);
 }
 
 GraphManager::DatareaderListener::DatareaderListener(
