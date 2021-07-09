@@ -89,22 +89,28 @@ public:
 
     /**
      * @brief   Adds a DDS participant to the graph tree.
-     * @param   participant eprosima::fastdds::dds::DomainParticipant to be added.
-     * @param   from_microros if this participant has been added from micro-ROS.
+     * @param   participant Pointer to the participant to be added to the graph.
+     */
+    void add_participant(
+            const eprosima::fastdds::dds::DomainParticipant* participant);
+
+    /**
+     * @brief   Adds a DDS participant to the graph tree.
+     * @param   guid rtps::GUID_t of the participant to be added.
+     * @param   node_name Name of the ROS 2 node associated to the given participant.
      * @param   enclave ROS 2 enclave.
      */
     void add_participant(
-            eprosima::fastdds::dds::DomainParticipant* participant,
-            bool from_microros = true,
-            const std::string& enclave = "/");
+            const eprosima::fastrtps::rtps::GUID_t& guid,
+            const std::string& node_name,
+            const std::string& enclave);
 
     /**
      * @brief   Removes a DDS participant from the graph tree.
-     * @param   participant eprosima::fastdds::dds::DomainParticipant to be removed.
+     * @param   guid rtps::GUID_t of the participant to be removed.
      */
     void remove_participant(
-        eprosima::fastdds::dds::DomainParticipant* participant,
-        bool from_microros = true);
+            const eprosima::fastrtps::rtps::GUID_t& guid);
 
     /**
      * @brief   Adds a DDS datawriter to the graph tree.
@@ -180,7 +186,7 @@ public:
      */
     void associate_entity(
             const eprosima::fastrtps::rtps::GUID_t& entity_guid,
-            eprosima::fastdds::dds::DomainParticipant* participant,
+            const eprosima::fastdds::dds::DomainParticipant* participant,
             const dds::xrce::ObjectKind& entity_kind);
 
 private:
@@ -271,11 +277,10 @@ private:
     eprosima::fastdds::dds::DomainId_t domain_id_;
     bool graph_changed_;
     bool display_on_change_;
+    const char * enclave_;
     std::thread microros_graph_publisher_;
     std::mutex mtx_;
     std::condition_variable cv_;
-
-    eprosima::fastdds::dds::DataWriterQos datawriter_qos_;
 
     rmw_dds_common::GraphCache graphCache_;
     std::unique_ptr<ParticipantListener> participant_listener_;
@@ -288,17 +293,9 @@ private:
     std::unique_ptr<eprosima::fastdds::dds::Subscriber> subscriber_;
     std::unique_ptr<eprosima::fastdds::dds::Topic> ros_discovery_topic_;
     std::unique_ptr<eprosima::fastdds::dds::Topic> ros_to_microros_graph_topic_;
+    std::unique_ptr<eprosima::fastdds::dds::DataWriter> ros_discovery_datawriter_;
     std::unique_ptr<eprosima::fastdds::dds::DataWriter> ros_to_microros_graph_datawriter_;
     std::unique_ptr<eprosima::fastdds::dds::DataReader> ros_discovery_datareader_;
-
-    // Store a auxiliary publishers and datawriter for each participant created in micro-ROS
-    std::map<
-        eprosima::fastdds::dds::DomainParticipant*,
-        std::pair<
-            std::unique_ptr<eprosima::fastdds::dds::Publisher>,
-            std::unique_ptr<eprosima::fastdds::dds::DataWriter>
-        >
-    > micro_ros_graph_datawriters_;
 };
 
 }  // namespace graph_manager
