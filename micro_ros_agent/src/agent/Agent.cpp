@@ -40,12 +40,7 @@ bool Agent::create(
             ([&](
                 const eprosima::fastdds::dds::DomainParticipant* participant) -> void
             {
-                auto graph_manager_ =
-                    find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t(
-                        participant->get_domain_id()
-                    )
-                );
-
+                auto graph_manager_ = find_or_create_graph_manager(participant->get_domain_id());
                 graph_manager_->add_participant(participant);
             });
         xrce_dds_agent_instance_.add_middleware_callback(
@@ -61,13 +56,8 @@ bool Agent::create(
             ([&](
                 const eprosima::fastdds::dds::DomainParticipant* participant) -> void
             {
-                auto graph_manager_ =
-                    find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t(
-                        participant->get_domain_id()
-                    )
-                );
-
-                graph_manager_->remove_participant(participant->guid());
+                auto graph_manager_ = find_or_create_graph_manager(participant->get_domain_id());
+                graph_manager_->remove_participant(participant);
             });
         xrce_dds_agent_instance_.add_middleware_callback(
             eprosima::uxr::Middleware::Kind::FASTDDS,
@@ -84,11 +74,7 @@ bool Agent::create(
                 const eprosima::fastdds::dds::DomainParticipant* participant,
                 const eprosima::fastdds::dds::DataWriter* datawriter) -> void
             {
-                auto graph_manager_ =
-                    find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t(
-                        participant->get_domain_id()
-                    )
-                );
+                auto graph_manager_ = find_or_create_graph_manager(participant->get_domain_id());
 
                 // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
                 const eprosima::fastrtps::rtps::InstanceHandle_t instance_handle =
@@ -115,11 +101,7 @@ bool Agent::create(
                 const eprosima::fastdds::dds::DataWriter* datawriter) -> void
             {
 
-                auto graph_manager_ =
-                    find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t(
-                        participant->get_domain_id()
-                    )
-                );
+                auto graph_manager_ = find_or_create_graph_manager(participant->get_domain_id());
 
                 // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
                 const eprosima::fastrtps::rtps::InstanceHandle_t instance_handle =
@@ -144,11 +126,7 @@ bool Agent::create(
                 const eprosima::fastdds::dds::DomainParticipant* participant,
                 const eprosima::fastdds::dds::DataReader* datareader) -> void
             {
-                auto graph_manager_ =
-                    find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t(
-                        participant->get_domain_id()
-                    )
-                );
+                auto graph_manager_ = find_or_create_graph_manager(participant->get_domain_id());
 
                 // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
                 const eprosima::fastrtps::rtps::InstanceHandle_t instance_handle =
@@ -174,11 +152,7 @@ bool Agent::create(
                 const eprosima::fastdds::dds::DomainParticipant* participant,
                 const eprosima::fastdds::dds::DataReader* datareader) -> void
             {
-                auto graph_manager_ =
-                    find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t(
-                        participant->get_domain_id()
-                    )
-                );
+                auto graph_manager_ = find_or_create_graph_manager(participant->get_domain_id());
 
                 // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
                 const eprosima::fastrtps::rtps::InstanceHandle_t instance_handle =
@@ -204,16 +178,14 @@ void Agent::run()
 
 std::shared_ptr<graph_manager::GraphManager> Agent::find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id)
 {
-    auto it = graph_manager_map_.find(domain_id);
+
+auto it = graph_manager_map_.find(domain_id);
 
     if (it != graph_manager_map_.end()) {
         return it->second;
     }else{
         return graph_manager_map_.insert(
-            std::pair<
-                eprosima::fastdds::dds::DomainId_t,
-                std::shared_ptr<graph_manager::GraphManager>
-            >(
+            std::make_pair(
                 domain_id,
                 std::make_shared<graph_manager::GraphManager>(domain_id)
             )
