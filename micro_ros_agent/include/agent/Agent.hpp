@@ -67,6 +67,11 @@ public:
 	void create(std::vector<std::string> devs, const std::string baudrate);
 	void create(const std::string baudrate);
 
+    void set_verbose_level(uint8_t verbose_level)
+    {
+        xrce_dds_agent_instance_API.set_verbose_level(verbose_level);
+    }
+
     void run()
     {
         xrce_dds_agent_instance_API.run();
