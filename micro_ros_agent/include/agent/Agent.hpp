@@ -38,13 +38,66 @@ public:
 
     void run();
 
+    void add_callbacks();
+
 private:
 
     eprosima::uxr::AgentInstance& xrce_dds_agent_instance_;
     std::map<eprosima::fastdds::dds::DomainId_t, std::shared_ptr<graph_manager::GraphManager>> graph_manager_map_;
 
     std::shared_ptr<graph_manager::GraphManager> find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id);
+    void remove_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id);    // TODO: check grap_manager on agent closing
 };
+
+template<typename AgentType>
+class AgentAPI : Agent
+{
+public:
+    AgentAPI() : Agent(){};
+
+    ~AgentAPI() = default;
+
+    void create(uint16_t port)
+	{
+		xrce_dds_agent_instance_API.configure(port);
+        add_callbacks();
+	}
+
+	void create(std::string dev, const std::string baudrate);
+	void create(std::vector<std::string> devs, const std::string baudrate);
+	void create(const std::string baudrate);
+
+    void run()
+    {
+        xrce_dds_agent_instance_API.run();
+    }
+    
+    void stop()
+    {
+        xrce_dds_agent_instance_API.stop();
+    }
+
+private:
+    eprosima::uxr::AgentInstanceAPI<AgentType> xrce_dds_agent_instance_API;
+};
+
+template<> inline UXR_AGENT_EXPORT void AgentAPI<eprosima::uxr::TermiosAgent>::create(std::string dev, const std::string baudrate)
+{
+    xrce_dds_agent_instance_API.configure(dev, baudrate);
+    add_callbacks();
+}
+
+template<> inline UXR_AGENT_EXPORT void AgentAPI<eprosima::uxr::MultiTermiosAgent>::create(std::vector<std::string> devs, const std::string baudrate)
+{
+    xrce_dds_agent_instance_API.configure(devs, baudrate);
+    add_callbacks();
+}
+
+template<> inline UXR_AGENT_EXPORT void AgentAPI<eprosima::uxr::PseudoTerminalAgent>::create(const std::string baudrate)
+{
+    xrce_dds_agent_instance_API.configure(baudrate);
+    add_callbacks();
+}
 
 }  // namespace agent
 }  // namespace uros

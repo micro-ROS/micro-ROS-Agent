@@ -32,6 +32,14 @@ bool Agent::create(
     bool result = xrce_dds_agent_instance_.create(argc, argv);
     if (result)
     {
+        add_callbacks();
+    }
+
+    return result;
+}
+
+void Agent::add_callbacks()
+{
         /**
          * Add CREATE_PARTICIPANT callback.
          */
@@ -166,9 +174,6 @@ bool Agent::create(
             eprosima::uxr::Middleware::Kind::FASTDDS,
             eprosima::uxr::middleware::CallbackKind::DELETE_DATAREADER,
             std::move(on_delete_datareader));
-    }
-
-    return result;
 }
 
 void Agent::run()
@@ -190,6 +195,17 @@ auto it = graph_manager_map_.find(domain_id);
                 std::make_shared<graph_manager::GraphManager>(domain_id)
             )
         ).first->second;
+    }
+}
+
+void Agent::remove_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id)
+{
+    auto it = graph_manager_map_.find(domain_id);
+
+    if (it != graph_manager_map_.end()) 
+    {
+        it->second = nullptr;
+        graph_manager_map_.erase(it);        
     }
 }
 
