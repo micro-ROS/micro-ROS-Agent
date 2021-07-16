@@ -29,17 +29,13 @@ bool Agent::create(
         int argc,
         char** argv)
 {
-    bool result = xrce_dds_agent_instance_.create(argc, argv);
-    if (result)
-    {
-        add_callbacks();
-    }
-
-    return result;
+    return xrce_dds_agent_instance_.create(argc, argv);
 }
 
 void Agent::add_callbacks()
 {
+    if (!started)
+    {
         /**
          * Add CREATE_PARTICIPANT callback.
          */
@@ -108,7 +104,6 @@ void Agent::add_callbacks()
                 const eprosima::fastdds::dds::DomainParticipant* participant,
                 const eprosima::fastdds::dds::DataWriter* datawriter) -> void
             {
-
                 auto graph_manager_ = find_or_create_graph_manager(participant->get_domain_id());
 
                 // TODO(jamoralp): Workaround for Fast-DDS bug #9977. Remove when fixed
@@ -174,6 +169,9 @@ void Agent::add_callbacks()
             eprosima::uxr::Middleware::Kind::FASTDDS,
             eprosima::uxr::middleware::CallbackKind::DELETE_DATAREADER,
             std::move(on_delete_datareader));
+
+        started = true;
+    }
 }
 
 void Agent::run()
@@ -195,17 +193,6 @@ auto it = graph_manager_map_.find(domain_id);
                 std::make_shared<graph_manager::GraphManager>(domain_id)
             )
         ).first->second;
-    }
-}
-
-void Agent::remove_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id)
-{
-    auto it = graph_manager_map_.find(domain_id);
-
-    if (it != graph_manager_map_.end()) 
-    {
-        it->second = nullptr;
-        graph_manager_map_.erase(it);        
     }
 }
 
