@@ -80,7 +80,16 @@ public:
     /**
      * @brief   Default destructor.
      */
-    ~GraphManager() = default;
+    ~GraphManager()
+    {
+        exit = true;
+        cv_.notify_one();
+
+        if (microros_graph_publisher_.joinable())
+        {
+            microros_graph_publisher_.join();
+        }
+    }
 
     /**
      * @brief   Implementation of the notification logic that updates the micro-ROS graph.
@@ -298,6 +307,7 @@ private:
             std::string& node_name,
             std::string& node_namespace);
 
+    bool exit = false;
     eprosima::fastdds::dds::DomainId_t domain_id_;
     bool graph_changed_;
     bool display_on_change_;

@@ -137,10 +137,15 @@ inline void GraphManager::publish_microros_graph()
             std::unique_lock<std::mutex> lock(mtx_);
             cv_.wait(lock, [this]()
             {
-                return this->graph_changed_;
+                return this->graph_changed_ || exit;
             });
         }
 
+        if (exit)
+        {
+            break;
+        }
+        
         if (display_on_change_)
         {
             std::cout << "Updated uros Graph: graph changed" << std::endl;
