@@ -62,6 +62,8 @@ public:
 
     void run();
 
+    void stop();
+
     void add_callbacks();
 
 private:
