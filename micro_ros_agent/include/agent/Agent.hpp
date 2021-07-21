@@ -38,6 +38,8 @@ public:
 
     void run();
 
+    void stop();
+
 private:
 
     eprosima::uxr::AgentInstance& xrce_dds_agent_instance_;
