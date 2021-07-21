@@ -14,6 +14,9 @@
 
 cmake_minimum_required(VERSION 3.5)
 
+option(BUILD_SHARED_LIBS "Control shared/static building." ON)
+option(UBUILD_AGENT_EXECUTABLE "Control shared/static building." ON)
+
 option(UROSAGENT_GENERATE_PROFILE
   "Generates agent.refs according to the .msgs provided in the .repos" OFF
   )
@@ -41,15 +44,26 @@ find_package(ament_cmake_gtest REQUIRED)
 
 find_package(micro_ros_msgs REQUIRED)
 
-add_executable(${PROJECT_NAME}
-  src/main.cpp
+include(GNUInstallDirs)
+set(BIN_INSTALL_DIR     ${CMAKE_INSTALL_BINDIR}     CACHE PATH "Installation directory for binaries")
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Installation directory for C headers")
+set(LIB_INSTALL_DIR     ${CMAKE_INSTALL_LIBDIR}     CACHE PATH "Installation directory for libraries")
+set(DATA_INSTALL_DIR    ${CMAKE_INSTALL_DATADIR}    CACHE PATH "Installation directory for data")
+
+# Set source files
+set(SRCS
   src/agent/Agent.cpp
   src/agent/graph_manager/graph_manager.cpp
   src/agent/graph_manager/graph_typesupport.cpp
   src/agent/utils/demangle.cpp
   )
 
-target_include_directories(${PROJECT_NAME}
+# Library
+add_library(${PROJECT_NAME} ${SRCS})
+
+target_include_directories(${PROJECT_NAME} BEFORE
+  PUBLIC
+    $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
   PRIVATE
     include
   )
@@ -76,49 +90,124 @@ target_link_libraries(${PROJECT_NAME}
 
 target_compile_options(${PROJECT_NAME}
   PRIVATE
-    $<$<C_COMPILER_ID:GNU>:-Wall>
-    $<$<C_COMPILER_ID:GNU>:-Wextra>
-    $<$<C_COMPILER_ID:GNU>:-pedantic>
-  )
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-  CXX_STANDARD
-    14
-  CXX_STANDARD_REQUIRED
-    YES
-  )
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-  CXX_STANDARD
-    14
-  CXX_STANDARD_REQUIRED
-    YES
-  )
-
-target_compile_options(${PROJECT_NAME}
-  PRIVATE
     $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wall>
     $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wextra>
     $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wpedantic>
   )
 
+set_target_properties(${PROJECT_NAME} PROPERTIES
+  CXX_STANDARD
+    14
+  CXX_STANDARD_REQUIRED
+    YES
+  )
+
+# Install agent lib
+install(
+    TARGETS
+        ${PROJECT_NAME}
+    EXPORT
+        ${PROJECT_NAME}Targets
+    RUNTIME DESTINATION
+        ${BIN_INSTALL_DIR}
+    LIBRARY DESTINATION
+        ${LIB_INSTALL_DIR}
+    ARCHIVE DESTINATION
+        ${LIB_INSTALL_DIR}
+    COMPONENT
+        libraries
+    )
+
+# Install includes
+install(
+    DIRECTORY
+        ${PROJECT_SOURCE_DIR}/include/agent
+    DESTINATION
+        ${INCLUDE_INSTALL_DIR}
+    FILES_MATCHING
+        PATTERN "*.hpp"
+        PATTERN "*.h"
+    )
+
+# Export library
+install(
+  EXPORT
+      ${PROJECT_NAME}Targets
+  DESTINATION
+      ${DATA_INSTALL_DIR}/${PROJECT_NAME}/cmake
+  )
+
+# Package configuration
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+      ${PROJECT_SOURCE_DIR}/cmake/Config.cmake.in
+        ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION
+        ${DATA_INSTALL_DIR}/${PROJECT_NAME}/cmake
+    PATH_VARS
+        BIN_INSTALL_DIR
+        INCLUDE_INSTALL_DIR
+        LIB_INSTALL_DIR
+        DATA_INSTALL_DIR
+    )
+
+install(
+  FILES
+      ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}Config.cmake
+  DESTINATION
+      ${DATA_INSTALL_DIR}/${PROJECT_NAME}/cmake
+  )
+
+if(UBUILD_AGENT_EXECUTABLE)
+  add_executable(micro_ROS_agent
+    ${SRCS}
+    src/main.cpp
+    )
+
+  target_include_directories(micro_ROS_agent
+    PRIVATE
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    )
+
+  ament_target_dependencies(micro_ROS_agent
+    rosidl_typesupport_fastrtps_cpp
+    rosidl_runtime_cpp
+    rosidl_typesupport_cpp
+    fastcdr
+    fastrtps
+    rmw_dds_common
+    rmw
+    rmw_fastrtps_shared_cpp
+    micro_ros_msgs
+    )
+
+  target_link_libraries(micro_ROS_agent
+    microxrcedds_agent
+    fastcdr
+    fastrtps
+    $<$<BOOL:$<PLATFORM_ID:Linux>>:rt>
+    $<$<BOOL:$<PLATFORM_ID:Linux>>:dl>
+    )
+
+  install(
+    TARGETS
+      micro_ROS_agent
+    DESTINATION
+      lib/${PROJECT_NAME}
+    )
+
+  install(
+    DIRECTORY
+      launch
+    DESTINATION
+      share/${PROJECT_NAME}
+    )
+endif()
+
 ament_export_dependencies(microxrcedds_agent)
 
 ament_package()
-
-install(
-  TARGETS
-    ${PROJECT_NAME}
-  DESTINATION
-    lib/${PROJECT_NAME}
-  )
-
-install(
-  DIRECTORY
-    launch
-  DESTINATION
-    share/${PROJECT_NAME}
-  )
 
 if(UROSAGENT_GENERATE_PROFILE)
   set(_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/python")
