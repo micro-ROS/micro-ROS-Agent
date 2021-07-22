@@ -54,29 +54,29 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
         eprosima::fastrtps::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
 
     eprosima::fastdds::dds::StatusMask par_mask = eprosima::fastdds::dds::StatusMask::none();
-    participant_.reset(eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->
-        create_participant(domain_id_, participant_qos, participant_listener_.get(), par_mask));
+    participant_ = eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->
+        create_participant(domain_id_, participant_qos, participant_listener_.get(), par_mask);
 
     // Register participant within typesupport
     participant_->register_type(*participant_info_typesupport_);
     participant_->register_type(*microros_graph_info_typesupport_);
 
     // Create publisher
-    publisher_.reset(participant_->create_publisher(
-        eprosima::fastdds::dds::PUBLISHER_QOS_DEFAULT));
+    publisher_ = participant_->create_publisher(
+        eprosima::fastdds::dds::PUBLISHER_QOS_DEFAULT);
 
     // Create subscriber
-    subscriber_.reset(participant_->create_subscriber(
-        eprosima::fastdds::dds::SUBSCRIBER_QOS_DEFAULT));
+    subscriber_ = participant_->create_subscriber(
+        eprosima::fastdds::dds::SUBSCRIBER_QOS_DEFAULT);
 
     // Create topics
-    ros_discovery_topic_.reset(participant_->create_topic("ros_discovery_info",
+    ros_discovery_topic_ = participant_->create_topic("ros_discovery_info",
         participant_info_typesupport_->get_type_name(),
-        eprosima::fastdds::dds::TOPIC_QOS_DEFAULT));
+        eprosima::fastdds::dds::TOPIC_QOS_DEFAULT);
 
-    ros_to_microros_graph_topic_.reset(participant_->create_topic("ros_to_microros_graph",
+    ros_to_microros_graph_topic_ = participant_->create_topic("ros_to_microros_graph",
         microros_graph_info_typesupport_->get_type_name(),
-        eprosima::fastdds::dds::TOPIC_QOS_DEFAULT));
+        eprosima::fastdds::dds::TOPIC_QOS_DEFAULT);
 
     // Create datawriters
     datawriter_qos_ =
@@ -97,8 +97,8 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     eprosima::fastdds::dds::DataWriterQos ros_to_microros_datawriter_qos_ = datawriter_qos_;
     ros_to_microros_datawriter_qos_.history().kind =
         eprosima::fastdds::dds::HistoryQosPolicyKind::KEEP_ALL_HISTORY_QOS;
-    ros_to_microros_graph_datawriter_.reset(
-        publisher_->create_datawriter(ros_to_microros_graph_topic_.get(), ros_to_microros_datawriter_qos_));
+    ros_to_microros_graph_datawriter_ = 
+        publisher_->create_datawriter(ros_to_microros_graph_topic_, ros_to_microros_datawriter_qos_);
 
     // Create datareaders
 
@@ -114,9 +114,9 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     datareader_qos.durability().kind =
         eprosima::fastdds::dds::DurabilityQosPolicyKind::TRANSIENT_LOCAL_DURABILITY_QOS;
 
-    ros_discovery_datareader_.reset(
-        subscriber_->create_datareader(ros_discovery_topic_.get(),
-            datareader_qos, datareader_listener_.get()));
+    ros_discovery_datareader_ = 
+        subscriber_->create_datareader(ros_discovery_topic_,
+            datareader_qos, datareader_listener_.get());
 
     // Set graph cache on change callback function
     graphCache_.set_on_change_callback([this]()
@@ -137,8 +137,13 @@ inline void GraphManager::publish_microros_graph()
             std::unique_lock<std::mutex> lock(mtx_);
             cv_.wait(lock, [this]()
             {
-                return this->graph_changed_;
+                return this->graph_changed_ || exit;
             });
+        }
+
+        if (exit)
+        {
+            break;
         }
 
         if (display_on_change_)
@@ -315,8 +320,8 @@ void GraphManager::add_participant(
         if (it == micro_ros_graph_datawriters_.end())
         {
             // Create datawriter
-            std::unique_ptr<eprosima::fastdds::dds::DataWriter> datawriter;
-            datawriter.reset(publisher_->create_datawriter(ros_discovery_topic_.get(), datawriter_qos_));
+            eprosima::fastdds::dds::DataWriter* datawriter;
+            datawriter = publisher_->create_datawriter(ros_discovery_topic_, datawriter_qos_);
 
             it = micro_ros_graph_datawriters_.insert(
                 std::make_pair(participant, std::move(datawriter))).first;

@@ -80,7 +80,30 @@ public:
     /**
      * @brief   Default destructor.
      */
-    ~GraphManager() = default;
+    ~GraphManager()
+	{
+		graphCache_.clear_on_change_callback();
+
+		exit = true;
+        cv_.notify_one();
+
+		if (microros_graph_publisher_.joinable())
+		{
+			microros_graph_publisher_.join();
+		}
+		
+		subscriber_->delete_datareader(ros_discovery_datareader_);
+		publisher_->delete_datawriter(ros_to_microros_graph_datawriter_);
+
+		participant_->delete_subscriber(subscriber_);
+		participant_->delete_publisher(publisher_);
+
+		// Delete topics
+		participant_->delete_topic(ros_discovery_topic_);
+		participant_->delete_topic(ros_to_microros_graph_topic_);
+
+		eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->delete_participant(participant_);
+	}
 
     /**
      * @brief   Implementation of the notification logic that updates the micro-ROS graph.
@@ -274,6 +297,7 @@ private:
     std::thread microros_graph_publisher_;
     std::mutex mtx_;
     std::condition_variable cv_;
+    volatile bool exit = false;
 
     eprosima::fastdds::dds::DataWriterQos datawriter_qos_;
 
@@ -283,18 +307,17 @@ private:
 
     std::unique_ptr<eprosima::fastdds::dds::TypeSupport> participant_info_typesupport_;
     std::unique_ptr<eprosima::fastdds::dds::TypeSupport> microros_graph_info_typesupport_;
-    std::unique_ptr<eprosima::fastdds::dds::DomainParticipant> participant_;
-    std::unique_ptr<eprosima::fastdds::dds::Publisher> publisher_;
-    std::unique_ptr<eprosima::fastdds::dds::Subscriber> subscriber_;
-    std::unique_ptr<eprosima::fastdds::dds::Topic> ros_discovery_topic_;
-    std::unique_ptr<eprosima::fastdds::dds::Topic> ros_to_microros_graph_topic_;
-    std::unique_ptr<eprosima::fastdds::dds::DataWriter> ros_to_microros_graph_datawriter_;
-    std::unique_ptr<eprosima::fastdds::dds::DataReader> ros_discovery_datareader_;
-
+    eprosima::fastdds::dds::DomainParticipant* participant_;
+    eprosima::fastdds::dds::Publisher* publisher_;
+    eprosima::fastdds::dds::Subscriber* subscriber_;
+    eprosima::fastdds::dds::Topic* ros_discovery_topic_;
+    eprosima::fastdds::dds::Topic* ros_to_microros_graph_topic_;
+    eprosima::fastdds::dds::DataWriter* ros_to_microros_graph_datawriter_;
+    eprosima::fastdds::dds::DataReader* ros_discovery_datareader_;
     // Store a auxiliary publishers and datawriter for each participant created in micro-ROS
     std::map<
         const eprosima::fastdds::dds::DomainParticipant*,
-        std::unique_ptr<eprosima::fastdds::dds::DataWriter>
+        eprosima::fastdds::dds::DataWriter*
     > micro_ros_graph_datawriters_;
 };
 
