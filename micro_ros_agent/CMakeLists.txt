@@ -170,8 +170,6 @@ if(UBUILD_AGENT_EXECUTABLE)
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     )
 
-  ament_target_dependencies(micro_ros_agent_bin ${PROJECT_NAME})
-
   target_link_libraries(micro_ros_agent_bin ${PROJECT_NAME})
 
   set_target_properties(micro_ros_agent_bin
