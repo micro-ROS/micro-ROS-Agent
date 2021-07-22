@@ -173,12 +173,12 @@ bool Agent::create(
 
 void Agent::run()
 {
-    return xrce_dds_agent_instance_.run();
+    xrce_dds_agent_instance_.run();
 }
 
 void Agent::stop()
 {
-    return xrce_dds_agent_instance_.stop();
+    xrce_dds_agent_instance_.stop();
 }
 
 std::shared_ptr<graph_manager::GraphManager> Agent::find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id)
