@@ -160,39 +160,26 @@ install(
   )
 
 if(UBUILD_AGENT_EXECUTABLE)
-  add_executable(micro_ROS_agent
+  add_executable(micro_ros_agent_bin
     ${SRCS}
     src/main.cpp
     )
 
-  target_include_directories(micro_ROS_agent
+  target_include_directories(micro_ros_agent_bin
     PRIVATE
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     )
 
-  ament_target_dependencies(micro_ROS_agent
-    rosidl_typesupport_fastrtps_cpp
-    rosidl_runtime_cpp
-    rosidl_typesupport_cpp
-    fastcdr
-    fastrtps
-    rmw_dds_common
-    rmw
-    rmw_fastrtps_shared_cpp
-    micro_ros_msgs
-    )
+  ament_target_dependencies(micro_ros_agent_bin ${PROJECT_NAME})
 
-  target_link_libraries(micro_ROS_agent
-    microxrcedds_agent
-    fastcdr
-    fastrtps
-    $<$<BOOL:$<PLATFORM_ID:Linux>>:rt>
-    $<$<BOOL:$<PLATFORM_ID:Linux>>:dl>
-    )
+  target_link_libraries(micro_ros_agent_bin ${PROJECT_NAME})
+
+  set_target_properties(micro_ros_agent_bin
+      PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 
   install(
     TARGETS
-      micro_ROS_agent
+      micro_ros_agent_bin
     DESTINATION
       lib/${PROJECT_NAME}
     )
