@@ -344,8 +344,10 @@ void GraphManager::remove_participant(
         rmw_dds_common::convert_gid_to_msg(&gid, &info.gid);
         auto it = micro_ros_graph_datawriters_.find(participant);
         it->second->write(static_cast<void *>(&info));
+
+        publisher_->delete_datawriter(it->second);
+        micro_ros_graph_datawriters_.erase(participant);
     }
-    micro_ros_graph_datawriters_.erase(participant);
 }
 
 void GraphManager::add_datawriter(
