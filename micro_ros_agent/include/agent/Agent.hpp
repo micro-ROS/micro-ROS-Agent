@@ -51,7 +51,7 @@ public:
     void stop();
 
 private:
-
+    bool initialized = false;
     eprosima::uxr::AgentInstance& xrce_dds_agent_instance_;
     std::map<eprosima::fastdds::dds::DomainId_t, std::shared_ptr<graph_manager::GraphManager>> graph_manager_map_;
 
