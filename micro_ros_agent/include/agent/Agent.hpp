@@ -26,11 +26,21 @@ namespace agent {
 
 class Agent
 {
-public:
-
+private:
     Agent();
 
-    ~Agent() = default;
+    Agent(const Agent &) = delete;
+
+    Agent(Agent &&) = delete;
+
+    Agent& operator =(
+            const Agent &) = delete;
+
+    Agent& operator =(
+            Agent &&) = delete;
+
+public:
+    static Agent& getInstance();
 
     bool create(
             int argc,
