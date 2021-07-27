@@ -288,8 +288,6 @@ private:
 
     eprosima::fastdds::dds::DataWriterQos datawriter_qos_;
 
-    eprosima::fastdds::dds::DataWriterQos datawriter_qos_;
-
     rmw_dds_common::GraphCache graphCache_;
 
     ParticipantListener participant_listener_;
