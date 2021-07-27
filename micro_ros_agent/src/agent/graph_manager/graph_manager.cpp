@@ -34,6 +34,7 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     , microros_graph_info_typesupport_()
 {
     eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->load_profiles();
+
     participant_info_typesupport_ = (eprosima::fastdds::dds::TypeSupport) new graph_manager::ParticipantEntitiesInfoTypeSupport();
     microros_graph_info_typesupport_ = (eprosima::fastdds::dds::TypeSupport) new graph_manager::MicrorosGraphInfoTypeSupport();
 
@@ -54,6 +55,7 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
         eprosima::fastrtps::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
 
     eprosima::fastdds::dds::StatusMask par_mask = eprosima::fastdds::dds::StatusMask::none();
+
     participant_ = eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->
         create_participant(domain_id_, participant_qos, &participant_listener_, par_mask);
 
@@ -97,6 +99,7 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     eprosima::fastdds::dds::DataWriterQos ros_to_microros_datawriter_qos_ = datawriter_qos_;
     ros_to_microros_datawriter_qos_.history().kind =
         eprosima::fastdds::dds::HistoryQosPolicyKind::KEEP_ALL_HISTORY_QOS;
+
     ros_to_microros_graph_datawriter_ = 
         publisher_->create_datawriter(ros_to_microros_graph_topic_, ros_to_microros_datawriter_qos_);
 

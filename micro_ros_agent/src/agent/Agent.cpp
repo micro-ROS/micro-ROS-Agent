@@ -197,7 +197,8 @@ void Agent::stop()
 
 graph_manager::GraphManager* Agent::find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id)
 {
-    auto it = graph_manager_map_.find(domain_id);
+
+auto it = graph_manager_map_.find(domain_id);
 
     if (it != graph_manager_map_.end()) {
         return &it->second;
