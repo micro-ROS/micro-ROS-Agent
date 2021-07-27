@@ -80,29 +80,16 @@ public:
     /**
      * @brief   Default destructor.
      */
-    ~GraphManager()
+    ~GraphManager() = default;
+
+	void stop()
 	{
-		graphCache_.clear_on_change_callback();
-
-		exit = true;
-        cv_.notify_one();
-
 		if (microros_graph_publisher_.joinable())
 		{
+			exit = true;
+        	cv_.notify_one();
 			microros_graph_publisher_.join();
 		}
-		
-		subscriber_->delete_datareader(ros_discovery_datareader_);
-		publisher_->delete_datawriter(ros_to_microros_graph_datawriter_);
-
-		participant_->delete_subscriber(subscriber_);
-		participant_->delete_publisher(publisher_);
-
-		// Delete topics
-		participant_->delete_topic(ros_discovery_topic_);
-		participant_->delete_topic(ros_to_microros_graph_topic_);
-
-		eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->delete_participant(participant_);
 	}
 
     /**
@@ -302,11 +289,11 @@ private:
     eprosima::fastdds::dds::DataWriterQos datawriter_qos_;
 
     rmw_dds_common::GraphCache graphCache_;
-    std::unique_ptr<ParticipantListener> participant_listener_;
-    std::unique_ptr<DatareaderListener> datareader_listener_;
+    ParticipantListener participant_listener_;
+    DatareaderListener datareader_listener_;
 
-    std::unique_ptr<eprosima::fastdds::dds::TypeSupport> participant_info_typesupport_;
-    std::unique_ptr<eprosima::fastdds::dds::TypeSupport> microros_graph_info_typesupport_;
+    eprosima::fastdds::dds::TypeSupport participant_info_typesupport_;
+    eprosima::fastdds::dds::TypeSupport microros_graph_info_typesupport_;
     eprosima::fastdds::dds::DomainParticipant* participant_;
     eprosima::fastdds::dds::Publisher* publisher_;
     eprosima::fastdds::dds::Subscriber* subscriber_;

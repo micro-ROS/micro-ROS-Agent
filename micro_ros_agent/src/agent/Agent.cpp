@@ -35,8 +35,6 @@ bool Agent::create(
         int argc,
         char** argv)
 {
-    stop();
-
     bool result = xrce_dds_agent_instance_.create(argc, argv);
 
     if (result && !initialized)
@@ -190,22 +188,21 @@ void Agent::run()
 void Agent::stop()
 {
     xrce_dds_agent_instance_.stop();
-    graph_manager_map_.clear();
+
+    for (auto & element : graph_manager_map_)
+    {
+        element.second.stop();
+    }
 }
 
-std::shared_ptr<graph_manager::GraphManager> Agent::find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id)
+graph_manager::GraphManager* Agent::find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id)
 {
     auto it = graph_manager_map_.find(domain_id);
 
     if (it != graph_manager_map_.end()) {
-        return it->second;
+        return &it->second;
     }else{
-        return graph_manager_map_.insert(
-            std::make_pair(
-                domain_id,
-                std::make_shared<graph_manager::GraphManager>(domain_id)
-            )
-        ).first->second;
+        return &graph_manager_map_.emplace(domain_id, domain_id).first->second;
     }
 }
 

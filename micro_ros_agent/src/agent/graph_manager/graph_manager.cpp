@@ -28,14 +28,14 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     , mtx_()
     , cv_()
     , graphCache_()
-    , participant_listener_(std::make_unique<ParticipantListener>(this))
-    , datareader_listener_(std::make_unique<DatareaderListener>(this))
-    , participant_info_typesupport_(std::make_unique<
-        eprosima::fastdds::dds::TypeSupport>(new graph_manager::ParticipantEntitiesInfoTypeSupport()))
-    , microros_graph_info_typesupport_(std::make_unique<
-        eprosima::fastdds::dds::TypeSupport>(new graph_manager::MicrorosGraphInfoTypeSupport()))
+    , participant_listener_(this)
+    , datareader_listener_(this)
+    , participant_info_typesupport_()
+    , microros_graph_info_typesupport_()
 {
     eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->load_profiles();
+    participant_info_typesupport_ = (eprosima::fastdds::dds::TypeSupport) new graph_manager::ParticipantEntitiesInfoTypeSupport();
+    microros_graph_info_typesupport_ = (eprosima::fastdds::dds::TypeSupport) new graph_manager::MicrorosGraphInfoTypeSupport();
 
     // Create DomainParticipant
     eprosima::fastdds::dds::DomainParticipantQos participant_qos =
@@ -55,11 +55,11 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
 
     eprosima::fastdds::dds::StatusMask par_mask = eprosima::fastdds::dds::StatusMask::none();
     participant_ = eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->
-        create_participant(domain_id_, participant_qos, participant_listener_.get(), par_mask);
+        create_participant(domain_id_, participant_qos, &participant_listener_, par_mask);
 
     // Register participant within typesupport
-    participant_->register_type(*participant_info_typesupport_);
-    participant_->register_type(*microros_graph_info_typesupport_);
+    participant_->register_type(participant_info_typesupport_);
+    participant_->register_type(microros_graph_info_typesupport_);
 
     // Create publisher
     publisher_ = participant_->create_publisher(
@@ -71,11 +71,11 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
 
     // Create topics
     ros_discovery_topic_ = participant_->create_topic("ros_discovery_info",
-        participant_info_typesupport_->get_type_name(),
+        participant_info_typesupport_.get_type_name(),
         eprosima::fastdds::dds::TOPIC_QOS_DEFAULT);
 
     ros_to_microros_graph_topic_ = participant_->create_topic("ros_to_microros_graph",
-        microros_graph_info_typesupport_->get_type_name(),
+        microros_graph_info_typesupport_.get_type_name(),
         eprosima::fastdds::dds::TOPIC_QOS_DEFAULT);
 
     // Create datawriters
@@ -116,7 +116,7 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
 
     ros_discovery_datareader_ = 
         subscriber_->create_datareader(ros_discovery_topic_,
-            datareader_qos, datareader_listener_.get());
+            datareader_qos, &datareader_listener_);
 
     // Set graph cache on change callback function
     graphCache_.set_on_change_callback([this]()
