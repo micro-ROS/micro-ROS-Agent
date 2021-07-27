@@ -25,13 +25,22 @@ Agent::Agent()
 {
 }
 
+Agent& Agent::getInstance()
+{
+    static Agent instance;
+    return instance;
+}
+
 bool Agent::create(
         int argc,
         char** argv)
 {
     bool result = xrce_dds_agent_instance_.create(argc, argv);
-    if (result)
+
+    if (result && !initialized)
     {
+        initialized = true;
+
         /**
          * Add CREATE_PARTICIPANT callback.
          */
@@ -173,23 +182,27 @@ bool Agent::create(
 
 void Agent::run()
 {
-    return xrce_dds_agent_instance_.run();
+    xrce_dds_agent_instance_.run();
 }
 
-std::shared_ptr<graph_manager::GraphManager> Agent::find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id)
+void Agent::stop()
 {
+    xrce_dds_agent_instance_.stop();
 
-auto it = graph_manager_map_.find(domain_id);
+    for (auto & element : graph_manager_map_)
+    {
+        element.second.stop();
+    }
+}
+
+graph_manager::GraphManager* Agent::find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id)
+{
+    auto it = graph_manager_map_.find(domain_id);
 
     if (it != graph_manager_map_.end()) {
-        return it->second;
+        return &it->second;
     }else{
-        return graph_manager_map_.insert(
-            std::make_pair(
-                domain_id,
-                std::make_shared<graph_manager::GraphManager>(domain_id)
-            )
-        ).first->second;
+        return &graph_manager_map_.emplace(domain_id, domain_id).first->second;
     }
 }
 

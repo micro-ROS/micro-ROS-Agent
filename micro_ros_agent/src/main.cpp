@@ -16,7 +16,7 @@
 
 int main(int argc, char** argv)
 {
-    uros::agent::Agent micro_ros_agent;
+    uros::agent::Agent& micro_ros_agent = micro_ros_agent.getInstance();
 
     /** Bypass '--ros-args' flag, as we use our own CLI parser.
       * As a workaround for launch files, arguments will be passed from
