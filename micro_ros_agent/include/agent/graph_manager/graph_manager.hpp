@@ -80,17 +80,15 @@ public:
     /**
      * @brief   Default destructor.
      */
-    ~GraphManager() = default;
-
-	void stop()
-	{
-		if (microros_graph_publisher_.joinable())
-		{
-			exit = true;
-        	cv_.notify_one();
-			microros_graph_publisher_.join();
-		}
-	}
+    ~GraphManager()
+    {
+        if (microros_graph_publisher_.joinable())
+        {
+            exit = true;
+            cv_.notify_one();
+            microros_graph_publisher_.join();
+        }
+    }
 
     /**
      * @brief   Implementation of the notification logic that updates the micro-ROS graph.

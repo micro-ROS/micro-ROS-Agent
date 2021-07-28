@@ -188,13 +188,6 @@ void Agent::run()
 void Agent::stop()
 {
     xrce_dds_agent_instance_.stop();
-
-    for (auto & element : graph_manager_map_)
-    {
-        element.second.stop();
-    }
-
-    graph_manager_map_.clear();
 }
 
 graph_manager::GraphManager* Agent::find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id)
