@@ -193,6 +193,8 @@ void Agent::stop()
     {
         element.second.stop();
     }
+
+    graph_manager_map_.clear();
 }
 
 graph_manager::GraphManager* Agent::find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id)
