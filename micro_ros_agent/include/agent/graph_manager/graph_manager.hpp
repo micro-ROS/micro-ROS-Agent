@@ -80,15 +80,29 @@ public:
     /**
      * @brief   Default destructor.
      */
-    ~GraphManager()
-    {
-        if (microros_graph_publisher_.joinable())
-        {
-            exit = true;
-            cv_.notify_one();
-            microros_graph_publisher_.join();
-        }
-    }
+    ~GraphManager() = default;
+
+	void stop()
+	{
+		if (microros_graph_publisher_.joinable())
+		{
+			exit = true;
+			cv_.notify_one();
+			microros_graph_publisher_.join();
+		}
+
+		subscriber_->delete_datareader(ros_discovery_datareader_);
+		publisher_->delete_datawriter(ros_to_microros_graph_datawriter_);
+
+		participant_->delete_subscriber(subscriber_);
+		participant_->delete_publisher(publisher_);
+
+		// Delete topics
+		participant_->delete_topic(ros_discovery_topic_);
+		participant_->delete_topic(ros_to_microros_graph_topic_);
+
+		eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->delete_participant(participant_);
+	}
 
     /**
      * @brief   Implementation of the notification logic that updates the micro-ROS graph.
