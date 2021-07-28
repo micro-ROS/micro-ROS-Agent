@@ -29,6 +29,11 @@ class Agent
 private:
     Agent();
 
+    ~Agent()
+    {
+        stop();
+    }
+    
     Agent(const Agent &) = delete;
 
     Agent(Agent &&) = delete;
