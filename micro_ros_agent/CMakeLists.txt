@@ -19,7 +19,15 @@ option(UROSAGENT_GENERATE_PROFILE
   )
 set(CMAKE_C_CLANG_TIDY clang-tidy -checks=*)
 
-project(micro_ros_agent LANGUAGES CXX)
+option(MICROROSAGENT_SUPERBUILD "Enable superbuild compilation." ON)
+
+if(NOT MICROROSAGENT_SUPERBUILD)
+    project(micro_ros_agent LANGUAGES CXX)
+else()
+    project(uagent_superbuild NONE)
+    include(${PROJECT_SOURCE_DIR}/cmake/SuperBuild.cmake)
+    return()
+endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(microxrcedds_agent REQUIRED)

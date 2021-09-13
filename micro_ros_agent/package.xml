@@ -2,9 +2,10 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>micro_ros_agent</name>
-  <version>0.0.1</version>
-  <description>DDS-XCRE agent implementation </description>
-  <maintainer email="borjaouterelo@eprosima.com">Borja Outerelo</maintainer>
+  <version>1.0.0</version>
+  <description>micro-ROS Agent package</description>
+  <maintainer email="pablogarrido@eprosima.com">Pablo Garrido</maintainer>
+  <maintainer email="antoniocuadros@eprosima.com">Antonio Cuadros</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
@@ -14,7 +15,6 @@
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
-  <depend>microxrcedds_agent</depend>
   <depend>rmw</depend>
   <depend>rcutils</depend>
   <depend>rmw_fastrtps_shared_cpp</depend>
