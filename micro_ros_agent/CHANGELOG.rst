@@ -2,6 +2,9 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.1 (2021-09-13)
 ------------------
 * Remove XRCE dependency and add superbuild (`#97 <https://github.com/micro-ROS/micro-ROS-Agent/issues/97>`_)
