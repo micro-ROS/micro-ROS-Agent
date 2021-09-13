@@ -2,8 +2,8 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2021-09-13)
+------------------
 * Remove XRCE dependency and add superbuild (`#97 <https://github.com/micro-ROS/micro-ROS-Agent/issues/97>`_)
 * Fixed launch file by using a list for arguments. Ensures order of items is kept. (`#93 <https://github.com/micro-ROS/micro-ROS-Agent/issues/93>`_) (`#94 <https://github.com/micro-ROS/micro-ROS-Agent/issues/94>`_)
 * Modify argument type (`#91 <https://github.com/micro-ROS/micro-ROS-Agent/issues/91>`_)
