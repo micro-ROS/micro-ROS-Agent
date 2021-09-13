@@ -26,11 +26,26 @@ namespace agent {
 
 class Agent
 {
-public:
-
+private:
     Agent();
 
-    ~Agent() = default;
+    ~Agent()
+    {
+        stop();
+    }
+    
+    Agent(const Agent &) = delete;
+
+    Agent(Agent &&) = delete;
+
+    Agent& operator =(
+            const Agent &) = delete;
+
+    Agent& operator =(
+            Agent &&) = delete;
+
+public:
+    static Agent& getInstance();
 
     bool create(
             int argc,
@@ -38,12 +53,14 @@ public:
 
     void run();
 
+    void stop();
+
 private:
-
+    bool initialized = false;
     eprosima::uxr::AgentInstance& xrce_dds_agent_instance_;
-    std::map<eprosima::fastdds::dds::DomainId_t, std::shared_ptr<graph_manager::GraphManager>> graph_manager_map_;
+    std::map<eprosima::fastdds::dds::DomainId_t, graph_manager::GraphManager> graph_manager_map_;
 
-    std::shared_ptr<graph_manager::GraphManager> find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id);
+    graph_manager::GraphManager* find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id);
 };
 
 }  // namespace agent
