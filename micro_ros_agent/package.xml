@@ -21,6 +21,8 @@
   <depend>rmw_dds_common</depend>
   <depend>micro_ros_msgs</depend>
 
+  <exec_depend>microxrcedds_agent</exec_depend> 
+
   <test_depend>rosidl_typesupport_fastrtps_cpp</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>builtin_interfaces</test_depend>
