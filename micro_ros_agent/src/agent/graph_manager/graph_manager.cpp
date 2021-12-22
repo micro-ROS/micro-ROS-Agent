@@ -96,7 +96,7 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
 
     eprosima::fastdds::dds::DataWriterQos ros_to_microros_datawriter_qos_ = datawriter_qos_;
     ros_to_microros_datawriter_qos_.history().kind =
-        eprosima::fastdds::dds::HistoryQosPolicyKind::KEEP_ALL_HISTORY_QOS;
+        eprosima::fastdds::dds::HistoryQosPolicyKind::KEEP_LAST_HISTORY_QOS;
     ros_to_microros_graph_datawriter_.reset(
         publisher_->create_datawriter(ros_to_microros_graph_topic_.get(), ros_to_microros_datawriter_qos_));
 
