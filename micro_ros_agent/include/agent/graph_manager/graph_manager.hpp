@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef _UROS_AGENT_GRAPH_MANAGER_HPP
+#define _UROS_AGENT_GRAPH_MANAGER_HPP
+
 #include "fastrtps/Domain.h"
 #include <fastrtps/TopicDataType.h>
 #include "fastrtps/attributes/ParticipantAttributes.h"
@@ -58,8 +61,7 @@
 #include <agent/graph_manager/graph_typesupport.hpp>
 #include <agent/utils/demangle.hpp>
 
-#ifndef _UROS_AGENT_GRAPH_MANAGER_HPP
-#define _UROS_AGENT_GRAPH_MANAGER_HPP
+#include <condition_variable>
 
 namespace uros {
 namespace agent {
