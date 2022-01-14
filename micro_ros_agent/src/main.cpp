@@ -14,6 +14,9 @@
 
 #include <agent/Agent.hpp>
 
+#include <string>
+#include <vector>
+
 int main(int argc, char** argv)
 {
     uros::agent::Agent micro_ros_agent;
