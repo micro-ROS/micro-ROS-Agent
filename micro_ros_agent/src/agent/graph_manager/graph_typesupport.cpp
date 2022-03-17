@@ -17,6 +17,8 @@
 
 #include <agent/graph_manager/graph_typesupport.hpp>
 
+#include <string>
+
 namespace uros {
 namespace agent {
 namespace graph_manager {
