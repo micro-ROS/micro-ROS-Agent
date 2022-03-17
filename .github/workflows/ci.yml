@@ -2,7 +2,7 @@ name: CI micro-ROS Agent
 
 on:
     pull_request:
-      branches: 
+      branches:
         - '**'
 
 jobs:
@@ -22,9 +22,9 @@ jobs:
             cd /uros_ws
             . /opt/ros/$ROS_DISTRO/setup.sh
             . install/local_setup.sh
-            rosdep update
-            ros2 run micro_ros_setup create_agent_ws.sh 
-        
+            rosdep update --rosdistro=$ROS_DISTRO
+            ros2 run micro_ros_setup create_agent_ws.sh
+
         - name: Patch branch
           run: |
             rm -rf /uros_ws/src/uros/micro-ROS-Agent/*
@@ -35,4 +35,4 @@ jobs:
             cd /uros_ws
             . /opt/ros/$ROS_DISTRO/setup.sh
             . install/local_setup.sh
-            ros2 run micro_ros_setup build_agent.sh 
+            ros2 run micro_ros_setup build_agent.sh
