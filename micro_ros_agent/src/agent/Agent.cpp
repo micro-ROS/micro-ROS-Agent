@@ -17,6 +17,9 @@
 
 #include <agent/Agent.hpp>
 
+#include <utility>
+#include <memory>
+
 namespace uros {
 namespace agent {
 

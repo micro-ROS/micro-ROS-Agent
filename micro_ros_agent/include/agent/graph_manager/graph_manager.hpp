@@ -62,6 +62,9 @@
 #include <agent/utils/demangle.hpp>
 
 #include <condition_variable>
+#include <string>
+#include <memory>
+#include <map>
 
 namespace uros {
 namespace agent {
