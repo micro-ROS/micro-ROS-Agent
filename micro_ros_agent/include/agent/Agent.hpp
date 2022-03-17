@@ -20,6 +20,10 @@
 #include <uxr/agent/middleware/utils/Callbacks.hpp>
 
 #include <agent/graph_manager/graph_manager.hpp>
+
+#include <map>
+#include <memory>
+
 // TODO(jamoralp): class Documentation
 namespace uros {
 namespace agent {

@@ -17,6 +17,11 @@
 
 #include <agent/graph_manager/graph_manager.hpp>
 
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 namespace uros {
 namespace agent {
 namespace graph_manager {
