@@ -2,6 +2,16 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add services to graph manager (`#127 <https://github.com/micro-ROS/micro-ROS-Agent/issues/127>`_)
+* Add used missing includes (`#116 <https://github.com/micro-ROS/micro-ROS-Agent/issues/116>`_) (`#125 <https://github.com/micro-ROS/micro-ROS-Agent/issues/125>`_)
+* Add system logger flag (`#118 <https://github.com/micro-ROS/micro-ROS-Agent/issues/118>`_)
+* Add condition variable include (`#113 <https://github.com/micro-ROS/micro-ROS-Agent/issues/113>`_)
+* pass system name to xrceagent (`#110 <https://github.com/micro-ROS/micro-ROS-Agent/issues/110>`_)
+* Fix memory leak in FastDDS datawriter (`#107 <https://github.com/micro-ROS/micro-ROS-Agent/issues/107>`_)
+* Contributors: Antonio Cuadros, Pablo Garrido, Roland Schwan, mergify[bot]
+
 2.0.0 (2021-09-13)
 ------------------
 * Remove XRCE dependency and add superbuild (`#97 <https://github.com/micro-ROS/micro-ROS-Agent/issues/97>`_)
