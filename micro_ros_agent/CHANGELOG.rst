@@ -2,8 +2,8 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.5.1 (2022-03-25)
+------------------
 * Add services to graph manager (backport `#127 <https://github.com/micro-ROS/micro-ROS-Agent/issues/127>`_) (`#128 <https://github.com/micro-ROS/micro-ROS-Agent/issues/128>`_)
 * Add used missing includes (`#116 <https://github.com/micro-ROS/micro-ROS-Agent/issues/116>`_)
 * Add system logger flag (`#118 <https://github.com/micro-ROS/micro-ROS-Agent/issues/118>`_) (`#120 <https://github.com/micro-ROS/micro-ROS-Agent/issues/120>`_)
