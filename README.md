@@ -55,3 +55,4 @@ see the file [3rd-party-licenses.txt](3rd-party-licenses.txt).
 Please notice the following issues/limitations:
 
 * There is an unknown issue when dealing with serial ports shared with the micro-ROS agent running inside a Docker. Sometimes it works with a remarkable packet loss.
+* There is an known issues with serial port communication on micro-ros-agent snap version. It is recommended to use the dockerized version or build it from source.
