@@ -1,0 +1,7 @@
+{
+    "name": "micro_ros_agent",
+    "type": "cmake",
+    "dependencies":[
+        "microxrcedds_agent",
+    ],
+}

@@ -24,4 +24,4 @@ if [ -n "$p2p_port" ]; then
 	set -- --p2p "$p2p_port" "$@"
 fi
 
-exec "$SNAP/lib/micro_ros_agent/micro_ros_agent" "$transport" "$@"
+exec "$SNAP/opt/ros/snap/lib/micro_ros_agent/micro_ros_agent" "$transport" "$@"
