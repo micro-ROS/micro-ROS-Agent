@@ -10,7 +10,7 @@ on:
 jobs:
 
     microros_agent_ci:
-      runs-on: ${{ matrix.os }}
+      runs-on: ubuntu
       strategy:
         fail-fast: false
         matrix:
