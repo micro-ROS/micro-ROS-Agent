@@ -27,7 +27,7 @@ jobs:
       - name : Download and install dependencies
         run: |
           apt-get install ros-${{ matrix.ros_distribution }}-micro-ros-msgs
-          apt-get install ros-${{ matrix.ros_distribution }}-micro-ros-msgs
+          apt-get install ros-${{ matrix.ros_distribution }}-rmw-fastrtps-cpp
       - uses : ros-tooling/action-ros-ci@0.2.5
         with:
           package-name: "micro_ros_agent"
