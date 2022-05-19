@@ -3,7 +3,7 @@ name: CI micro-ROS Agent
 on:
     pull_request:
       branches:
-        - '**'
+        - 'main'
     schedule:
       - cron: '33 6 * * *'
 
@@ -15,26 +15,18 @@ jobs:
         fail-fast: false
         matrix:
           os: [ ubuntu-20.04 ]
-          ros_distribution: [ rolling, humble, foxy, galactic ]
-          include:
-            - docker_image: ubuntu:22.04
-              ros_distribution: rolling
-            - docker_image: ubuntu:22.04
-              ros_distribution: humble
-            - docker_image: ubuntu:20.04
-              ros_distribution: galactic
-            - docker_image: ubuntu:20.04
-              ros_distribution: foxy
+          ros_distribution: [ rolling ]
       container:
-        image: ${{ matrix.docker_image }}
+        image: ubuntu:22.04
       steps:
       - uses: actions/checkout@v2
       - uses: ros-tooling/setup-ros@0.3.2
         with:
           use-ros2-testing: false
           required-ros-distributions: ${{ matrix.ros_distribution }}
-      - name : Download and install rclc-dependencies
+      - name : Download and install dependencies
         run: |
+          apt-get install ros-${{ matrix.ros_distribution }}-micro-ros-msgs
           apt-get install ros-${{ matrix.ros_distribution }}-micro-ros-msgs
       - uses : ros-tooling/action-ros-ci@0.2.5
         with:
