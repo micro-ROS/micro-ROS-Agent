@@ -117,6 +117,12 @@ parts:
         [ ! -d Micro-XRCE-DDS-Agent ] && git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git -b $ROS_DISTRO
         # Place additional colcon.pkg for correct topological order
         mv snap/local/micro_ros_agent_colcon.pkg micro_ros_agent/colcon.pkg
+
+        version="$(git describe --always --tags| sed -e 's/^v//;s/-/+git/;y/-/./')"
+        [ -n "$(echo $version | grep "+git")" ] && grade=devel || grade=stable
+        snapcraftctl set-version "$version"
+        snapcraftctl set-grade "$grade"
+
     colcon-cmake-args:
       - -DUAGENT_BUILD_EXECUTABLE=OFF
       - -DUAGENT_USE_SYSTEM_FASTDDS=ON
