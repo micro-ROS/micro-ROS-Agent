@@ -16,6 +16,9 @@ jobs:
         matrix:
           os: [ ubuntu-20.04 ]
           ros_distribution: [ rolling ]
+          include:
+            - docker_image: ubuntu:22.04
+              ros_distribution: rolling
       container:
         image: ubuntu:22.04
       steps:
