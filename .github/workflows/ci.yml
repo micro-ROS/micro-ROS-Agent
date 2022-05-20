@@ -10,17 +10,17 @@ on:
 jobs:
 
     microros_agent_ci:
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-20.04
       strategy:
         fail-fast: false
         matrix:
           os: [ ubuntu-20.04 ]
           ros_distribution: [ humble ]
           include:
-            - docker_image: ubuntu:jammy
+            - docker_image: ubuntu-20.04
               ros_distribution: humble
       container:
-        image: ubuntu:jammy
+        image: ubuntu-20.04
       steps:
       - uses: actions/checkout@v2
       - uses: ros-tooling/setup-ros@0.3.2
