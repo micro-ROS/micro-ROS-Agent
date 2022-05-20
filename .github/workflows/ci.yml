@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ros-tooling/setup-ros@0.3.2
         with:
-          use-ros2-testing: false
+          use-ros2-testing: true
           required-ros-distributions: ${{ matrix.ros_distribution }}
       - name : Download and install dependencies
         run: |
