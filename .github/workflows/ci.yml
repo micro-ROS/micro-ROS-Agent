@@ -3,36 +3,36 @@ name: CI micro-ROS Agent
 on:
     pull_request:
       branches:
-        - '**'
+        - 'foxy'
+    schedule:
+      - cron: '33 6 * * *'
 
 jobs:
 
     microros_agent_ci:
-        runs-on: ubuntu-20.04
-        container: microros/base:foxy
+      runs-on: ubuntu-20.04
+      strategy:
+        fail-fast: false
+        matrix:
+          os: [ ubuntu-20.04 ]
+          ros_distribution: [ foxy ]
+          include:
+            - docker_image: ubuntu:20.04
+              ros_distribution: foxy
+      container:
+        image: ubuntu:20.04
+      steps:
+      - uses: actions/checkout@v2
+      - uses: ros-tooling/setup-ros@0.3.2
+        with:
+          use-ros2-testing: false
+          required-ros-distributions: ${{ matrix.ros_distribution }}
+      - name : Download and install dependencies
+        run: |
+          apt-get install ros-${{ matrix.ros_distribution }}-micro-ros-msgs
+          apt-get install ros-${{ matrix.ros_distribution }}-rmw-fastrtps-cpp
+      - uses : ros-tooling/action-ros-ci@0.2.5
+        with:
+          package-name: "micro_ros_agent"
+          target-ros2-distro: ${{ matrix.ros_distribution }}
 
-        steps:
-        - uses: actions/checkout@v2
-          with:
-            path: urosagent
-
-        - name: Download dependencies
-          run: |
-            apt update
-            cd /uros_ws
-            . /opt/ros/$ROS_DISTRO/setup.sh
-            . install/local_setup.sh
-            rosdep update --rosdistro=$ROS_DISTRO
-            ros2 run micro_ros_setup create_agent_ws.sh
-
-        - name: Patch branch
-          run: |
-            rm -rf /uros_ws/src/uros/micro-ROS-Agent/*
-            cp -R urosagent/* /uros_ws/src/uros/micro-ROS-Agent/
-
-        - name: Build
-          run:  |
-            cd /uros_ws
-            . /opt/ros/$ROS_DISTRO/setup.sh
-            . install/local_setup.sh
-            ros2 run micro_ros_setup build_agent.sh
