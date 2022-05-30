@@ -26,8 +26,9 @@ namespace uros {
 namespace agent {
 namespace graph_manager {
 
-GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
+GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id, std::string namespace_remapping)
     : domain_id_(domain_id)
+    , namespace_remapping_(namespace_remapping)
     , graph_changed_(false)
     , display_on_change_(false)
     , mtx_()
@@ -313,6 +314,8 @@ void GraphManager::add_participant(
         std::string isolated_node_name, isolated_namespace;
         get_name_and_namespace(qos.name().to_string(), isolated_node_name, isolated_namespace);
 
+        isolated_namespace = namespace_remapping_ + isolated_namespace;
+
         rmw_dds_common::msg::ParticipantEntitiesInfo info =
             graphCache_.add_node(gid, isolated_node_name, isolated_namespace);
 
@@ -355,7 +358,10 @@ void GraphManager::add_datawriter(
 {
     const std::string& topic_name = datawriter->get_topic()->get_name();
     const std::string& type_name = datawriter->get_topic()->get_type_name();
-    this->add_datawriter(datawriter_guid, topic_name, type_name,
+
+    auto remapped_topic_name = namespace_remapping_ + "/" + topic_name;
+
+    this->add_datawriter(datawriter_guid, remapped_topic_name, type_name,
         participant->guid(), datawriter->get_qos());
 }
 
@@ -372,7 +378,9 @@ void GraphManager::add_datawriter(
         "rmw_fastrtps_cpp", participant_guid);
     const rmw_qos_profile_t qos_profile = fastdds_qos_to_rmw_qos(writer_qos);
 
-    graphCache_.add_entity(datawriter_gid, topic_name,
+     auto remapped_topic_name = namespace_remapping_ + "/" + topic_name;
+
+    graphCache_.add_entity(datawriter_gid, remapped_topic_name,
         type_name, participant_gid, qos_profile, false);
 }
 
@@ -441,6 +449,7 @@ void GraphManager::associate_entity(
         {
             std::string isolated_node_name, isolated_namespace;
             get_name_and_namespace(qos.name().c_str(), isolated_node_name, isolated_namespace);
+            isolated_namespace = namespace_remapping_ + isolated_namespace;
             info = graphCache_.associate_writer(
                 entity_gid, participant_gid, isolated_node_name, isolated_namespace);
             break;
@@ -449,6 +458,7 @@ void GraphManager::associate_entity(
         {
             std::string isolated_node_name, isolated_namespace;
             get_name_and_namespace(qos.name().c_str(), isolated_node_name, isolated_namespace);
+            isolated_namespace = namespace_remapping_ + isolated_namespace;
             info = graphCache_.associate_reader(
                 entity_gid, participant_gid, isolated_node_name, isolated_namespace);
             break;

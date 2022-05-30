@@ -80,7 +80,7 @@ public:
     /**
      * @brief   Default constructor.
      */
-    GraphManager(eprosima::fastdds::dds::DomainId_t domain_id);
+    GraphManager(eprosima::fastdds::dds::DomainId_t domain_id, std::string namespace_remapping);
 
     /**
      * @brief   Default destructor.
@@ -274,6 +274,7 @@ private:
             std::string& node_namespace);
 
     eprosima::fastdds::dds::DomainId_t domain_id_;
+    std::string namespace_remapping_;
     bool graph_changed_;
     bool display_on_change_;
     std::thread microros_graph_publisher_;
