@@ -112,6 +112,12 @@ public:
         bool from_microros = true);
 
     /**
+     * @brief   Getter for the graph cache.
+     * @return  Reference to inner graph cache
+     */
+    rmw_dds_common::GraphCache& get_graph_cache() { return graphCache_; }
+
+    /**
      * @brief   Adds a DDS datawriter to the graph tree.
      * @param   datawriter_guid rtps::GUID_t of the datawriter to be added.
      * @param   participant Pointer to the participant which owns this datawriter.
