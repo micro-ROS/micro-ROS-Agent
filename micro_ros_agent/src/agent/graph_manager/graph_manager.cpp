@@ -633,7 +633,7 @@ GraphManager::ParticipantListener::ParticipantListener(
 }
 
 void GraphManager::ParticipantListener::on_participant_discovery(
-        eprosima::fastdds::dds::DomainParticipant* participant,
+        eprosima::fastdds::dds::DomainParticipant* /* participant */,
         eprosima::fastrtps::rtps::ParticipantDiscoveryInfo&& info)
 {
     switch (info.status)
@@ -650,13 +650,15 @@ void GraphManager::ParticipantListener::on_participant_discovery(
             const std::string enclave =
                 std::string(name_found->second.begin(), name_found->second.end());
 
-            graphManager_from_->add_participant(participant, false, enclave);
+            const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", info.info.m_guid);
+            graphManager_from_->get_graph_cache().add_participant(gid, enclave);
             break;
         }
         case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::REMOVED_PARTICIPANT:
         case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::DROPPED_PARTICIPANT:
         {
-            graphManager_from_->remove_participant(participant, false);
+            const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", info.info.m_guid);
+            graphManager_from_->get_graph_cache().remove_participant(gid);
             break;
         }
         default:
