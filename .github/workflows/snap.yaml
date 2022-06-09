@@ -18,14 +18,14 @@ jobs:
     strategy:
       matrix:
         architecture:
-        - linux/amd64
-        - linux/arm64
+        - amd64
+        - arm64
     steps:
     - uses: actions/checkout@v2
     - uses: snapcore/action-build@v1
       id: build-snap
       with:
-        snapcraft-args: '--enable-experimental-extensions'
+        snapcraft-args: ['--enable-experimental-extensions', '--enable-experimental-target-arch', '--target-arch=${{ matrix.architecture }}', '--destructive-mode']
 
     # Make sure the snap is installable
     - run: |
@@ -46,8 +46,8 @@ jobs:
     strategy:
       matrix:
         architecture:
-        - linux/amd64
-        - linux/arm64
+        - amd64
+        - arm64
     steps:
     - uses: actions/download-artifact@v3
       with:
