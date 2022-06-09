@@ -19,6 +19,8 @@ jobs:
     - uses: actions/checkout@v2
     - uses: snapcore/action-build@v1
       id: build-snap
+      with:
+        snapcraft-args: '--enable-experimental-extensions'
 
     # Make sure the snap is installable
     - run: |
