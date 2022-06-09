@@ -17,14 +17,16 @@ jobs:
       snap-file: ${{ steps.build-snap.outputs.snap }}
     strategy:
       matrix:
-        architecture:
-        - linux/amd64
-        - linux/arm64
+        platform:
+        - amd64
+        - arm64
     steps:
     - uses: actions/checkout@v2
-    - uses: snapcore/action-build@v1
+    - uses: docker/setup-qemu-action@v1
+    - uses: diddlesnaps/snapcraft-multiarch-action@v1
       id: build-snap
       with:
+        architecture: ${{ matrix.platform }}
         snapcraft-args: '--enable-experimental-extensions'
 
     # Make sure the snap is installable
@@ -45,9 +47,9 @@ jobs:
     needs: build
     strategy:
       matrix:
-        architecture:
-        - linux/amd64
-        - linux/arm64
+        platform:
+        - amd64
+        - arm64
     steps:
     - uses: actions/download-artifact@v3
       with:
