@@ -25,7 +25,7 @@ jobs:
     - uses: snapcore/action-build@v1
       id: build-snap
       with:
-        snapcraft-args: '--enable-experimental-extensions --enable-experimental-target-arch --target-arch=${{ matrix.architecture }} --destructive-mode'
+        snapcraft-args: '--enable-experimental-extensions --enable-experimental-target-arch --target-arch=${{ matrix.architecture }}'
 
     # Make sure the snap is installable
     - run: |
