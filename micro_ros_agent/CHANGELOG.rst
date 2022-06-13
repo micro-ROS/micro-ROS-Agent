@@ -2,8 +2,8 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.0.1 (2022-06-13)
+------------------
 * Fix memory leak in graph manager (`#147 <https://github.com/micro-ROS/micro-ROS-Agent/issues/147>`_) (`#148 <https://github.com/micro-ROS/micro-ROS-Agent/issues/148>`_)
 
 4.0.0 (2022-05-25)
