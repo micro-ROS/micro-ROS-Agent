@@ -31,7 +31,7 @@ else()
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(microxrcedds_agent REQUIRED)
+find_package(microxrcedds_agent REQUIRED PATHS ${PROJECT_BINARY_DIR}/temp_install)
 find_package(rosidl_cmake REQUIRED)
 find_package(fastcdr REQUIRED)
 find_package(fastrtps REQUIRED)
@@ -128,6 +128,16 @@ install(
   DESTINATION
     share/${PROJECT_NAME}
   )
+
+if(EXISTS ${PROJECT_BINARY_DIR}/temp_install/)
+  install(
+    DIRECTORY
+      ${PROJECT_BINARY_DIR}/temp_install/
+    DESTINATION
+      ${CMAKE_INSTALL_PREFIX}
+    USE_SOURCE_PERMISSIONS
+  )
+endif()
 
 if(UROSAGENT_GENERATE_PROFILE)
   set(_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/python")
