@@ -126,8 +126,10 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     // Set graph cache on change callback function
     graphCache_.set_on_change_callback([this]()
     {
-        std::unique_lock<std::mutex> lock(this->mtx_);
-        this->graph_changed_ = true;
+        {
+            std::unique_lock<std::mutex> lock(this->mtx_);
+            this->graph_changed_ = true;
+        }
         this->cv_.notify_one();
     });
 
