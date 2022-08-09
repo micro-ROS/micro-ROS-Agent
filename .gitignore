@@ -33,3 +33,7 @@
 # End of https://www.gitignore.io/api/qtcreator
 
 CMakeLists.txt.user
+
+
+# snaps
+*.snap
