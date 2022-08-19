@@ -126,8 +126,10 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     // Set graph cache on change callback function
     graphCache_.set_on_change_callback([this]()
     {
-        std::unique_lock<std::mutex> lock(this->mtx_);
-        this->graph_changed_ = true;
+        {
+            std::unique_lock<std::mutex> lock(this->mtx_);
+            this->graph_changed_ = true;
+        }
         this->cv_.notify_one();
     });
 
@@ -144,6 +146,7 @@ inline void GraphManager::publish_microros_graph()
             {
                 return this->graph_changed_;
             });
+            graph_changed_ = false;
         }
 
         if (display_on_change_)
@@ -151,7 +154,6 @@ inline void GraphManager::publish_microros_graph()
             std::cout << "Updated uros Graph: graph changed" << std::endl;
             std::cout << graphCache_ << std::endl;
         }
-        graph_changed_ = false;
 
         micro_ros_msgs::msg::Graph graph_message;
 
