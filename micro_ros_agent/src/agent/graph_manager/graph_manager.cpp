@@ -322,11 +322,10 @@ void GraphManager::add_participant(
         if (it == micro_ros_graph_datawriters_.end())
         {
             // Create datawriter
-            std::unique_ptr<eprosima::fastdds::dds::DataWriter> datawriter;
-            datawriter.reset(publisher_->create_datawriter(ros_discovery_topic_.get(), datawriter_qos_));
+            eprosima::fastdds::dds::DataWriter * datawriter = publisher_->create_datawriter(ros_discovery_topic_.get(), datawriter_qos_);
 
             it = micro_ros_graph_datawriters_.insert(
-                std::make_pair(participant, std::move(datawriter))).first;
+                std::make_pair(participant, datawriter)).first;
         }
 
         it->second->write(static_cast<void *>(&info));
@@ -346,8 +345,9 @@ void GraphManager::remove_participant(
         rmw_dds_common::convert_gid_to_msg(&gid, &info.gid);
         auto it = micro_ros_graph_datawriters_.find(participant);
         it->second->write(static_cast<void *>(&info));
+        publisher_->delete_datawriter(it->second);
+        micro_ros_graph_datawriters_.erase(participant);
     }
-    micro_ros_graph_datawriters_.erase(participant);
 }
 
 void GraphManager::add_datawriter(

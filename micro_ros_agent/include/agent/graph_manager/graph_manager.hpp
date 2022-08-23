@@ -305,7 +305,7 @@ private:
     // Store a auxiliary publishers and datawriter for each participant created in micro-ROS
     std::map<
         const eprosima::fastdds::dds::DomainParticipant*,
-        std::unique_ptr<eprosima::fastdds::dds::DataWriter>
+        eprosima::fastdds::dds::DataWriter*
     > micro_ros_graph_datawriters_;
 };
 
