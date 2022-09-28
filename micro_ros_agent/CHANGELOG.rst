@@ -2,8 +2,8 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.4 (2022-09-28)
+------------------
 * Fix Datawriter destruction (`#169 <https://github.com/micro-ROS/micro-ROS-Agent/issues/169>`_) (`#172 <https://github.com/micro-ROS/micro-ROS-Agent/issues/172>`_)
 * Synchronise predicate (`#160 <https://github.com/micro-ROS/micro-ROS-Agent/issues/160>`_) (`#166 <https://github.com/micro-ROS/micro-ROS-Agent/issues/166>`_)
 
