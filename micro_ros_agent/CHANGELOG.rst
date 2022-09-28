@@ -2,6 +2,11 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix Datawriter destruction (`#169 <https://github.com/micro-ROS/micro-ROS-Agent/issues/169>`_)
+* Synchronise predicate (`#160 <https://github.com/micro-ROS/micro-ROS-Agent/issues/160>`_)
+
 3.0.3 (2022-06-13)
 ------------------
 * Fix memory leak in graph manager (`#147 <https://github.com/micro-ROS/micro-ROS-Agent/issues/147>`_)
