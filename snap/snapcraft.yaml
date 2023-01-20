@@ -1,6 +1,6 @@
 name: micro-ros-agent
+adopt-info: uros-agent # parse metadata from the uros-agent part
 base: core20
-version: git
 summary: Bridge between Micro ROS client applications and ROS 2
 description: |
   Micro-ROS, whose default implementation is based on eProsima's
@@ -99,7 +99,6 @@ description: |
   After this, you can execute your snap as usual,
   using `sudo micro-ros-agent serial -d <serial-dev>`.
 
-grade: stable
 confinement: strict
 
 architectures:
@@ -123,7 +122,7 @@ parts:
         snapcraftctl set-version "$version"
         snapcraftctl set-grade "$grade"
 
-    build-packages: [make, gcc, g++]
+    build-packages: [make, gcc, g++, git]
     stage-packages: [ros-foxy-ros2launch]
 
   runner:

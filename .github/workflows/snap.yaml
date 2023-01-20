@@ -17,6 +17,9 @@ jobs:
       snap-file: ${{ steps.build-snap.outputs.snap }}
     steps:
     - uses: actions/checkout@v2
+      with:
+        # full history for latest tag name
+        fetch-depth: 0
     - uses: snapcore/action-build@v1
       id: build-snap
       with:
@@ -44,7 +47,8 @@ jobs:
         name: micro-ros-agent-snap
         path: .
     - uses: snapcore/action-publish@v1
+      env:
+        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
       with:
-        store_login: ${{ secrets.STORE_LOGIN }}
         snap: ${{needs.build.outputs.snap-file}}
         release: ${{ startsWith(github.ref, 'refs/tags/') && 'candidate' || 'edge'}}
