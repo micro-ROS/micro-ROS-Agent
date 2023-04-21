@@ -374,8 +374,8 @@ void GraphManager::add_datawriter(
         "rmw_fastrtps_cpp", participant_guid);
     const rmw_qos_profile_t qos_profile = fastdds_qos_to_rmw_qos(writer_qos);
 
-    graphCache_.add_entity(datawriter_gid, topic_name,
-        type_name, participant_gid, qos_profile, false);
+    graphCache_.add_entity(datawriter_gid, topic_name, type_name,
+        rosidl_get_zero_initialized_type_hash(), participant_gid, qos_profile, false);
 }
 
 void GraphManager::remove_datawriter(
@@ -411,8 +411,13 @@ void GraphManager::add_datareader(
         "rmw_fastrtps_cpp", participant_guid);
     const rmw_qos_profile_t qos_profile = fastdds_qos_to_rmw_qos(reader_qos);
 
-    graphCache_.add_entity(datareader_gid, topic_name,
-        type_name, participant_gid, qos_profile, true);
+    // TODO(acuadros95): Use typesupport to calculate type hash on micro-ROS and save and get it from reader_qos.user_data.
+    // Related PRs:
+    // https://github.com/ros2/rmw_dds_common/pull/70
+    // https://github.com/ros2/rmw_fastrtps/pull/671
+    // https://github.com/ros2/rmw_fastrtps/pull/680
+    graphCache_.add_entity(datareader_gid, topic_name, type_name,
+        rosidl_get_zero_initialized_type_hash(), participant_gid, qos_profile, true);
 }
 
 void GraphManager::remove_datareader(
