@@ -3,7 +3,7 @@ name: CI micro-ROS Agent
 on:
     pull_request:
       branches:
-        - 'main'
+        - 'iron'
     schedule:
       - cron: '33 6 * * *'
 
@@ -14,16 +14,16 @@ jobs:
       strategy:
         fail-fast: false
         matrix:
-          os: [ ubuntu-20.04 ]
-          ros_distribution: [ rolling ]
+          os: [ ubuntu-latest ]
+          ros_distribution: [ iron ]
           include:
-            - docker_image: ubuntu:22.04
-              ros_distribution: rolling
+            - docker_image: ubuntu:jammy
+              ros_distribution: iron
       container:
-        image: ubuntu:22.04
+        image: ubuntu:jammy
       steps:
-      - uses: actions/checkout@v2
-      - uses: ros-tooling/setup-ros@0.3.2
+      - uses: actions/checkout@v3
+      - uses: ros-tooling/setup-ros@0.6.2
         with:
           use-ros2-testing: false
           required-ros-distributions: ${{ matrix.ros_distribution }}
