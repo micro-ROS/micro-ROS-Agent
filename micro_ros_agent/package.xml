@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>micro_ros_agent</name>
-  <version>3.0.5</version>
+  <version>3.0.6</version>
   <description>micro-ROS Agent package</description>
   <maintainer email="pablogarrido@eprosima.com">Pablo Garrido</maintainer>
   <maintainer email="antoniocuadros@eprosima.com">Antonio Cuadros</maintainer>
