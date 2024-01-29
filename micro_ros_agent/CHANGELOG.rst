@@ -2,6 +2,10 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix thread include (`#216 <https://github.com/micro-ROS/micro-ROS-Agent/issues/216>`_) (`#218 <https://github.com/micro-ROS/micro-ROS-Agent/issues/218>`_)
+
 5.0.0 (2023-06-06)
 ------------------
 * Add empty type key hash to GraphCache (`#189 <https://github.com/micro-ROS/micro-ROS-Agent/issues/189>`_)
