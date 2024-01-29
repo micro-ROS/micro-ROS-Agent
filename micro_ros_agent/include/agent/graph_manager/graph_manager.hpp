@@ -65,6 +65,7 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <thread>
 
 namespace uros {
 namespace agent {
