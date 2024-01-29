@@ -2,6 +2,10 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix thread include (backport `#216 <https://github.com/micro-ROS/micro-ROS-Agent/issues/216>`_) (`#217 <https://github.com/micro-ROS/micro-ROS-Agent/issues/217>`_)
+
 3.0.5 (2023-06-06)
 ------------------
 
