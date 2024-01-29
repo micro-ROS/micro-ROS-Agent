@@ -2,8 +2,8 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+5.0.1 (2024-01-29)
+------------------
 * Fix thread include (`#216 <https://github.com/micro-ROS/micro-ROS-Agent/issues/216>`_) (`#218 <https://github.com/micro-ROS/micro-ROS-Agent/issues/218>`_)
 
 5.0.0 (2023-06-06)
