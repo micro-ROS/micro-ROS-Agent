@@ -2,6 +2,18 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix thread include (`#216 <https://github.com/micro-ROS/micro-ROS-Agent/issues/216>`_)
+  * Fix thread include
+  * Update CI
+  * Revert "Fix thread include"
+  This reverts commit 1427fb6246c46a0b5851a017ddc886abd80d895b.
+  * fix
+  * Fix
+  ---------
+* Contributors: Pablo Garrido
+
 4.0.3 (2023-06-06)
 ------------------
 * Add empty type key hash to GraphCache (`#189 <https://github.com/micro-ROS/micro-ROS-Agent/issues/189>`_)
