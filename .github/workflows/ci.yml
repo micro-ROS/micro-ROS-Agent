@@ -3,7 +3,7 @@ name: CI micro-ROS Agent
 on:
     pull_request:
       branches:
-        - 'rolling'
+        - 'jazzy'
     schedule:
       - cron: '33 6 * * *'
 
@@ -15,10 +15,10 @@ jobs:
         fail-fast: false
         matrix:
           os: [ ubuntu-latest ]
-          ros_distribution: [ rolling ]
+          ros_distribution: [ jazzy ]
           include:
             - docker_image: ubuntu:24.04
-              ros_distribution: rolling
+              ros_distribution: jazzy
       container:
         image: ${{ matrix.docker_image }}
       steps:
@@ -31,7 +31,7 @@ jobs:
         run: |
           apt-get install ros-${{ matrix.ros_distribution }}-micro-ros-msgs
           apt-get install ros-${{ matrix.ros_distribution }}-rmw-fastrtps-cpp
-      - uses : ros-tooling/action-ros-ci@0.3.6
+      - uses : ros-tooling/action-ros-ci@0.3.13
         with:
           package-name: "micro_ros_agent"
           target-ros2-distro: ${{ matrix.ros_distribution }}
