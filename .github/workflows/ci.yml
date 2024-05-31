@@ -17,13 +17,13 @@ jobs:
           os: [ ubuntu-latest ]
           ros_distribution: [ rolling ]
           include:
-            - docker_image: ubuntu:22.04
+            - docker_image: ubuntu:24.04
               ros_distribution: rolling
       container:
-        image: ubuntu:22.04
+        image: ${{ matrix.docker_image }}
       steps:
-      - uses: actions/checkout@v3
-      - uses: ros-tooling/setup-ros@0.7.1
+      - uses: actions/checkout@v4
+      - uses: ros-tooling/setup-ros@0.7.7
         with:
           use-ros2-testing: false
           required-ros-distributions: ${{ matrix.ros_distribution }}

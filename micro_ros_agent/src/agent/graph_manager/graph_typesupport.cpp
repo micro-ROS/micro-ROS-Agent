@@ -54,14 +54,14 @@ bool ParticipantEntitiesInfoTypeSupport::serialize(
     eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload->data),
         payload->max_size);
     eprosima::fastcdr::Cdr scdr(fastbuffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
-        eprosima::fastcdr::Cdr::DDS_CDR);
+        eprosima::fastcdr::DDS_CDR);
 
     scdr.serialize_encapsulation();
     if (callbacks_->cdr_serialize(data, scdr))
     {
         payload->encapsulation = (scdr.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS) ?
             CDR_BE : CDR_LE;
-        payload->length = static_cast<uint32_t>(scdr.getSerializedDataLength());
+        payload->length = static_cast<uint32_t>(scdr.get_serialized_data_length());
         return true;
     }
     else
@@ -77,7 +77,7 @@ bool ParticipantEntitiesInfoTypeSupport::deserialize(
     eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload->data),
         payload->length);
     eprosima::fastcdr::Cdr dcdr(fastbuffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
-        eprosima::fastcdr::Cdr::DDS_CDR);
+        eprosima::fastcdr::DDS_CDR);
 
     dcdr.read_encapsulation();
     return callbacks_->cdr_deserialize(dcdr, data);
@@ -146,14 +146,14 @@ bool MicrorosGraphInfoTypeSupport::serialize(
     eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload->data),
         payload->max_size);
     eprosima::fastcdr::Cdr scdr(fastbuffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
-        eprosima::fastcdr::Cdr::DDS_CDR);
+        eprosima::fastcdr::DDS_CDR);
 
     scdr.serialize_encapsulation();
     if (callbacks_->cdr_serialize(data, scdr))
     {
         payload->encapsulation = (scdr.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS) ?
             CDR_BE : CDR_LE;
-        payload->length = static_cast<uint32_t>(scdr.getSerializedDataLength());
+        payload->length = static_cast<uint32_t>(scdr.get_serialized_data_length());
         return true;
     }
     else
@@ -169,7 +169,7 @@ bool MicrorosGraphInfoTypeSupport::deserialize(
     eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload->data),
         payload->length);
     eprosima::fastcdr::Cdr dcdr(fastbuffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
-        eprosima::fastcdr::Cdr::DDS_CDR);
+        eprosima::fastcdr::DDS_CDR);
 
     dcdr.read_encapsulation();
     return callbacks_->cdr_deserialize(dcdr, data);
