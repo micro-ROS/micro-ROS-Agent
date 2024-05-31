@@ -26,7 +26,7 @@ if(NOT xrceagent_FOUND)
             GIT_REPOSITORY
                 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
             GIT_TAG
-                ros2
+                v2.4.3
             PREFIX
                 ${PROJECT_BINARY_DIR}/agent
             INSTALL_DIR
