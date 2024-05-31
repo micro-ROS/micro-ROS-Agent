@@ -2,6 +2,11 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Jazzy Release
+* Bump Micro XRCE-DDS Agent (`#226 <https://github.com/micro-ROS/micro-ROS-Agent/issues/226>`_)
+
 5.0.1 (2024-01-29)
 ------------------
 * Fix thread include (`#216 <https://github.com/micro-ROS/micro-ROS-Agent/issues/216>`_) (`#218 <https://github.com/micro-ROS/micro-ROS-Agent/issues/218>`_)
