@@ -15,28 +15,25 @@
 #ifndef _UROS_AGENT_GRAPH_MANAGER_HPP
 #define _UROS_AGENT_GRAPH_MANAGER_HPP
 
-#include "fastrtps/Domain.h"
-#include <fastrtps/TopicDataType.h>
-#include "fastrtps/attributes/ParticipantAttributes.h"
-#include "fastrtps/participant/Participant.h"
-#include "fastrtps/participant/ParticipantListener.h"
-#include "fastrtps/attributes/PublisherAttributes.h"
-#include "fastrtps/publisher/Publisher.h"
-#include <fastrtps/publisher/PublisherListener.h>
-#include <fastrtps/rtps/common/MatchingInfo.h>
-
+#include "fastdds/dds/topic/TopicDataType.hpp"
+#include "fastdds/rtps/attributes/RTPSParticipantAttributes.hpp"
+#include "fastdds/rtps/participant/RTPSParticipant.hpp"
+#include "fastdds/rtps/participant/RTPSParticipantListener.hpp"
+#include "fastdds/rtps/RTPSDomain.hpp"
 #include <fastdds/dds/domain/DomainParticipant.hpp>
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipantListener.hpp>
 #include <fastdds/dds/domain/qos/DomainParticipantQos.hpp>
 #include <fastdds/dds/publisher/DataWriter.hpp>
-#include <fastdds/dds/publisher/qos/DataWriterQos.hpp>
 #include <fastdds/dds/publisher/Publisher.hpp>
+#include <fastdds/dds/publisher/PublisherListener.hpp>
+#include <fastdds/dds/publisher/qos/DataWriterQos.hpp>
 #include <fastdds/dds/subscriber/DataReader.hpp>
+#include <fastdds/dds/subscriber/DataReaderListener.hpp>
 #include <fastdds/dds/subscriber/qos/DataReaderQos.hpp>
 #include <fastdds/dds/subscriber/SampleInfo.hpp>
 #include <fastdds/dds/subscriber/Subscriber.hpp>
-#include <fastdds/dds/subscriber/DataReaderListener.hpp>
+#include <fastdds/rtps/common/MatchingInfo.hpp>
 
 #include "rmw/types.h"
 #include "rmw/names_and_types.h"
@@ -125,7 +122,7 @@ public:
      * @param   datawriter Pointer to the datawriter to be added.
      */
     void add_datawriter(
-            const eprosima::fastrtps::rtps::GUID_t& datawriter_guid,
+            const eprosima::fastdds::rtps::GUID_t& datawriter_guid,
             const eprosima::fastdds::dds::DomainParticipant* participant,
             const eprosima::fastdds::dds::DataWriter* datawriter);
 
@@ -138,10 +135,10 @@ public:
      * @param   writer_qos QOS of the datawriter to be included into the graph tree.
      */
     void add_datawriter(
-            const eprosima::fastrtps::rtps::GUID_t& datawriter_guid,
+            const eprosima::fastdds::rtps::GUID_t& datawriter_guid,
             const std::string& topic_name,
             const std::string& type_name,
-            const eprosima::fastrtps::rtps::GUID_t& participant_guid,
+            const eprosima::fastdds::rtps::GUID_t& participant_guid,
             const eprosima::fastdds::dds::DataWriterQos& writer_qos);
 
     /**
@@ -149,7 +146,7 @@ public:
      * @param   datawriter_guid rtps::GUID_t of the datawriter to be removed.
      */
     void remove_datawriter(
-            const eprosima::fastrtps::rtps::GUID_t& datawriter_guid);
+            const eprosima::fastdds::rtps::GUID_t& datawriter_guid);
 
     /**
      * @brief   Adds a DDS datareader to the graph tree.
@@ -158,7 +155,7 @@ public:
      * @param   datareader Pointer to the datareader to be added.
      */
     void add_datareader(
-            const eprosima::fastrtps::rtps::GUID_t& datareader_guid,
+            const eprosima::fastdds::rtps::GUID_t& datareader_guid,
             const eprosima::fastdds::dds::DomainParticipant* participant,
             const eprosima::fastdds::dds::DataReader* datareader);
 
@@ -168,13 +165,13 @@ public:
      * @param   topic_name Name of the topic to which the datareader sends information to.
      * @param   type_name Type name of the sent topic.
      * @param   participant_guid rtps::GUID_t of the participant which owns this datareader.
-     * @param   writer_qos QOS of the datareader to be included into the graph tree.
+     * @param   reader_qos QOS of the datareader to be included into the graph tree.
      */
     void add_datareader(
-            const eprosima::fastrtps::rtps::GUID_t& datareader_guid,
+            const eprosima::fastdds::rtps::GUID_t& datareader_guid,
             const std::string& topic_name,
             const std::string& type_name,
-            const eprosima::fastrtps::rtps::GUID_t& participant_guid,
+            const eprosima::fastdds::rtps::GUID_t& participant_guid,
             const eprosima::fastdds::dds::DataReaderQos& reader_qos);
 
     /**
@@ -182,7 +179,7 @@ public:
      * @param   datareader_guid rtps::GUID_t of the datareader to be removed.
      */
     void remove_datareader(
-            const  eprosima::fastrtps::rtps::GUID_t& datareader_guid);
+            const  eprosima::fastdds::rtps::GUID_t& datareader_guid);
 
     /**
      * @brief   Associates a certain DDS entity with a provided participant.
@@ -191,7 +188,7 @@ public:
      * @param   entity_kind Kind of the DDS entity.
      */
     void associate_entity(
-            const eprosima::fastrtps::rtps::GUID_t& entity_guid,
+            const eprosima::fastdds::rtps::GUID_t& entity_guid,
             const eprosima::fastdds::dds::DomainParticipant* participant,
             const dds::xrce::ObjectKind& entity_kind);
 
@@ -212,21 +209,28 @@ private:
                 GraphManager* graph_manager);
     private:
 
-        template <typename Info>
+        template <typename DiscoveryStatus, typename Info>
         void process_discovery_info(
+                DiscoveryStatus reason,
                 const Info& proxyData);
 
         void on_participant_discovery(
                 eprosima::fastdds::dds::DomainParticipant* participant,
-                eprosima::fastrtps::rtps::ParticipantDiscoveryInfo&& info) override;
+                eprosima::fastdds::rtps::ParticipantDiscoveryStatus reason,
+                const eprosima::fastdds::dds::ParticipantBuiltinTopicData& info,
+                bool& should_be_ignored) override;
 
-        void on_subscriber_discovery(
-                eprosima::fastdds::dds::DomainParticipant* /*participant*/,
-                eprosima::fastrtps::rtps::ReaderDiscoveryInfo&& info) override;
+        void on_data_reader_discovery(
+                eprosima::fastdds::dds::DomainParticipant* participant,
+                eprosima::fastdds::rtps::ReaderDiscoveryStatus reason,
+                const eprosima::fastdds::dds::SubscriptionBuiltinTopicData& info,
+                bool& should_be_ignored) override;
 
-        void on_publisher_discovery(
-                eprosima::fastdds::dds::DomainParticipant* /*participant*/,
-                eprosima::fastrtps::rtps::WriterDiscoveryInfo&& info) override;
+        void on_data_writer_discovery(
+                eprosima::fastdds::dds::DomainParticipant* participant,
+                eprosima::fastdds::rtps::WriterDiscoveryStatus reason,
+                const eprosima::fastdds::dds::PublicationBuiltinTopicData& info,
+                bool& should_be_ignored) override;
 
         GraphManager* graphManager_from_;
     };
