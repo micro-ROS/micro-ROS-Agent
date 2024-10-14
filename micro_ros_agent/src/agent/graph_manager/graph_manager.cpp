@@ -16,6 +16,9 @@
 #define _UROS_AGENT_GRAPH_MANAGER_CPP
 
 #include <agent/graph_manager/graph_manager.hpp>
+#include <fastdds/dds/core/detail/DDSReturnCode.hpp>
+#include <fastdds/rtps/participant/ParticipantDiscoveryInfo.hpp>
+#include <fastdds/rtps/reader/ReaderDiscoveryStatus.hpp>
 
 #include <memory>
 #include <string>
@@ -54,9 +57,9 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
 
     participant_qos.name(enclave);
     participant_qos.wire_protocol().builtin.readerHistoryMemoryPolicy =
-        eprosima::fastrtps::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
+        eprosima::fastdds::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
     participant_qos.wire_protocol().builtin.writerHistoryMemoryPolicy =
-        eprosima::fastrtps::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
+        eprosima::fastdds::rtps::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
 
     eprosima::fastdds::dds::StatusMask par_mask = eprosima::fastdds::dds::StatusMask::none();
     participant_.reset(eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->
@@ -91,7 +94,7 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
         eprosima::fastdds::dds::HistoryQosPolicyKind::KEEP_LAST_HISTORY_QOS;
     datawriter_qos_.history().depth = 1;
     datawriter_qos_.endpoint().history_memory_policy =
-        eprosima::fastrtps::rtps::MemoryManagementPolicy::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
+        eprosima::fastdds::rtps::MemoryManagementPolicy::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
     datawriter_qos_.publish_mode().kind =
         eprosima::fastdds::dds::PublishModeQosPolicyKind::ASYNCHRONOUS_PUBLISH_MODE;
     datawriter_qos_.reliability().kind =
@@ -113,7 +116,7 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
         eprosima::fastdds::dds::HistoryQosPolicyKind::KEEP_LAST_HISTORY_QOS;
     datareader_qos.history().depth = 1;
     datareader_qos.endpoint().history_memory_policy =
-        eprosima::fastrtps::rtps::MemoryManagementPolicy::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
+        eprosima::fastdds::rtps::MemoryManagementPolicy::PREALLOCATED_WITH_REALLOC_MEMORY_MODE;
     datareader_qos.reliability().kind =
         eprosima::fastdds::dds::ReliabilityQosPolicyKind::RELIABLE_RELIABILITY_QOS;
     datareader_qos.durability().kind =
@@ -351,7 +354,7 @@ void GraphManager::remove_participant(
 }
 
 void GraphManager::add_datawriter(
-        const eprosima::fastrtps::rtps::GUID_t& datawriter_guid,
+        const eprosima::fastdds::rtps::GUID_t& datawriter_guid,
         const eprosima::fastdds::dds::DomainParticipant* participant,
         const eprosima::fastdds::dds::DataWriter* datawriter)
 {
@@ -362,10 +365,10 @@ void GraphManager::add_datawriter(
 }
 
 void GraphManager::add_datawriter(
-        const eprosima::fastrtps::rtps::GUID_t& datawriter_guid,
+        const eprosima::fastdds::rtps::GUID_t& datawriter_guid,
         const std::string& topic_name,
         const std::string& type_name,
-        const eprosima::fastrtps::rtps::GUID_t& participant_guid,
+        const eprosima::fastdds::rtps::GUID_t& participant_guid,
         const eprosima::fastdds::dds::DataWriterQos& writer_qos)
 {
     const rmw_gid_t datawriter_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
@@ -379,7 +382,7 @@ void GraphManager::add_datawriter(
 }
 
 void GraphManager::remove_datawriter(
-        const eprosima::fastrtps::rtps::GUID_t& datawriter_guid)
+        const eprosima::fastdds::rtps::GUID_t& datawriter_guid)
 {
     const rmw_gid_t datawriter_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
         "rmw_fastrtps_cpp", datawriter_guid);
@@ -388,7 +391,7 @@ void GraphManager::remove_datawriter(
 }
 
 void GraphManager::add_datareader(
-        const eprosima::fastrtps::rtps::GUID_t& datareader_guid,
+        const eprosima::fastdds::rtps::GUID_t& datareader_guid,
         const eprosima::fastdds::dds::DomainParticipant* participant,
         const eprosima::fastdds::dds::DataReader* datareader)
 {
@@ -399,10 +402,10 @@ void GraphManager::add_datareader(
 }
 
 void GraphManager::add_datareader(
-        const eprosima::fastrtps::rtps::GUID_t& datareader_guid,
+        const eprosima::fastdds::rtps::GUID_t& datareader_guid,
         const std::string& topic_name,
         const std::string& type_name,
-        const eprosima::fastrtps::rtps::GUID_t& participant_guid,
+        const eprosima::fastdds::rtps::GUID_t& participant_guid,
         const eprosima::fastdds::dds::DataReaderQos& reader_qos)
 {
     const rmw_gid_t datareader_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
@@ -421,7 +424,7 @@ void GraphManager::add_datareader(
 }
 
 void GraphManager::remove_datareader(
-        const eprosima::fastrtps::rtps::GUID_t& datareader_guid)
+        const eprosima::fastdds::rtps::GUID_t& datareader_guid)
 {
     const rmw_gid_t datareader_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
         "rmw_fastrtps_cpp", datareader_guid);
@@ -430,7 +433,7 @@ void GraphManager::remove_datareader(
 }
 
 void GraphManager::associate_entity(
-        const eprosima::fastrtps::rtps::GUID_t& entity_guid,
+        const eprosima::fastdds::rtps::GUID_t& entity_guid,
         const eprosima::fastdds::dds::DomainParticipant* participant,
         const dds::xrce::ObjectKind& entity_kind)
 {
@@ -550,7 +553,7 @@ void GraphManager::update_node_entities_info()
     rmw_dds_common::msg::ParticipantEntitiesInfo entities_info;
     eprosima::fastdds::dds::SampleInfo sample_info;
     if (ros_discovery_datareader_->take_next_sample(&entities_info, &sample_info) ==
-        eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK)
+        eprosima::fastdds::dds::RETCODE_OK)
     {
         if (sample_info.instance_state == eprosima::fastdds::dds::InstanceStateKind::ALIVE_INSTANCE_STATE)
         {
@@ -604,14 +607,19 @@ GraphManager::ParticipantListener::ParticipantListener(
 }
 
 void GraphManager::ParticipantListener::on_participant_discovery(
-        eprosima::fastdds::dds::DomainParticipant* /* participant */,
-        eprosima::fastrtps::rtps::ParticipantDiscoveryInfo&& info)
+        eprosima::fastdds::dds::DomainParticipant* participant,
+        eprosima::fastdds::rtps::ParticipantDiscoveryStatus reason,
+        const eprosima::fastdds::dds::ParticipantBuiltinTopicData& info,
+        bool& should_be_ignored)
 {
-    switch (info.status)
+    static_cast<void>(participant);
+    static_cast<void>(should_be_ignored);
+
+    switch (reason)
     {
-        case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::DISCOVERED_PARTICIPANT:
+        case eprosima::fastdds::rtps::ParticipantDiscoveryStatus::DISCOVERED_PARTICIPANT:
         {
-            auto map = rmw::impl::cpp::parse_key_value(info.info.m_userData);
+            auto map = rmw::impl::cpp::parse_key_value(info.user_data);
             auto name_found = map.find("enclave");
 
             if (map.end() == name_found)
@@ -621,14 +629,14 @@ void GraphManager::ParticipantListener::on_participant_discovery(
             const std::string enclave =
                 std::string(name_found->second.begin(), name_found->second.end());
 
-            const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", info.info.m_guid);
+            const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", info.guid);
             graphManager_from_->get_graph_cache().add_participant(gid, enclave);
             break;
         }
-        case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::REMOVED_PARTICIPANT:
-        case eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::DROPPED_PARTICIPANT:
+        case eprosima::fastdds::rtps::ParticipantDiscoveryStatus::REMOVED_PARTICIPANT:
+        case eprosima::fastdds::rtps::ParticipantDiscoveryStatus::DROPPED_PARTICIPANT:
         {
-            const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", info.info.m_guid);
+            const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", info.guid);
             graphManager_from_->get_graph_cache().remove_participant(gid);
             break;
         }
@@ -640,117 +648,133 @@ void GraphManager::ParticipantListener::on_participant_discovery(
 }
 
 static eprosima::fastdds::dds::DataWriterQos writer_qos_conversion(
-    const eprosima::fastdds::dds::WriterQos& writer_qos)
+    const eprosima::fastdds::dds::PublicationBuiltinTopicData& writer_info)
 {
     eprosima::fastdds::dds::DataWriterQos datawriter_qos;
-    datawriter_qos.durability(writer_qos.m_durability);
-    datawriter_qos.durability_service(writer_qos.m_durabilityService);
-    datawriter_qos.deadline(writer_qos.m_deadline);
-    datawriter_qos.latency_budget(writer_qos.m_latencyBudget);
-    datawriter_qos.liveliness(writer_qos.m_liveliness);
-    datawriter_qos.reliability(writer_qos.m_reliability);
-    datawriter_qos.destination_order(writer_qos.m_destinationOrder);
-    datawriter_qos.lifespan(writer_qos.m_lifespan);
-    datawriter_qos.user_data(writer_qos.m_userData);
-    datawriter_qos.ownership(writer_qos.m_ownership);
-    datawriter_qos.ownership_strength(writer_qos.m_ownershipStrength);
-    datawriter_qos.publish_mode(writer_qos.m_publishMode);
-    datawriter_qos.representation(writer_qos.representation);
-    datawriter_qos.data_sharing(writer_qos.data_sharing);
+    eprosima::fastdds::dds::RTPSReliableWriterQos reliable_writer_qos;
+    reliable_writer_qos.disable_positive_acks = writer_info.disable_positive_acks;
+
+    datawriter_qos.durability(writer_info.durability);
+    datawriter_qos.durability_service(writer_info.durability_service);
+    datawriter_qos.deadline(writer_info.deadline);
+    datawriter_qos.latency_budget(writer_info.latency_budget);
+    datawriter_qos.liveliness(writer_info.liveliness);
+    datawriter_qos.reliability(writer_info.reliability);
+    datawriter_qos.lifespan(writer_info.lifespan);
+    datawriter_qos.user_data(writer_info.user_data);
+    datawriter_qos.ownership(writer_info.ownership);
+    datawriter_qos.ownership_strength(writer_info.ownership_strength);
+    datawriter_qos.destination_order(writer_info.destination_order);
+    datawriter_qos.reliable_writer_qos(reliable_writer_qos);
+    datawriter_qos.representation(writer_info.representation);
+    datawriter_qos.data_sharing(writer_info.data_sharing);
 
     return datawriter_qos;
 }
 
 static eprosima::fastdds::dds::DataReaderQos reader_qos_conversion(
-    const eprosima::fastdds::dds::ReaderQos& reader_qos)
+    const eprosima::fastdds::rtps::SubscriptionBuiltinTopicData& reader_info)
 {
     eprosima::fastdds::dds::DataReaderQos datareader_qos;
+    eprosima::fastdds::dds::RTPSReliableReaderQos reliable_reader_qos;
+    reliable_reader_qos.disable_positive_acks = reader_info.disable_positive_acks;
 
-    datareader_qos.durability(reader_qos.m_durability);
-    datareader_qos.deadline(reader_qos.m_deadline);
-    datareader_qos.latency_budget(reader_qos.m_latencyBudget);
-    datareader_qos.liveliness(reader_qos.m_liveliness);
-    datareader_qos.reliability(reader_qos.m_reliability);
-    datareader_qos.destination_order(reader_qos.m_destinationOrder);
-    datareader_qos.user_data(reader_qos.m_userData);
-    datareader_qos.ownership(reader_qos.m_ownership);
-    datareader_qos.time_based_filter(reader_qos.m_timeBasedFilter);
-    datareader_qos.lifespan(reader_qos.m_lifespan);
-    datareader_qos.durability_service(reader_qos.m_durabilityService);
-    eprosima::fastdds::dds::TypeConsistencyQos consistency;
-    consistency.type_consistency = reader_qos.type_consistency;
-    datareader_qos.type_consistency(consistency);
-    datareader_qos.data_sharing(reader_qos.data_sharing);
+    datareader_qos.durability(reader_info.durability);
+    datareader_qos.deadline(reader_info.deadline);
+    datareader_qos.latency_budget(reader_info.latency_budget);
+    datareader_qos.lifespan(reader_info.lifespan);
+    datareader_qos.liveliness(reader_info.liveliness);
+    datareader_qos.reliability(reader_info.reliability);
+    datareader_qos.ownership(reader_info.ownership);
+    datareader_qos.destination_order(reader_info.destination_order);
+    datareader_qos.user_data(reader_info.user_data);
+    datareader_qos.time_based_filter(reader_info.time_based_filter);
+    datareader_qos.type_consistency(reader_info.type_consistency);
+    datareader_qos.reliable_reader_qos(reliable_reader_qos);
+    datareader_qos.representation(reader_info.representation);
+    datareader_qos.data_sharing(reader_info.data_sharing);
 
     return datareader_qos;
 }
 
 template <>
-void GraphManager::ParticipantListener::process_discovery_info<eprosima::fastrtps::rtps::ReaderDiscoveryInfo>(
-        const eprosima::fastrtps::rtps::ReaderDiscoveryInfo& reader_info)
+void GraphManager::ParticipantListener::process_discovery_info<eprosima::fastdds::rtps::ReaderDiscoveryStatus, eprosima::fastdds::rtps::SubscriptionBuiltinTopicData>(
+        eprosima::fastdds::rtps::ReaderDiscoveryStatus reason,
+        const eprosima::fastdds::rtps::SubscriptionBuiltinTopicData& reader_info)
 {
-    switch (reader_info.status)
+    switch (reason)
     {
-        case eprosima::fastrtps::rtps::ReaderDiscoveryInfo::CHANGED_QOS_READER:
+        case eprosima::fastdds::rtps::ReaderDiscoveryStatus::CHANGED_QOS_READER:
         {
             return;
         }
-        case eprosima::fastrtps::rtps::ReaderDiscoveryInfo::DISCOVERED_READER:
+        case eprosima::fastdds::rtps::ReaderDiscoveryStatus::DISCOVERED_READER:
         {
-            const std::string topic_name = reader_info.info.topicName().to_string();
-            const std::string type_name = reader_info.info.typeName().to_string();
+            const std::string topic_name = reader_info.topic_name.to_string();
+            const std::string type_name = reader_info.type_name.to_string();
 
-            graphManager_from_->add_datareader(reader_info.info.guid(), topic_name, type_name,
-                iHandle2GUID(reader_info.info.RTPSParticipantKey()), reader_qos_conversion(reader_info.info.m_qos));
+            graphManager_from_->add_datareader(reader_info.guid, topic_name, type_name,
+                reader_info.participant_guid, reader_qos_conversion(reader_info));
             break;
         }
         default:
         {
-            graphManager_from_->remove_datareader(reader_info.info.guid());
+            graphManager_from_->remove_datareader(reader_info.guid);
             break;
         }
     }
 }
 
 template <>
-void GraphManager::ParticipantListener::process_discovery_info<eprosima::fastrtps::rtps::WriterDiscoveryInfo>(
-        const eprosima::fastrtps::rtps::WriterDiscoveryInfo& writer_info)
+void GraphManager::ParticipantListener::process_discovery_info<eprosima::fastdds::rtps::WriterDiscoveryStatus, eprosima::fastdds::rtps::PublicationBuiltinTopicData>(
+        eprosima::fastdds::rtps::WriterDiscoveryStatus reason,
+        const eprosima::fastdds::rtps::PublicationBuiltinTopicData& writer_info)
 {
-    switch (writer_info.status)
+    switch (reason)
     {
-        case eprosima::fastrtps::rtps::WriterDiscoveryInfo::CHANGED_QOS_WRITER:
+        case eprosima::fastdds::rtps::WriterDiscoveryStatus::CHANGED_QOS_WRITER:
         {
             return;
         }
-        case eprosima::fastrtps::rtps::WriterDiscoveryInfo::DISCOVERED_WRITER:
+        case eprosima::fastdds::rtps::WriterDiscoveryStatus::DISCOVERED_WRITER:
         {
-            const std::string topic_name = writer_info.info.topicName().to_string();
-            const std::string type_name = writer_info.info.typeName().to_string();
+            const std::string topic_name = writer_info.topic_name.to_string();
+            const std::string type_name = writer_info.type_name.to_string();
 
-            graphManager_from_->add_datawriter(writer_info.info.guid(), topic_name, type_name,
-                iHandle2GUID(writer_info.info.RTPSParticipantKey()), writer_qos_conversion(writer_info.info.m_qos));
+            graphManager_from_->add_datawriter(writer_info.guid, topic_name, type_name,
+                writer_info.participant_guid, writer_qos_conversion(writer_info));
             break;
         }
         default:
         {
-            graphManager_from_->remove_datawriter(writer_info.info.guid());
+            graphManager_from_->remove_datawriter(writer_info.guid);
             break;
         }
     }
 }
 
-void GraphManager::ParticipantListener::on_subscriber_discovery(
-        eprosima::fastdds::dds::DomainParticipant* /*participant*/,
-        eprosima::fastrtps::rtps::ReaderDiscoveryInfo&& info)
+void GraphManager::ParticipantListener::on_data_reader_discovery(
+        eprosima::fastdds::dds::DomainParticipant* participant,
+        eprosima::fastdds::rtps::ReaderDiscoveryStatus reason,
+        const eprosima::fastdds::dds::SubscriptionBuiltinTopicData& info,
+        bool& should_be_ignored)
 {
-    process_discovery_info<eprosima::fastrtps::rtps::ReaderDiscoveryInfo>(info);
+    static_cast<void>(participant);
+    static_cast<void>(should_be_ignored);
+
+    process_discovery_info<eprosima::fastdds::rtps::ReaderDiscoveryStatus, eprosima::fastdds::rtps::SubscriptionBuiltinTopicData>(reason, info);
 }
 
-void GraphManager::ParticipantListener::on_publisher_discovery(
-        eprosima::fastdds::dds::DomainParticipant* /*participant*/,
-        eprosima::fastrtps::rtps::WriterDiscoveryInfo&& info)
+void GraphManager::ParticipantListener::on_data_writer_discovery(
+        eprosima::fastdds::dds::DomainParticipant* participant,
+        eprosima::fastdds::rtps::WriterDiscoveryStatus reason,
+        const eprosima::fastdds::dds::PublicationBuiltinTopicData& info,
+        bool& should_be_ignored)
 {
-    process_discovery_info<eprosima::fastrtps::rtps::WriterDiscoveryInfo>(info);
+    static_cast<void>(participant);
+    static_cast<void>(should_be_ignored);
+
+    process_discovery_info<eprosima::fastdds::rtps::WriterDiscoveryStatus, eprosima::fastdds::rtps::PublicationBuiltinTopicData>(reason, info);
 }
 
 GraphManager::DatareaderListener::DatareaderListener(

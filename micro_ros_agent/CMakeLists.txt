@@ -31,10 +31,10 @@ else()
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(microxrcedds_agent REQUIRED)
 find_package(rosidl_cmake REQUIRED)
 find_package(fastcdr REQUIRED)
-find_package(fastrtps REQUIRED)
+find_package(fastdds REQUIRED)
+find_package(microxrcedds_agent REQUIRED)
 find_package(fastrtps_cmake_module REQUIRED)
 find_package(rmw_dds_common REQUIRED)
 find_package(rmw REQUIRED)
@@ -68,7 +68,7 @@ ament_target_dependencies(${PROJECT_NAME}
   rosidl_runtime_cpp
   rosidl_typesupport_cpp
   fastcdr
-  fastrtps
+  fastdds
   rmw_dds_common
   rmw
   rmw_fastrtps_shared_cpp
@@ -78,7 +78,7 @@ ament_target_dependencies(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   microxrcedds_agent
   fastcdr
-  fastrtps
+  fastdds
   $<$<BOOL:$<PLATFORM_ID:Linux>>:rt>
   $<$<BOOL:$<PLATFORM_ID:Linux>>:dl>
   )

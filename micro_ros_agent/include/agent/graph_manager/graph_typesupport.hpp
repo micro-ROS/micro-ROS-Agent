@@ -15,18 +15,16 @@
 #ifndef UROS_AGENT_GRAPH_PARTICIPANTS_TYPESUPPORT_HPP_
 #define UROS_AGENT_GRAPH_PARTICIPANTS_TYPESUPPORT_HPP_
 
-#include "fastrtps/Domain.h"
-#include <fastrtps/TopicDataType.h>
-#include "fastrtps/attributes/ParticipantAttributes.h"
-#include "fastrtps/participant/Participant.h"
-#include "fastrtps/participant/ParticipantListener.h"
-#include "fastrtps/attributes/PublisherAttributes.h"
-#include "fastrtps/publisher/Publisher.h"
-#include <fastrtps/publisher/PublisherListener.h>
-#include <fastrtps/rtps/common/MatchingInfo.h>
-
+#include "fastdds/dds/publisher/Publisher.hpp"
+#include "fastdds/dds/topic/TopicDataType.hpp"
+#include "fastdds/rtps/attributes/RTPSParticipantAttributes.hpp"
+#include "fastdds/rtps/participant/RTPSParticipant.hpp"
+#include "fastdds/rtps/participant/RTPSParticipantListener.hpp"
+#include "fastdds/rtps/RTPSDomain.hpp"
 #include <fastdds/dds/domain/DomainParticipant.hpp>
 #include <fastdds/dds/domain/qos/DomainParticipantQos.hpp>
+#include <fastdds/dds/publisher/PublisherListener.hpp>
+#include <fastdds/rtps/common/MatchingInfo.hpp>
 
 #include "rmw/types.h"
 #include "rmw/impl/cpp/key_value.hpp"
@@ -59,24 +57,31 @@ public:
     ParticipantEntitiesInfoTypeSupport();
 
     virtual bool serialize(
-            void* data,
-            eprosima::fastrtps::rtps::SerializedPayload_t* payload) override;
+            const void* const data,
+            eprosima::fastdds::rtps::SerializedPayload_t& payload,
+            eprosima::fastdds::dds::DataRepresentationId_t data_representation) override;
 
     virtual bool deserialize(
-            eprosima::fastrtps::rtps::SerializedPayload_t* payload,
+            eprosima::fastdds::rtps::SerializedPayload_t& payload,
             void* data) override;
 
-    virtual std::function<uint32_t()> getSerializedSizeProvider(
-            void* data) override;
+    virtual uint32_t calculate_serialized_size(
+            const void* const data,
+            eprosima::fastdds::dds::DataRepresentationId_t data_representation) override;
 
-    virtual void* createData() override;
+    virtual void* create_data() override;
 
-    virtual void deleteData(void* data) override;
+    virtual void delete_data(void* data) override;
 
-    virtual bool getKey(
-            void* data,
-            eprosima::fastrtps::rtps::InstanceHandle_t* handle,
-            bool force_md5) override;
+    virtual bool compute_key(
+            eprosima::fastdds::rtps::SerializedPayload_t& payload,
+            eprosima::fastdds::rtps::InstanceHandle_t& ihandle,
+            bool force_md5 = false) override;
+
+    virtual bool compute_key(
+            const void* const data,
+            eprosima::fastdds::rtps::InstanceHandle_t& ihandle,
+            bool force_md5 = false) override;
 
 private:
 
@@ -95,24 +100,31 @@ public:
     MicrorosGraphInfoTypeSupport();
 
     virtual bool serialize(
-            void* data,
-            eprosima::fastrtps::rtps::SerializedPayload_t* payload) override;
+            const void* const data,
+            eprosima::fastdds::rtps::SerializedPayload_t& payload,
+            eprosima::fastdds::dds::DataRepresentationId_t data_representation) override;
 
     virtual bool deserialize(
-            eprosima::fastrtps::rtps::SerializedPayload_t* payload,
+            eprosima::fastdds::rtps::SerializedPayload_t& payload,
             void* data) override;
 
-    virtual std::function<uint32_t()> getSerializedSizeProvider(
-            void* data) override;
+    virtual uint32_t calculate_serialized_size(
+            const void* const data,
+            eprosima::fastdds::dds::DataRepresentationId_t data_representation) override;
 
-    virtual void* createData() override;
+    virtual void* create_data() override;
 
-    virtual void deleteData(void* data) override;
+    virtual void delete_data(void* data) override;
 
-    virtual bool getKey(
-            void* data,
-            eprosima::fastrtps::rtps::InstanceHandle_t* handle,
-            bool force_md5) override;
+    virtual bool compute_key(
+            eprosima::fastdds::rtps::SerializedPayload_t& payload,
+            eprosima::fastdds::rtps::InstanceHandle_t& ihandle,
+            bool force_md5 = false) override;
+
+    virtual bool compute_key(
+            const void* const data,
+            eprosima::fastdds::rtps::InstanceHandle_t& ihandle,
+            bool force_md5 = false) override;
 
 private:
 
