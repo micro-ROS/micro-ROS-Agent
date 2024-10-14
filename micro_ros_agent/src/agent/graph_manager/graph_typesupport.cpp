@@ -41,27 +41,30 @@ ParticipantEntitiesInfoTypeSupport::ParticipantEntitiesInfoTypeSupport()
         ss << message_namespace << "::";
     }
     ss << "dds_::" << message_name << "_";
-    this->setName(ss.str().c_str());
+    this->set_name(ss.str().c_str());
 
     char full_bounded;
-    m_typeSize = 4 + callbacks_->max_serialized_size(full_bounded);
+    max_serialized_type_size = 4 + callbacks_->max_serialized_size(full_bounded);
 }
 
 bool ParticipantEntitiesInfoTypeSupport::serialize(
-        void * data,
-        eprosima::fastrtps::rtps::SerializedPayload_t * payload)
+        const void* const data,
+        eprosima::fastdds::rtps::SerializedPayload_t& payload,
+        eprosima::fastdds::dds::DataRepresentationId_t data_representation)
 {
-    eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload->data),
-        payload->max_size);
+    static_cast<void>(data_representation);
+
+    eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload.data),
+        payload.max_size);
     eprosima::fastcdr::Cdr scdr(fastbuffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
         eprosima::fastcdr::DDS_CDR);
 
     scdr.serialize_encapsulation();
     if (callbacks_->cdr_serialize(data, scdr))
     {
-        payload->encapsulation = (scdr.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS) ?
+        payload.encapsulation = (scdr.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS) ?
             CDR_BE : CDR_LE;
-        payload->length = static_cast<uint32_t>(scdr.get_serialized_data_length());
+        payload.length = static_cast<uint32_t>(scdr.get_serialized_data_length());
         return true;
     }
     else
@@ -71,11 +74,11 @@ bool ParticipantEntitiesInfoTypeSupport::serialize(
 }
 
 bool ParticipantEntitiesInfoTypeSupport::deserialize(
-        eprosima::fastrtps::rtps::SerializedPayload_t * payload,
+        eprosima::fastdds::rtps::SerializedPayload_t& payload,
         void * data)
 {
-    eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload->data),
-        payload->length);
+    eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload.data),
+        payload.length);
     eprosima::fastcdr::Cdr dcdr(fastbuffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
         eprosima::fastcdr::DDS_CDR);
 
@@ -83,35 +86,46 @@ bool ParticipantEntitiesInfoTypeSupport::deserialize(
     return callbacks_->cdr_deserialize(dcdr, data);
 }
 
-std::function<uint32_t()> ParticipantEntitiesInfoTypeSupport::getSerializedSizeProvider(
-        void * data)
+uint32_t ParticipantEntitiesInfoTypeSupport::calculate_serialized_size(
+            const void* const data,
+            eprosima::fastdds::dds::DataRepresentationId_t data_representation)
 {
-    return [data, this]() -> uint32_t
-    {
-        return static_cast<uint32_t>(4 + callbacks_->get_serialized_size(data));
-    };
+    static_cast<void>(data_representation);
+
+    return static_cast<uint32_t>(4 + callbacks_->get_serialized_size(data));
 }
 
-void * ParticipantEntitiesInfoTypeSupport::createData()
+void * ParticipantEntitiesInfoTypeSupport::create_data()
 {
     return static_cast<void *>(nullptr);
 }
 
-void ParticipantEntitiesInfoTypeSupport::deleteData(
+void ParticipantEntitiesInfoTypeSupport::delete_data(
         void * data)
 {
     (void) data;
 }
 
-bool ParticipantEntitiesInfoTypeSupport::getKey(
-        void * data,
-        eprosima::fastrtps::rtps::InstanceHandle_t * handle,
-        bool force_md5)
+bool ParticipantEntitiesInfoTypeSupport::compute_key(
+        eprosima::fastdds::rtps::SerializedPayload_t& payload,
+        eprosima::fastdds::rtps::InstanceHandle_t& ihandle,
+        bool force_md5 /* = false */)
+{
+    (void) payload;
+    (void) ihandle;
+    (void) force_md5;
+    return is_compute_key_provided;
+}
+
+bool ParticipantEntitiesInfoTypeSupport::compute_key(
+        const void * const data,
+        eprosima::fastdds::rtps::InstanceHandle_t& handle,
+        bool force_md5 /* = false */)
 {
     (void) data;
     (void) handle;
     (void) force_md5;
-    return m_isGetKeyDefined;
+    return is_compute_key_provided;
 }
 
 
@@ -133,27 +147,30 @@ MicrorosGraphInfoTypeSupport::MicrorosGraphInfoTypeSupport()
         ss << message_namespace << "::";
     }
     ss << "dds_::" << message_name << "_";
-    this->setName(ss.str().c_str());
+    this->set_name(ss.str().c_str());
 
     char full_bounded;
-    m_typeSize = 4 + callbacks_->max_serialized_size(full_bounded);
+    max_serialized_type_size = 4 + callbacks_->max_serialized_size(full_bounded);
 }
 
 bool MicrorosGraphInfoTypeSupport::serialize(
-        void * data,
-        eprosima::fastrtps::rtps::SerializedPayload_t * payload)
+        const void* const data,
+        eprosima::fastdds::rtps::SerializedPayload_t& payload,
+        eprosima::fastdds::dds::DataRepresentationId_t data_representation)
 {
-    eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload->data),
-        payload->max_size);
+    static_cast<void>(data_representation);
+
+    eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload.data),
+        payload.max_size);
     eprosima::fastcdr::Cdr scdr(fastbuffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
         eprosima::fastcdr::DDS_CDR);
 
     scdr.serialize_encapsulation();
     if (callbacks_->cdr_serialize(data, scdr))
     {
-        payload->encapsulation = (scdr.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS) ?
+        payload.encapsulation = (scdr.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS) ?
             CDR_BE : CDR_LE;
-        payload->length = static_cast<uint32_t>(scdr.get_serialized_data_length());
+        payload.length = static_cast<uint32_t>(scdr.get_serialized_data_length());
         return true;
     }
     else
@@ -163,11 +180,11 @@ bool MicrorosGraphInfoTypeSupport::serialize(
 }
 
 bool MicrorosGraphInfoTypeSupport::deserialize(
-        eprosima::fastrtps::rtps::SerializedPayload_t * payload,
-        void * data)
+        eprosima::fastdds::rtps::SerializedPayload_t& payload,
+        void* data)
 {
-    eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload->data),
-        payload->length);
+    eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char *>(payload.data),
+        payload.length);
     eprosima::fastcdr::Cdr dcdr(fastbuffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
         eprosima::fastcdr::DDS_CDR);
 
@@ -175,35 +192,46 @@ bool MicrorosGraphInfoTypeSupport::deserialize(
     return callbacks_->cdr_deserialize(dcdr, data);
 }
 
-std::function<uint32_t()> MicrorosGraphInfoTypeSupport::getSerializedSizeProvider(
-        void * data)
+uint32_t MicrorosGraphInfoTypeSupport::calculate_serialized_size(
+        const void* const data,
+        eprosima::fastdds::dds::DataRepresentationId_t data_representation)
 {
-    return [data, this]() -> uint32_t
-    {
-        return static_cast<uint32_t>(4 + callbacks_->get_serialized_size(data));
-    };
+    static_cast<void>(data_representation);
+
+    return static_cast<uint32_t>(4 + callbacks_->get_serialized_size(data));
 }
 
-void * MicrorosGraphInfoTypeSupport::createData()
+void * MicrorosGraphInfoTypeSupport::create_data()
 {
     return static_cast<void *>(nullptr);
 }
 
-void MicrorosGraphInfoTypeSupport::deleteData(
+void MicrorosGraphInfoTypeSupport::delete_data(
         void * data)
 {
     (void) data;
 }
 
-bool MicrorosGraphInfoTypeSupport::getKey(
-        void * data,
-        eprosima::fastrtps::rtps::InstanceHandle_t * handle,
-        bool force_md5)
+bool MicrorosGraphInfoTypeSupport::compute_key(
+        eprosima::fastdds::rtps::SerializedPayload_t& payload,
+        eprosima::fastdds::rtps::InstanceHandle_t& ihandle,
+        bool force_md5 /* = false */)
+{
+    (void) payload;
+    (void) ihandle;
+    (void) force_md5;
+    return is_compute_key_provided;
+}
+
+bool MicrorosGraphInfoTypeSupport::compute_key(
+        const void* const data,
+        eprosima::fastdds::rtps::InstanceHandle_t& ihandle,
+        bool force_md5 /* = false */)
 {
     (void) data;
-    (void) handle;
+    (void) ihandle;
     (void) force_md5;
-    return m_isGetKeyDefined;
+    return is_compute_key_provided;
 }
 
 }  // namespace graph_manager
