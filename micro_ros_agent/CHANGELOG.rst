@@ -2,6 +2,10 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Bump micro-ROS-Agent to Fast DDS v3.0.1 (`#237 <https://github.com/micro-ROS/micro-ROS-Agent/issues/237>`_)
+
 5.0.2 (2024-05-31)
 ------------------
 * Jazzy Release
