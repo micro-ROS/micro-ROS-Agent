@@ -26,8 +26,7 @@ if(NOT xrceagent_FOUND)
             GIT_REPOSITORY
                 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
             GIT_TAG
-                # TODO: Change when https://github.com/eProsima/Micro-XRCE-DDS-Agent/pull/375 is merged
-                feature/fastdds3
+                v3.0.0
             PREFIX
                 ${PROJECT_BINARY_DIR}/agent
             INSTALL_DIR
