@@ -20,7 +20,7 @@ enable_language(C)
 enable_language(CXX)
 
 unset(microxrcedds_agent_DIR CACHE)
-find_package(microxrcedds_agent 2 EXACT QUIET)
+find_package(microxrcedds_agent 3 EXACT QUIET)
 if(NOT xrceagent_FOUND)
     ExternalProject_Add(microxrcedds_agent
             GIT_REPOSITORY
