@@ -31,11 +31,7 @@ jobs:
         run: |
           apt-get install ros-${{ matrix.ros_distribution }}-micro-ros-msgs
           apt-get install ros-${{ matrix.ros_distribution }}-rmw-fastrtps-cpp
-<<<<<<< HEAD
-      - uses : ros-tooling/action-ros-ci@0.3.6
-=======
       - uses : ros-tooling/action-ros-ci@0.4.3
->>>>>>> 0e6e8e3 (Bump setup-ros and action-ros-ci (#249))
         with:
           package-name: "micro_ros_agent"
           target-ros2-distro: ${{ matrix.ros_distribution }}
