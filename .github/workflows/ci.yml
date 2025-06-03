@@ -23,7 +23,7 @@ jobs:
         image: ${{ matrix.docker_image }}
       steps:
       - uses: actions/checkout@v4
-      - uses: ros-tooling/setup-ros@0.7.7
+      - uses: ros-tooling/setup-ros@0.7.13
         with:
           use-ros2-testing: false
           required-ros-distributions: ${{ matrix.ros_distribution }}
@@ -31,7 +31,7 @@ jobs:
         run: |
           apt-get install ros-${{ matrix.ros_distribution }}-micro-ros-msgs
           apt-get install ros-${{ matrix.ros_distribution }}-rmw-fastrtps-cpp
-      - uses : ros-tooling/action-ros-ci@0.3.13
+      - uses : ros-tooling/action-ros-ci@0.4.3
         with:
           package-name: "micro_ros_agent"
           target-ros2-distro: ${{ matrix.ros_distribution }}
