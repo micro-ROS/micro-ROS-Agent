@@ -3,7 +3,7 @@ name: CI micro-ROS Agent
 on:
     pull_request:
       branches:
-        - 'rolling'
+        - 'kilted'
     schedule:
       - cron: '33 6 * * *'
 
@@ -15,10 +15,10 @@ jobs:
         fail-fast: false
         matrix:
           os: [ ubuntu-latest ]
-          ros_distribution: [ rolling ]
+          ros_distribution: [ kilted ]
           include:
             - docker_image: ubuntu:24.04
-              ros_distribution: rolling
+              ros_distribution: kilted
       container:
         image: ${{ matrix.docker_image }}
       steps:
