@@ -62,16 +62,15 @@ target_include_directories(${PROJECT_NAME}
     include
   )
 
-ament_target_dependencies(${PROJECT_NAME}
-  rosidl_typesupport_fastrtps_cpp
-  rosidl_runtime_cpp
-  rosidl_typesupport_cpp
-  fastcdr
-  fastdds
-  rmw_dds_common
-  rmw
-  rmw_fastrtps_shared_cpp
-  micro_ros_msgs
+target_link_libraries(${PROJECT_NAME}
+  ${micro_ros_msgs_TARGETS}
+  ${rmw_dds_common_TARGETS}
+  rmw::rmw
+  rmw_dds_common::rmw_dds_common_library
+  rmw_fastrtps_shared_cpp::rmw_fastrtps_shared_cpp
+  rosidl_runtime_cpp::rosidl_runtime_cpp
+  rosidl_typesupport_cpp::rosidl_typesupport_cpp
+  rosidl_typesupport_fastrtps_cpp::rosidl_typesupport_fastrtps_cpp
   )
 
 target_link_libraries(${PROJECT_NAME}
