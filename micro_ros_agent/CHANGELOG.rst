@@ -2,6 +2,15 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Use target_link_libraries instead of ament_target_dependencies (`#253 <https://github.com/micro-ROS/micro-ROS-Agent/issues/253>`_)
+* Remove fastrtps_cmake_module from CMakeLists.txt (`#248 <https://github.com/micro-ROS/micro-ROS-Agent/issues/248>`_)
+* bump Micro XRCE-DDS Agent (`#245 <https://github.com/micro-ROS/micro-ROS-Agent/issues/245>`_)
+* Undo changes in micro-ros agent compilation (`#239 <https://github.com/micro-ROS/micro-ROS-Agent/issues/239>`_)
+* Update SuperBuild.cmake (`#238 <https://github.com/micro-ROS/micro-ROS-Agent/issues/238>`_)
+* Bump micro-ROS-Agent to Fast DDS v3.0.1 (`#237 <https://github.com/micro-ROS/micro-ROS-Agent/issues/237>`_)
+
 6.0.0 (2024-05-31)
 ------------------
 * Bump Micro XRCE-DDS Agent (`#226 <https://github.com/micro-ROS/micro-ROS-Agent/issues/226>`_)
