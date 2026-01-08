@@ -136,16 +136,70 @@ GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     microros_graph_publisher_ = std::thread(&GraphManager::publish_microros_graph, this);
 }
 
+GraphManager::~GraphManager()
+{
+    shutdown();
+    graphCache_.set_on_change_callback([](){});
+
+    for (auto& pair : micro_ros_graph_datawriters_) {
+        if (pair.second && publisher_) {
+            publisher_->delete_datawriter(pair.second);
+        }
+    }
+    micro_ros_graph_datawriters_.clear();
+
+    if (subscriber_ && ros_discovery_datareader_) {
+        subscriber_->delete_datareader(ros_discovery_datareader_.release());
+    }
+    if (publisher_ && ros_to_microros_graph_datawriter_) {
+        publisher_->delete_datawriter(ros_to_microros_graph_datawriter_.release());
+    }
+
+    if (participant_) {
+        if (ros_discovery_topic_) {
+            participant_->delete_topic(ros_discovery_topic_.release());
+        }
+        if (ros_to_microros_graph_topic_) {
+            participant_->delete_topic(ros_to_microros_graph_topic_.release());
+        }
+        if (publisher_) {
+            participant_->delete_publisher(publisher_.release());
+        }
+        if (subscriber_) {
+            participant_->delete_subscriber(subscriber_.release());
+        }
+        eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->
+            delete_participant(participant_.release());
+    }
+}
+
+void GraphManager::shutdown()
+{
+    {
+        std::unique_lock<std::mutex> lock(mtx_);
+        shutdown_requested_ = true;
+        graph_changed_ = true;
+    }
+    cv_.notify_one();
+
+    if (microros_graph_publisher_.joinable()) {
+        microros_graph_publisher_.join();
+    }
+}
+
 inline void GraphManager::publish_microros_graph()
 {
-    while (true)
+    while (!shutdown_requested_)
     {
         {
             std::unique_lock<std::mutex> lock(mtx_);
             cv_.wait(lock, [this]()
             {
-                return this->graph_changed_;
+                return this->graph_changed_ || this->shutdown_requested_;
             });
+            if (shutdown_requested_) {
+                break;
+            }
             graph_changed_ = false;
         }
 
