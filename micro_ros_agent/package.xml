@@ -5,7 +5,7 @@
   <version>3.0.6</version>
   <description>micro-ROS Agent package</description>
   <maintainer email="eugeniocollado@eprosima.com">Eugenio Collado</maintainer>
-  <maintainer email="carlosespinoza@eprosima.com">Carlos Espinoza</maintainer>
+  <maintainer email="davidlaseca@eprosima.com">David Laseca</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
