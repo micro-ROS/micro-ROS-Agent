@@ -2,6 +2,11 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update maintainers (`#275 <https://github.com/micro-ROS/micro-ROS-Agent/issues/275>`_)
+* Update CMakeLists.txt (`#247 <https://github.com/micro-ROS/micro-ROS-Agent/issues/247>`_) (`#263 <https://github.com/micro-ROS/micro-ROS-Agent/issues/263>`_)
+
 6.1.0 (2025-07-10)
 ------------------
 * Use target_link_libraries instead of ament_target_dependencies (`#253 <https://github.com/micro-ROS/micro-ROS-Agent/issues/253>`_)
