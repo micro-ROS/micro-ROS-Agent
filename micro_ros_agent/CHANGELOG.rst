@@ -2,8 +2,8 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+6.1.1 (2026-08-11)
+------------------
 * Update maintainers (`#275 <https://github.com/micro-ROS/micro-ROS-Agent/issues/275>`_)
 * Update CMakeLists.txt (`#247 <https://github.com/micro-ROS/micro-ROS-Agent/issues/247>`_) (`#263 <https://github.com/micro-ROS/micro-ROS-Agent/issues/263>`_)
 
