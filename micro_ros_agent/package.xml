@@ -20,6 +20,7 @@
   <depend>rmw_fastrtps_shared_cpp</depend>
   <depend>rmw_dds_common</depend>
   <depend>micro_ros_msgs</depend>
+  <depend>microxrcedds_agent</depend>
 
   <test_depend>rosidl_typesupport_fastrtps_cpp</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>
