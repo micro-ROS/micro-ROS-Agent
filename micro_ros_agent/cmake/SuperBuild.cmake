@@ -19,25 +19,14 @@ unset(_deps)
 enable_language(C)
 enable_language(CXX)
 
-<<<<<<< HEAD
-unset(xrceagent_DIR CACHE)
-find_package(xrceagent 2 EXACT QUIET)
-if(NOT xrceagent_FOUND)
-    ExternalProject_Add(xrceagent
-            GIT_REPOSITORY
-                https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
-            GIT_TAG
-                v2.4.3
-=======
 unset(microxrcedds_agent_DIR CACHE)
-find_package(microxrcedds_agent 3.0.2 QUIET)
+find_package(microxrcedds_agent 2 QUIET)
 if(NOT microxrcedds_agent_FOUND)
     ExternalProject_Add(microxrcedds_agent
             GIT_REPOSITORY
                 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
             GIT_TAG
-                v3.0.2
->>>>>>> 5e42d6a (Fix 'microxrcedds_agent' name and dependency (#279))
+                v2.4.3
             PREFIX
                 ${PROJECT_BINARY_DIR}/agent
             INSTALL_DIR
