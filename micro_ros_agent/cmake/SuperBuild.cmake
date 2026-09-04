@@ -19,10 +19,10 @@ unset(_deps)
 enable_language(C)
 enable_language(CXX)
 
-unset(microxrcedds_agent_DIR CACHE)
-find_package(microxrcedds_agent 2 QUIET)
-if(NOT microxrcedds_agent_FOUND)
-    ExternalProject_Add(microxrcedds_agent
+unset(xrceagent_DIR CACHE)
+find_package(xrceagent 2 EXACT QUIET)
+if(NOT xrceagent_FOUND)
+    ExternalProject_Add(xrceagent
             GIT_REPOSITORY
                 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
             GIT_TAG
@@ -51,7 +51,6 @@ if(NOT microxrcedds_agent_FOUND)
                 -DUAGENT_BUILD_EXECUTABLE:BOOL=OFF
                 -DUAGENT_ISOLATED_INSTALL:BOOL=OFF
             )
-    list(APPEND _deps microxrcedds_agent)
 endif()
 
 # Main project.
@@ -65,5 +64,5 @@ ExternalProject_Add(micro_ros_agent
     INSTALL_COMMAND
         ""
     DEPENDS
-        ${_deps}
+        xrceagent
     )
