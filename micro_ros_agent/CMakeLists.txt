@@ -50,20 +50,76 @@ find_package(ament_cmake_gtest REQUIRED)
 
 find_package(micro_ros_msgs REQUIRED)
 
+set(GRAPH_MANAGER_LIB ${PROJECT_NAME}_graph_manager)
+
+add_library(${GRAPH_MANAGER_LIB} STATIC
+  src/agent/graph_manager/graph_manager.cpp
+  src/agent/graph_manager/graph_manager_plugin.cpp
+  src/agent/graph_manager/graph_typesupport.cpp
+  src/agent/utils/demangle.cpp
+)
+
+target_include_directories(${GRAPH_MANAGER_LIB}
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+)
+
+target_link_libraries(${GRAPH_MANAGER_LIB}
+  PUBLIC
+    ${micro_ros_msgs_TARGETS}
+    ${rmw_dds_common_TARGETS}
+    rmw::rmw
+    rmw_dds_common::rmw_dds_common_library
+    rmw_fastrtps_shared_cpp::rmw_fastrtps_shared_cpp
+    rosidl_runtime_cpp::rosidl_runtime_cpp
+    rosidl_typesupport_cpp::rosidl_typesupport_cpp
+    rosidl_typesupport_fastrtps_cpp::rosidl_typesupport_fastrtps_cpp
+    microxrcedds_agent
+    fastcdr
+    fastrtps
+)
+
+set_target_properties(${GRAPH_MANAGER_LIB} PROPERTIES
+  CXX_STANDARD 14
+  CXX_STANDARD_REQUIRED YES
+  POSITION_INDEPENDENT_CODE ON
+)
+
 add_executable(${PROJECT_NAME}
   src/main.cpp
   src/agent/Agent.cpp
-  src/agent/graph_manager/graph_manager.cpp
-  src/agent/graph_manager/graph_typesupport.cpp
-  src/agent/utils/demangle.cpp
-  )
+)
 
 target_include_directories(${PROJECT_NAME}
   PRIVATE
     include
-  )
+)
 
-ament_target_dependencies(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}
+  ${GRAPH_MANAGER_LIB}
+  microxrcedds_agent
+  fastcdr
+  fastrtps
+  $<$<BOOL:$<PLATFORM_ID:Linux>>:rt>
+  $<$<BOOL:$<PLATFORM_ID:Linux>>:dl>
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+  CXX_STANDARD 14
+  CXX_STANDARD_REQUIRED YES
+)
+
+target_compile_options(${PROJECT_NAME}
+  PRIVATE
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wall>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wextra>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wpedantic>
+)
+
+ament_export_targets(export_${GRAPH_MANAGER_LIB} HAS_LIBRARY_TARGET)
+ament_export_dependencies(
+  microxrcedds_agent
   rosidl_typesupport_fastrtps_cpp
   rosidl_runtime_cpp
   rosidl_typesupport_cpp
@@ -73,61 +129,36 @@ ament_target_dependencies(${PROJECT_NAME}
   rmw
   rmw_fastrtps_shared_cpp
   micro_ros_msgs
-  )
-
-target_link_libraries(${PROJECT_NAME}
-  microxrcedds_agent
-  fastcdr
-  fastrtps
-  $<$<BOOL:$<PLATFORM_ID:Linux>>:rt>
-  $<$<BOOL:$<PLATFORM_ID:Linux>>:dl>
-  )
-
-target_compile_options(${PROJECT_NAME}
-  PRIVATE
-    $<$<C_COMPILER_ID:GNU>:-Wall>
-    $<$<C_COMPILER_ID:GNU>:-Wextra>
-    $<$<C_COMPILER_ID:GNU>:-pedantic>
-  )
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-  CXX_STANDARD
-    14
-  CXX_STANDARD_REQUIRED
-    YES
-  )
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-  CXX_STANDARD
-    14
-  CXX_STANDARD_REQUIRED
-    YES
-  )
-
-target_compile_options(${PROJECT_NAME}
-  PRIVATE
-    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wall>
-    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wextra>
-    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wpedantic>
-  )
-
-ament_export_dependencies(microxrcedds_agent)
+)
 
 ament_package()
+
+install(
+  TARGETS ${GRAPH_MANAGER_LIB}
+  EXPORT export_${GRAPH_MANAGER_LIB}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(
+  DIRECTORY include/
+  DESTINATION include/${PROJECT_NAME}
+)
 
 install(
   TARGETS
     ${PROJECT_NAME}
   DESTINATION
     lib/${PROJECT_NAME}
-  )
+)
 
 install(
   DIRECTORY
     launch
   DESTINATION
     share/${PROJECT_NAME}
-  )
+)
 
 if(UROSAGENT_GENERATE_PROFILE)
   set(_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/python")

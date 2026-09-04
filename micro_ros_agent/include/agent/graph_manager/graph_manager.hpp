@@ -61,6 +61,7 @@
 #include <agent/graph_manager/graph_typesupport.hpp>
 #include <agent/utils/demangle.hpp>
 
+#include <atomic>
 #include <condition_variable>
 #include <string>
 #include <memory>
@@ -84,9 +85,15 @@ public:
     GraphManager(eprosima::fastdds::dds::DomainId_t domain_id);
 
     /**
-     * @brief   Default destructor.
+     * @brief   Destructor - signals thread to stop and joins it.
      */
-    ~GraphManager() = default;
+    ~GraphManager();
+
+    /**
+     * @brief   Signal the graph manager to stop (called before destruction).
+     *          Safe to call multiple times.
+     */
+    void shutdown();
 
     /**
      * @brief   Implementation of the notification logic that updates the micro-ROS graph.
@@ -283,6 +290,7 @@ private:
     eprosima::fastdds::dds::DomainId_t domain_id_;
     bool graph_changed_;
     bool display_on_change_;
+    std::atomic<bool> shutdown_requested_{false};
     std::thread microros_graph_publisher_;
     std::mutex mtx_;
     std::condition_variable cv_;
