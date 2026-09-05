@@ -30,7 +30,7 @@ if(NOT xrceagent_FOUND)
             PREFIX
                 ${PROJECT_BINARY_DIR}/agent
             INSTALL_DIR
-                ${CMAKE_INSTALL_PREFIX}
+                ${PROJECT_BINARY_DIR}/temp_install
             CMAKE_CACHE_ARGS
                 -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
                 -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
