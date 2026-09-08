@@ -46,6 +46,7 @@ private:
 
     eprosima::uxr::AgentInstance& xrce_dds_agent_instance_;
     std::map<eprosima::fastdds::dds::DomainId_t, std::shared_ptr<graph_manager::GraphManager>> graph_manager_map_;
+    std::string namespace_remapping = "";
 
     std::shared_ptr<graph_manager::GraphManager> find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id);
 };

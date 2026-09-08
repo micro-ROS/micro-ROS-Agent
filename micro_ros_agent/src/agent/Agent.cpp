@@ -33,6 +33,17 @@ bool Agent::create(
         char** argv)
 {
     bool result = xrce_dds_agent_instance_.create(argc, argv);
+
+    // Find namespace remapping
+    for (int i = 0; i < argc; i++)
+    {
+        if (strcmp(argv[i], "--namespace-remapping") == 0 && i + 1 < argc)
+        {
+            namespace_remapping = argv[i + 1];
+            std::cout << "Remapping all entities to namespace " << namespace_remapping << std::endl;
+        }
+    }
+
     if (result)
     {
         /**
@@ -293,8 +304,7 @@ void Agent::run()
 
 std::shared_ptr<graph_manager::GraphManager> Agent::find_or_create_graph_manager(eprosima::fastdds::dds::DomainId_t domain_id)
 {
-
-auto it = graph_manager_map_.find(domain_id);
+    auto it = graph_manager_map_.find(domain_id);
 
     if (it != graph_manager_map_.end()) {
         return it->second;
@@ -302,7 +312,7 @@ auto it = graph_manager_map_.find(domain_id);
         return graph_manager_map_.insert(
             std::make_pair(
                 domain_id,
-                std::make_shared<graph_manager::GraphManager>(domain_id)
+                std::make_shared<graph_manager::GraphManager>(domain_id, namespace_remapping)
             )
         ).first->second;
     }
