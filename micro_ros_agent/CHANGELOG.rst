@@ -2,8 +2,8 @@
 Changelog for package micro-ros_agent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+7.0.0 (2026-09-10)
+------------------
 * Fix 'microxrcedds_agent' name and dependency (`#279 <https://github.com/micro-ROS/micro-ROS-Agent/issues/279>`_)
 * Update maintainers (`#275 <https://github.com/micro-ROS/micro-ROS-Agent/issues/275>`_) (`#278 <https://github.com/micro-ROS/micro-ROS-Agent/issues/278>`_)
 * Update CMakeLists.txt (`#247 <https://github.com/micro-ROS/micro-ROS-Agent/issues/247>`_) (`#264 <https://github.com/micro-ROS/micro-ROS-Agent/issues/264>`_)
