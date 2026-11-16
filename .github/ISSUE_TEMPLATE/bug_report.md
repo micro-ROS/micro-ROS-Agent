@@ -22,8 +22,8 @@ Code or shell commands ready to be copy-pasted are welcome.
 A clear and concise description of what you expected to happen.
 
 **System information (please complete the following information):**
- - OS: [e.g. WIndows 10, Ubuntu 16.04, ...]
- - ROS 2 [e.g. Dashing, Foxy, ...]
+ - OS: [e.g. Windows 11, Ubuntu 24.04, ...]
+ - ROS 2 [e.g. Lyrical, Jazzy, ...]
  - Version [e.g. commit hash, tag, ...]
 
 **Additional context**
