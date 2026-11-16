@@ -38,7 +38,7 @@ find_package(fastdds REQUIRED)
 find_package(rmw_dds_common REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rcutils REQUIRED)
-find_package(rmw_fastrtps_shared_cpp REQUIRED)
+find_package(rcpputils REQUIRED)
 
 find_package(ament_lint_auto REQUIRED)
 
@@ -65,9 +65,9 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   ${micro_ros_msgs_TARGETS}
   ${rmw_dds_common_TARGETS}
+  rcpputils::rcpputils
   rmw::rmw
   rmw_dds_common::rmw_dds_common_library
-  rmw_fastrtps_shared_cpp::rmw_fastrtps_shared_cpp
   rosidl_runtime_cpp::rosidl_runtime_cpp
   rosidl_typesupport_cpp::rosidl_typesupport_cpp
   rosidl_typesupport_fastrtps_cpp::rosidl_typesupport_fastrtps_cpp

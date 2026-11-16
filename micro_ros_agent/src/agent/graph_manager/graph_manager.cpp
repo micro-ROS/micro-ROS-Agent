@@ -20,6 +20,7 @@
 #include <fastdds/rtps/participant/ParticipantDiscoveryInfo.hpp>
 #include <fastdds/rtps/reader/ReaderDiscoveryStatus.hpp>
 
+#include <cstring>
 #include <memory>
 #include <string>
 #include <utility>
@@ -28,6 +29,23 @@
 namespace uros {
 namespace agent {
 namespace graph_manager {
+
+// Builds a GID the way rmw_fastrtps_cpp does, the 16-byte GUID copied as is
+// Defined here since rmw_fastrtps_shared_cpp, which provided it, was removed upstream
+// (ros2/rmw_fastrtps#923)
+rmw_gid_t create_rmw_gid(
+        const char* identifier,
+        const eprosima::fastdds::rtps::GUID_t& guid)
+{
+    static_assert(
+        sizeof(guid) == sizeof(guid.guidPrefix.value) + sizeof(guid.entityId.value) &&
+        sizeof(guid) <= RMW_GID_STORAGE_SIZE,
+        "Fast DDS GUID_t must be a packed prefix + entity id that fits in rmw_gid_t");
+    rmw_gid_t rmw_gid = {};
+    rmw_gid.implementation_identifier = identifier;
+    std::memcpy(rmw_gid.data, &guid, sizeof(guid));
+    return rmw_gid;
+}
 
 GraphManager::GraphManager(eprosima::fastdds::dds::DomainId_t domain_id)
     : domain_id_(domain_id)
@@ -307,7 +325,7 @@ void GraphManager::add_participant(
         const std::string& enclave)
 {
     const eprosima::fastdds::dds::DomainParticipantQos qos = participant->get_qos();
-    const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", participant->guid());
+    const rmw_gid_t gid = create_rmw_gid("rmw_fastrtps_cpp", participant->guid());
 
     graphCache_.add_participant(gid, enclave);
 
@@ -339,7 +357,7 @@ void GraphManager::remove_participant(
         const eprosima::fastdds::dds::DomainParticipant* participant,
         bool from_microros)
 {
-    const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", participant->guid());
+    const rmw_gid_t gid = create_rmw_gid("rmw_fastrtps_cpp", participant->guid());
     graphCache_.remove_participant(gid);
 
     if (from_microros)
@@ -371,9 +389,9 @@ void GraphManager::add_datawriter(
         const eprosima::fastdds::rtps::GUID_t& participant_guid,
         const eprosima::fastdds::dds::DataWriterQos& writer_qos)
 {
-    const rmw_gid_t datawriter_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
+    const rmw_gid_t datawriter_gid = create_rmw_gid(
         "rmw_fastrtps_cpp", datawriter_guid);
-    const rmw_gid_t participant_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
+    const rmw_gid_t participant_gid = create_rmw_gid(
         "rmw_fastrtps_cpp", participant_guid);
     const rmw_qos_profile_t qos_profile = fastdds_qos_to_rmw_qos(writer_qos);
 
@@ -384,7 +402,7 @@ void GraphManager::add_datawriter(
 void GraphManager::remove_datawriter(
         const eprosima::fastdds::rtps::GUID_t& datawriter_guid)
 {
-    const rmw_gid_t datawriter_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
+    const rmw_gid_t datawriter_gid = create_rmw_gid(
         "rmw_fastrtps_cpp", datawriter_guid);
 
     graphCache_.remove_entity(datawriter_gid, false);
@@ -408,9 +426,9 @@ void GraphManager::add_datareader(
         const eprosima::fastdds::rtps::GUID_t& participant_guid,
         const eprosima::fastdds::dds::DataReaderQos& reader_qos)
 {
-    const rmw_gid_t datareader_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
+    const rmw_gid_t datareader_gid = create_rmw_gid(
         "rmw_fastrtps_cpp", datareader_guid);
-    const rmw_gid_t participant_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
+    const rmw_gid_t participant_gid = create_rmw_gid(
         "rmw_fastrtps_cpp", participant_guid);
     const rmw_qos_profile_t qos_profile = fastdds_qos_to_rmw_qos(reader_qos);
 
@@ -426,7 +444,7 @@ void GraphManager::add_datareader(
 void GraphManager::remove_datareader(
         const eprosima::fastdds::rtps::GUID_t& datareader_guid)
 {
-    const rmw_gid_t datareader_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
+    const rmw_gid_t datareader_gid = create_rmw_gid(
         "rmw_fastrtps_cpp", datareader_guid);
 
     graphCache_.remove_entity(datareader_gid, true);
@@ -437,9 +455,9 @@ void GraphManager::associate_entity(
         const eprosima::fastdds::dds::DomainParticipant* participant,
         const dds::xrce::ObjectKind& entity_kind)
 {
-    const rmw_gid_t entity_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
+    const rmw_gid_t entity_gid = create_rmw_gid(
         "rmw_fastrtps_cpp", entity_guid);
-    const rmw_gid_t participant_gid = rmw_fastrtps_shared_cpp::create_rmw_gid(
+    const rmw_gid_t participant_gid = create_rmw_gid(
         "rmw_fastrtps_cpp", participant->guid());
 
     eprosima::fastdds::dds::DomainParticipantQos qos = participant->get_qos();
@@ -629,14 +647,14 @@ void GraphManager::ParticipantListener::on_participant_discovery(
             const std::string enclave =
                 std::string(name_found->second.begin(), name_found->second.end());
 
-            const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", info.guid);
+            const rmw_gid_t gid = create_rmw_gid("rmw_fastrtps_cpp", info.guid);
             graphManager_from_->get_graph_cache().add_participant(gid, enclave);
             break;
         }
         case eprosima::fastdds::rtps::ParticipantDiscoveryStatus::REMOVED_PARTICIPANT:
         case eprosima::fastdds::rtps::ParticipantDiscoveryStatus::DROPPED_PARTICIPANT:
         {
-            const rmw_gid_t gid = rmw_fastrtps_shared_cpp::create_rmw_gid("rmw_fastrtps_cpp", info.guid);
+            const rmw_gid_t gid = create_rmw_gid("rmw_fastrtps_cpp", info.guid);
             graphManager_from_->get_graph_cache().remove_participant(gid);
             break;
         }
