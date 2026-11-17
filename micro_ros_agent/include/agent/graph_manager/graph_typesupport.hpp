@@ -29,8 +29,6 @@
 #include "rmw/types.h"
 #include "rmw/impl/cpp/key_value.hpp"
 #include "rmw_dds_common/graph_cache.hpp"
-#include "rmw_fastrtps_shared_cpp/create_rmw_gid.hpp"
-#include "rmw_fastrtps_shared_cpp/qos.hpp"
 
 #include "rcutils/types.h"
 

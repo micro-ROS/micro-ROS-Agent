@@ -23,13 +23,43 @@
 #include <rcutils/logging_macros.h>
 #include <rcutils/types.h>
 
-#include <rmw_fastrtps_shared_cpp/namespace_prefix.hpp>
-
 #include <agent/utils/demangle.hpp>
 
 namespace uros {
 namespace agent {
 namespace utils {
+
+// ROS 2 name prefixes on DDS topics. Defined here since rmw_fastrtps_shared_cpp,
+// which provided them, was removed upstream (ros2/rmw_fastrtps#923)
+const char* const ros_topic_prefix = "rt";
+const char* const ros_service_requester_prefix = "rq";
+const char* const ros_service_response_prefix = "rr";
+
+// Returns name without "<prefix>", or "" if name does not start with "<prefix>/".
+// Defined here for the same reason as the prefixes above
+std::string _resolve_prefix(
+        const std::string& name,
+        const std::string& prefix)
+{
+    return (name.rfind(prefix + "/", 0) == 0) ? name.substr(prefix.length()) : "";
+}
+
+// Returns topic_name without its ROS 2 prefix, if it has one.
+// Defined here for the same reason as the prefixes above
+std::string _strip_ros_prefix_if_exists(
+        const std::string& topic_name)
+{
+    for (const char* prefix :
+            {ros_topic_prefix, ros_service_requester_prefix, ros_service_response_prefix})
+    {
+        const std::string stripped = _resolve_prefix(topic_name, prefix);
+        if (!stripped.empty())
+        {
+            return stripped;
+        }
+    }
+    return topic_name;
+}
 
 std::string Demangle::demangle_if_ros_topic(
         const std::string& topic_name)

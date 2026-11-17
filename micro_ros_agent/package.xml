@@ -17,7 +17,7 @@
 
   <depend>rmw</depend>
   <depend>rcutils</depend>
-  <depend>rmw_fastrtps_shared_cpp</depend>
+  <depend>rcpputils</depend>
   <depend>rmw_dds_common</depend>
   <depend>micro_ros_msgs</depend>
   <depend>microxrcedds_agent</depend>
